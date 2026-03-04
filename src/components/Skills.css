@@ -1,6 +1,6 @@
 .skills {
   padding: 6rem 1.5rem;
-  background: #fff;
+  background: var(--color-bg-primary);
 }
 
 .skills-grid {
@@ -10,8 +10,8 @@
 }
 
 .skill-category {
-  background: #fafafa;
-  border: 1px solid #e5e7eb;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1.75rem;
 }
@@ -21,7 +21,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
   margin: 0 0 1.25rem;
 }
 
@@ -32,9 +32,9 @@
 }
 
 .skill-item {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  color: #4a4a68;
+  background: var(--color-skill-item-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   padding: 0.45rem 1rem;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -43,9 +43,9 @@
 }
 
 .skill-item:hover {
-  background: #1a1a2e;
-  color: #fff;
-  border-color: #1a1a2e;
+  background: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-text);
+  border-color: var(--color-btn-primary-bg);
   transform: translateY(-2px);
 }
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ThemeToggle from './ThemeToggle';
 import './Navbar.css';
 
 function Navbar() {
@@ -20,15 +21,18 @@ function Navbar() {
         <a href="#hero" className="navbar-logo">
           Michael Piccirilli
         </a>
-        <button
-          className={`navbar-toggle ${menuOpen ? 'active' : ''}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+        <div className="navbar-right">
+          <button
+            className={`navbar-toggle ${menuOpen ? 'active' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <ThemeToggle />
+        </div>
         <ul className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
           {navLinks.map((link) => (
             <li key={link.href}>

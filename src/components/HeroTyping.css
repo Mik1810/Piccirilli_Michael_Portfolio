@@ -1,0 +1,169 @@
+.hero-typing {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 1.5rem 4rem;
+  background: linear-gradient(135deg, #1e3a5f 0%, #4a90d9 50%, #87ceeb 100%);
+}
+
+[data-theme="dark"] .hero-typing {
+  background: linear-gradient(135deg, #0a1628 0%, #0f2a4a 50%, #1a4a7a 100%);
+}
+
+.hero-typing-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  width: 100%;
+}
+
+.hero-typing-text {
+  flex: 1;
+}
+
+.hero-typing-greeting {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.hero-typing-name {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+}
+
+.hero-typing-role {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #bde0fe;
+  margin: 0.75rem 0 0.75rem;
+  min-height: 2.2rem;
+}
+
+.hero-university-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: background 0.2s;
+}
+
+.hero-university-badge:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hero-university-badge svg {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.hero-university-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.typed-text {
+  border-right: none;
+}
+
+.cursor {
+  display: inline-block;
+  color: #bde0fe;
+  animation: blink 0.8s infinite;
+  font-weight: 300;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.hero-typing-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.hero-typing-actions .btn-primary {
+  background: #ffffff;
+  color: #1e3a5f;
+}
+
+.hero-typing-actions .btn-primary:hover {
+  background: #f0f0f0;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.hero-typing-actions .btn-outline {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.hero-typing-actions .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.hero-typing-socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.hero-typing-socials a {
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.hero-typing-socials a:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.hero-typing-image {
+  flex-shrink: 0;
+}
+
+.hero-typing-image img {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+  .hero-typing-container {
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 2.5rem;
+  }
+  .hero-typing-name { font-size: 2.5rem; }
+  .hero-typing-role { font-size: 1.2rem; }
+  .hero-typing-actions { justify-content: center; }
+  .hero-typing-socials { justify-content: center; }
+  .hero-typing-image img { width: 220px; height: 220px; }
+}
