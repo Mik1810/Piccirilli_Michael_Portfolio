@@ -3,6 +3,70 @@
   background: var(--color-bg-primary);
 }
 
+/* ===== Tech Stack visuale ===== */
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+.tech-category {
+  flex: 1;
+  min-width: 200px;
+}
+
+.tech-category-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--color-text-muted);
+  margin: 0 0 1rem;
+}
+
+.tech-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.tech-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 72px;
+  padding: 0.75rem 0.5rem;
+  border-radius: 12px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  cursor: default;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.tech-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--tech-color, var(--color-accent));
+}
+
+.tech-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.tech-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ===== Categorie skills (pill badges) ===== */
+
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));

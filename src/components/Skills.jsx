@@ -1,23 +1,8 @@
+import skillCategories from '../data/skills.json';
+import techStack from '../data/techstack.json';
 import './Skills.css';
 
-const skillCategories = [
-  {
-    category: 'Programmazione',
-    skills: ['Programmazione Web', 'Linguaggi di Programmazione', 'Progettazione Software', 'Problem Solving'],
-  },
-  {
-    category: 'Competenze Tecniche',
-    skills: ['Intelligenza Artificiale', 'Cybersecurity', 'Strumenti e Tecnologie Moderne', 'Documentazione Tecnica'],
-  },
-  {
-    category: 'Soft Skills',
-    skills: ['Lavoro in Team', 'Apprendimento Autonomo', 'Metodo Scientifico', 'Comunicazione dei Risultati'],
-  },
-  {
-    category: 'Lingue',
-    skills: ['Italiano (madrelingua)', 'Inglese (B2)'],
-  },
-];
+const DEVICON_BASE = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons';
 
 function Skills() {
   return (
@@ -27,6 +12,30 @@ function Skills() {
         <p className="section-subtitle reveal reveal-delay-1">
           Le tecnologie e gli strumenti con cui lavoro
         </p>
+
+        {/* Tech Stack visuale */}
+        <div className="tech-stack reveal reveal-delay-2">
+          {techStack.map((cat) => (
+            <div key={cat.category} className="tech-category">
+              <h3 className="tech-category-title">{cat.category}</h3>
+              <div className="tech-items">
+                {cat.items.map((item) => (
+                  <div key={item.name} className="tech-item" style={{ '--tech-color': item.color }}>
+                    <img
+                      src={`${DEVICON_BASE}/${item.devicon}.svg`}
+                      alt={item.name}
+                      className="tech-icon"
+                      loading="lazy"
+                    />
+                    <span className="tech-name">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Categorie skills */}
         <div className="skills-grid">
           {skillCategories.map((cat, index) => (
             <div key={cat.category} className={`skill-category reveal reveal-delay-${Math.min(index + 1, 4)}`}>

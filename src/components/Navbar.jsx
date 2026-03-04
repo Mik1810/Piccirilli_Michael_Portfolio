@@ -1,17 +1,11 @@
 import { useState } from 'react';
+import personal from '../data/personal.json';
 import ThemeToggle from './ThemeToggle';
 import './Navbar.css';
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const navLinks = [
-    { href: '#hero', label: 'Home' },
-    { href: '#projects', label: 'Progetti' },
-    { href: '#experience', label: 'Esperienze' },
-    { href: '#skills', label: 'Competenze' },
-    { href: '#contact', label: 'Contatti' },
-  ];
+  const { name, navLinks, cv } = personal;
 
   const handleClick = () => setMenuOpen(false);
 
@@ -19,7 +13,7 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <a href="#hero" className="navbar-logo">
-          Michael Piccirilli
+          {name}
         </a>
         <div className="navbar-right">
           <button
@@ -43,7 +37,7 @@ function Navbar() {
           ))}
           <li>
             <a
-              href="/docs/Curriculum_Vitae_10_2025.pdf"
+              href={cv}
               target="_blank"
               rel="noopener noreferrer"
               className="navbar-cv-btn"

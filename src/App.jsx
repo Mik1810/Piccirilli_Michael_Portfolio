@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import HeroTyping from './components/HeroTyping';
+import About from './components/About';
 import Projects from './components/Projects';
 import Experience from './components/Experience';
 import Skills from './components/Skills';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
+import ScrollProgress from './components/ScrollProgress';
 
 function App() {
   // Scroll-reveal with IntersectionObserver
@@ -34,15 +37,18 @@ function App() {
 
   return (
     <>
+      <ScrollProgress />
       <Navbar />
       <main>
         <HeroTyping />
+        <About />
         <Projects />
         <Experience />
         <Skills />
         <Contact />
       </main>
       <Footer />
+      <ScrollToTop />
     </>
   );
 }

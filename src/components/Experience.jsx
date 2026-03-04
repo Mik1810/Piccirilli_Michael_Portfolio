@@ -1,52 +1,6 @@
+import experiences from '../data/experiences.json';
+import education from '../data/education.json';
 import './Experience.css';
-
-
-/* ── Data ────────────────────────────────────────────────── */
-
-const experiences = [
-  {
-    role: 'CyberChallenge 2024',
-    company: 'Cybersecurity National Lab',
-    period: 'Giugno 2024',
-    description:
-      'Partecipante alla CyberChallenge 2024, raggiungendo la fase nazionale a Torino con acquisizione di competenze pratiche in cybersecurity.',
-    logo: '/imgs/cyberchallenge.png',
-  },
-  {
-    role: 'iCities — CINI Challenge',
-    company: 'iCities Conference, Gaeta',
-    period: 'Gen 2024 – Ott 2024',
-    description:
-      'Sviluppo del "Flood Monitoring and Management System" per il monitoraggio e prevenzione di disastri ambientali. Vincitore del premio SellaLab offerto da Banca Sella.',
-    logo: '/imgs/icities.png',
-  },
-  {
-    role: 'Street Science 2025',
-    company: 'Università dell\'Aquila',
-    period: 'Settembre 2025',
-    description:
-      'Organizzazione e gestione dello stand pop-up di informatica e delle Olimpiadi di Informatica per le scuole superiori.',
-    logo: '/imgs/Street_Science.png',
-    logoBg: '#fff',
-  },
-];
-
-const education = [
-  {
-    degree: 'Laurea Magistrale in Informatica — Curriculum AICONDA',
-    institution: 'Università degli Studi dell\'Aquila',
-    period: 'Ott 2024 – In corso',
-    description: 'Curriculum in AI, Computing and Data Analytics.',
-    logo: '/imgs/univaq.gif',
-  },
-  {
-    degree: 'Laurea Triennale in Informatica — 110/110',
-    institution: 'Università degli Studi dell\'Aquila',
-    period: 'Ott 2021 – Ott 2024',
-    description: 'Tesi: "Studio della complessità computazionale di Nine Men\'s Morris". Competenze in analisi, progettazione software, linguaggi di programmazione e lavoro in team.',
-    logo: '/imgs/univaq.gif',
-  },
-];
 
 function Experience() {
   return (
