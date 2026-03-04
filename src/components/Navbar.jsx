@@ -18,7 +18,7 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <a href="#hero" className="navbar-logo">
-          Michael
+          Michael Piccirilli
         </a>
         <button
           className={`navbar-toggle ${menuOpen ? 'active' : ''}`}

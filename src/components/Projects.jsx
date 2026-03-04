@@ -2,28 +2,28 @@ import './Projects.css';
 
 const projects = [
   {
-    title: 'Progetto 1',
+    title: 'Flood Monitoring and Management System',
     description:
-      'Descrizione breve del progetto. Tecnologie utilizzate e obiettivo principale.',
-    tags: ['React', 'Node.js', 'MongoDB'],
+      'Sistema per il monitoraggio e la prevenzione dei disastri ambientali, sviluppato durante la CINI Challenge a iCities. Vincitore del premio SellaLab offerto da Banca Sella.',
+    tags: ['CINI Challenge', 'Disaster Prevention', 'Team Project'],
+    github: 'https://github.com/Mik1810',
+    live: 'https://icities25.unicas.it/',
+  },
+  {
+    title: "Nine Men's Morris — Complessità Computazionale",
+    description:
+      "Tesi di laurea triennale sullo studio della complessità computazionale del gioco del Mulino (Nine Men's Morris).",
+    tags: ['Tesi', 'Complessità', 'Algoritmi'],
     github: 'https://github.com/Mik1810',
     live: '#',
   },
   {
-    title: 'Progetto 2',
+    title: 'CyberChallenge 2024',
     description:
-      'Descrizione breve del progetto. Tecnologie utilizzate e obiettivo principale.',
-    tags: ['Python', 'Flask', 'PostgreSQL'],
+      'Partecipazione alla competizione nazionale di cybersecurity, raggiungendo la fase finale a Torino.',
+    tags: ['Cybersecurity', 'CTF', 'Networking'],
     github: 'https://github.com/Mik1810',
-    live: '#',
-  },
-  {
-    title: 'Progetto 3',
-    description:
-      'Descrizione breve del progetto. Tecnologie utilizzate e obiettivo principale.',
-    tags: ['Java', 'Spring Boot', 'REST API'],
-    github: 'https://github.com/Mik1810',
-    live: '#',
+    live: 'https://cyberchallenge.it/',
   },
 ];
 

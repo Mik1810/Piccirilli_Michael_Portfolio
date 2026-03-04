@@ -15,7 +15,7 @@ function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const { name, email, message } = formData;
-    const mailtoLink = `mailto:your.email@example.com?subject=Contatto da ${encodeURIComponent(name)}&body=${encodeURIComponent(`Da: ${name}\nEmail: ${email}\n\n${message}`)}`;
+    const mailtoLink = `mailto:michaelpiccirilli3@gmail.com?subject=Contatto da ${encodeURIComponent(name)}&body=${encodeURIComponent(`Da: ${name}\nEmail: ${email}\n\n${message}`)}`;  
     window.location.href = mailtoLink;
   };
 
@@ -33,20 +33,20 @@ function Contact() {
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                 <polyline points="22,6 12,13 2,6"/>
               </svg>
-              <a href="mailto:your.email@example.com">your.email@example.com</a>
+              <a href="mailto:michaelpiccirilli3@gmail.com">michaelpiccirilli3@gmail.com</a>
             </div>
             <div className="contact-item">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
-              <span>Italia</span>
+              <span>L'Aquila, Italia</span>
             </div>
             <div className="contact-socials">
               <a href="https://github.com/Mik1810" target="_blank" rel="noopener noreferrer">
                 GitHub
               </a>
-              <a href="https://linkedin.com/in/" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.linkedin.com/in/michael-piccirilli/" target="_blank" rel="noopener noreferrer">
                 LinkedIn
               </a>
             </div>

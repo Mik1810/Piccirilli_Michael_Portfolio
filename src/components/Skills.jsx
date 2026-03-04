@@ -2,20 +2,20 @@ import './Skills.css';
 
 const skillCategories = [
   {
-    category: 'Linguaggi',
-    skills: ['JavaScript', 'TypeScript', 'Python', 'Java', 'C/C++', 'SQL'],
+    category: 'Programmazione',
+    skills: ['Programmazione Web', 'Linguaggi di Programmazione', 'Progettazione Software', 'Problem Solving'],
   },
   {
-    category: 'Frontend',
-    skills: ['React', 'HTML5', 'CSS3', 'Vite'],
+    category: 'Competenze Tecniche',
+    skills: ['Intelligenza Artificiale', 'Cybersecurity', 'Strumenti e Tecnologie Moderne', 'Documentazione Tecnica'],
   },
   {
-    category: 'Backend',
-    skills: ['Node.js', 'Express', 'Spring Boot', 'REST API'],
+    category: 'Soft Skills',
+    skills: ['Lavoro in Team', 'Apprendimento Autonomo', 'Metodo Scientifico', 'Comunicazione dei Risultati'],
   },
   {
-    category: 'Strumenti',
-    skills: ['Git', 'Docker', 'Linux', 'VS Code'],
+    category: 'Lingue',
+    skills: ['Italiano (madrelingua)', 'Inglese (B2)'],
   },
 ];
 

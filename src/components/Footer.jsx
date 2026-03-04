@@ -6,12 +6,12 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-container">
-        <p>&copy; {year} Michael. Tutti i diritti riservati.</p>
+        <p>&copy; {year} Michael Piccirilli. Tutti i diritti riservati.</p>
         <div className="footer-links">
           <a href="https://github.com/Mik1810" target="_blank" rel="noopener noreferrer">
             GitHub
           </a>
-          <a href="https://linkedin.com/in/" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.linkedin.com/in/michael-piccirilli/" target="_blank" rel="noopener noreferrer">
             LinkedIn
           </a>
         </div>

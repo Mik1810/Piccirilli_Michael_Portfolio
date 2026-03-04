@@ -6,12 +6,12 @@ function Hero() {
       <div className="hero-container">
         <div className="hero-text">
           <p className="hero-greeting">Ciao, mi chiamo</p>
-          <h1 className="hero-name">Michael</h1>
-          <h2 className="hero-title">Software Developer</h2>
+          <h1 className="hero-name">Michael Piccirilli</h1>
+          <h2 className="hero-title">Studente Magistrale in Informatica</h2>
           <p className="hero-description">
-            Sono un appassionato sviluppatore software con focus su tecnologie web
-            moderne. Mi piace creare soluzioni eleganti a problemi complessi e
-            contribuire a progetti open source.
+            Laureato triennale in Informatica con 110/110 all'Università dell'Aquila,
+            attualmente iscritto alla Magistrale in Informatica — curriculum AICONDA.
+            Appassionato di programmazione web, Intelligenza Artificiale e cybersecurity.
           </p>
           <div className="hero-actions">
             <a href="#projects" className="btn btn-primary">
@@ -33,7 +33,7 @@ function Hero() {
               </svg>
             </a>
             <a
-              href="https://linkedin.com/in/"
+              href="https://www.linkedin.com/in/michael-piccirilli/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
