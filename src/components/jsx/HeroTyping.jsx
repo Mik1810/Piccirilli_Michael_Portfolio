@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react';
-import personal from '../data/personal.json';
-import icons from '../data/icons';
-import './HeroTyping.css';
-
-const { name: nameText, roles, greeting, photo, university, socials } = personal;
+import personal from '../../data/personal.json';
+import { useLanguage } from '../../context/LanguageContext';
+import icons from '../../data/icons';
+import '../css/HeroTyping.css';
 
 function HeroTyping() {
+  const { t, lang } = useLanguage();
+  const { name: nameText, photo, university, socials } = personal;
+  const roles = t('hero.roles');
+  const greeting = t('hero.greeting');
+  const uniName = t('hero.university');
+
   // Phase 1: type the name
   const [nameCharIndex, setNameCharIndex] = useState(0);
   const [nameFinished, setNameFinished] = useState(false);
@@ -14,6 +19,12 @@ function HeroTyping() {
   const [roleIndex, setRoleIndex] = useState(0);
   const [roleCharIndex, setRoleCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Reset typing on language change
+  useEffect(() => {
+    setRoleCharIndex(0);
+    setIsDeleting(false);
+  }, [lang]);
 
   // Type the name first
   useEffect(() => {
@@ -31,6 +42,7 @@ function HeroTyping() {
   useEffect(() => {
     if (!nameFinished) return;
     const currentRole = roles[roleIndex];
+    if (!currentRole) return;
     let timeout;
 
     if (!isDeleting && roleCharIndex < currentRole.length) {
@@ -45,10 +57,10 @@ function HeroTyping() {
     }
 
     return () => clearTimeout(timeout);
-  }, [roleCharIndex, isDeleting, roleIndex, nameFinished]);
+  }, [roleCharIndex, isDeleting, roleIndex, nameFinished, roles]);
 
   const displayName = nameText.substring(0, nameCharIndex);
-  const displayRole = nameFinished ? roles[roleIndex].substring(0, roleCharIndex) : '';
+  const displayRole = nameFinished && roles[roleIndex] ? roles[roleIndex].substring(0, roleCharIndex) : '';
 
   return (
     <section id="hero" className="hero-typing">
@@ -69,13 +81,13 @@ function HeroTyping() {
           </h2>
           {nameFinished && (
             <div className="hero-university-badge">
-              <img src={university.logo} alt={university.name} className="hero-university-logo" />
-              <span>{university.name}</span>
+              <img src={university.logo} alt={uniName} className="hero-university-logo" />
+              <span>{uniName}</span>
             </div>
           )}
           <div className="hero-typing-actions">
-            <a href="#projects" className="btn btn-primary">I miei progetti</a>
-            <a href="#contact" className="btn btn-outline">Contattami</a>
+            <a href="#projects" className="btn btn-primary">{t('hero.btnProjects')}</a>
+            <a href="#contact" className="btn btn-outline">{t('hero.btnContact')}</a>
           </div>
           <div className="hero-typing-socials">
             {socials.map((s) => (

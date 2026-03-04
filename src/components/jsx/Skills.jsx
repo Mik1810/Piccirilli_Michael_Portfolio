@@ -1,23 +1,27 @@
-import skillCategories from '../data/skills.json';
-import techStack from '../data/techstack.json';
-import './Skills.css';
+import techStack from '../../data/techstack.json';
+import { useLanguage } from '../../context/LanguageContext';
+import '../css/Skills.css';
 
 const DEVICON_BASE = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons';
 
 function Skills() {
+  const { t } = useLanguage();
+  const techCategoryNames = t('skills.techCategories');
+  const skillCategories = t('skills.categories');
+
   return (
     <section id="skills" className="skills">
       <div className="section-container">
-        <h2 className="section-title reveal">Competenze</h2>
+        <h2 className="section-title reveal">{t('skills.title')}</h2>
         <p className="section-subtitle reveal reveal-delay-1">
-          Le tecnologie e gli strumenti con cui lavoro
+          {t('skills.subtitle')}
         </p>
 
         {/* Tech Stack visuale */}
         <div className="tech-stack reveal reveal-delay-2">
-          {techStack.map((cat) => (
+          {techStack.map((cat, catIndex) => (
             <div key={cat.category} className="tech-category">
-              <h3 className="tech-category-title">{cat.category}</h3>
+              <h3 className="tech-category-title">{techCategoryNames[catIndex] || cat.category}</h3>
               <div className="tech-items">
                 {cat.items.map((item) => (
                   <div key={item.name} className="tech-item" style={{ '--tech-color': item.color }}>
@@ -38,7 +42,7 @@ function Skills() {
         {/* Categorie skills */}
         <div className="skills-grid">
           {skillCategories.map((cat, index) => (
-            <div key={cat.category} className={`skill-category reveal reveal-delay-${Math.min(index + 1, 4)}`}>
+            <div key={index} className={`skill-category reveal reveal-delay-${Math.min(index + 1, 4)}`}>
               <h3 className="skill-category-title">{cat.category}</h3>
               <div className="skill-list">
                 {cat.skills.map((skill) => (

@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
-import Navbar from './components/Navbar';
-import HeroTyping from './components/HeroTyping';
-import About from './components/About';
-import Projects from './components/Projects';
-import Experience from './components/Experience';
-import Skills from './components/Skills';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
-import ScrollToTop from './components/ScrollToTop';
-import ScrollProgress from './components/ScrollProgress';
+import Navbar from './components/jsx/Navbar';
+import HeroTyping from './components/jsx/HeroTyping';
+import About from './components/jsx/About';
+import Projects from './components/jsx/Projects';
+import Experience from './components/jsx/Experience';
+import Skills from './components/jsx/Skills';
+import Contact from './components/jsx/Contact';
+import Footer from './components/jsx/Footer';
+import ScrollToTop from './components/jsx/ScrollToTop';
+import ScrollProgress from './components/jsx/ScrollProgress';
 
 function App() {
   // Scroll-reveal with IntersectionObserver

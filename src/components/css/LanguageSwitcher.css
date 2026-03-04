@@ -1,0 +1,33 @@
+/* LanguageSwitcher usa la classe condivisa .navbar-icon-btn definita in Navbar.css */
+
+.lang-switcher.navbar-icon-btn {
+  gap: 4px;
+  padding: 0.3rem 0.45rem;
+}
+
+.lang-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lang-option.lang-active {
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
+}
+
+.lang-flag {
+  width: 16px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.lang-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}

@@ -1,0 +1,21 @@
+/* ThemeToggle — stile a due opzioni come il LanguageSwitcher */
+
+.theme-toggle.navbar-icon-btn {
+  gap: 4px;
+  padding: 0.3rem 0.45rem;
+}
+
+.theme-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 4px;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+  color: var(--color-text-muted);
+}
+
+.theme-option.theme-active {
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
+}

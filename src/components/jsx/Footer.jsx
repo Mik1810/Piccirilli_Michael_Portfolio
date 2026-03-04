@@ -1,15 +1,17 @@
-import personal from '../data/personal.json';
-import icons from '../data/icons';
-import './Footer.css';
+import personal from '../../data/personal.json';
+import { useLanguage } from '../../context/LanguageContext';
+import icons from '../../data/icons';
+import '../css/Footer.css';
 
 function Footer() {
   const year = new Date().getFullYear();
   const { name, socials } = personal;
+  const { t } = useLanguage();
 
   return (
     <footer className="footer">
       <div className="footer-container">
-        <p>&copy; {year} {name}. Tutti i diritti riservati.</p>
+        <p>&copy; {year} {name}. {t('footer.rights')}</p>
         <div className="footer-socials">
           {socials.map((s) => (
             <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.name} className="footer-social-link">

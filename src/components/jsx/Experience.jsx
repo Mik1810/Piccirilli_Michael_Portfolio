@@ -1,16 +1,31 @@
-import experiences from '../data/experiences.json';
-import education from '../data/education.json';
-import './Experience.css';
+import experiencesData from '../../data/experiences.json';
+import educationData from '../../data/education.json';
+import { useLanguage } from '../../context/LanguageContext';
+import '../css/Experience.css';
 
 function Experience() {
+  const { t } = useLanguage();
+  const translatedExp = t('experience.experiences');
+  const translatedEdu = t('experience.education');
+
+  // Merge translated text with static data (logos)
+  const experiences = experiencesData.map((exp, i) => ({
+    ...exp,
+    ...(translatedExp[i] || {}),
+  }));
+  const education = educationData.map((edu, i) => ({
+    ...edu,
+    ...(translatedEdu[i] || {}),
+  }));
+
   return (
     <section id="experience" className="experience">
       <div className="section-container">
-        <h2 className="section-title reveal">Esperienze</h2>
-        <p className="section-subtitle reveal reveal-delay-1">Il mio percorso accademico e le attività svolte</p>
+        <h2 className="section-title reveal">{t('experience.title')}</h2>
+        <p className="section-subtitle reveal reveal-delay-1">{t('experience.subtitle')}</p>
 
         <div className="timeline">
-          <h3 className="timeline-heading reveal">Attività e Conferenze</h3>
+          <h3 className="timeline-heading reveal">{t('experience.activitiesHeading')}</h3>
           {experiences.map((exp, index) => (
             <div key={index} className={`timeline-item reveal reveal-delay-${Math.min(index + 1, 4)}`}>
               <div className="timeline-dot"></div>
@@ -33,7 +48,7 @@ function Experience() {
           ))}
 
           <h3 className="timeline-heading reveal" style={{ marginTop: '3rem' }}>
-            Formazione
+            {t('experience.educationHeading')}
           </h3>
           {education.map((edu, index) => (
             <div key={index} className={`timeline-item reveal reveal-delay-${Math.min(index + 1, 4)}`}>
