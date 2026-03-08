@@ -25,6 +25,11 @@ export default async function handler(req, res) {
       { data: skillCategoryI18nRows, error: skillCategoryI18nError },
       { data: skillItemBaseRows, error: skillItemBaseError },
       { data: skillItemI18nRows, error: skillItemI18nError },
+      {
+        data: skillCategoryI18nFallbackRows,
+        error: skillCategoryI18nFallbackError,
+      },
+      { data: skillItemI18nFallbackRows, error: skillItemI18nFallbackError },
     ] = await Promise.all([
       supabaseAdmin
         .from('tech_categories')
@@ -50,6 +55,14 @@ export default async function handler(req, res) {
         .from('skill_items_i18n')
         .select('*')
         .eq('locale', lang),
+      supabaseAdmin
+        .from('skill_categories_i18n')
+        .select('*')
+        .eq('locale', lang === 'it' ? 'en' : 'it'),
+      supabaseAdmin
+        .from('skill_items_i18n')
+        .select('*')
+        .eq('locale', lang === 'it' ? 'en' : 'it'),
     ]);
 
     if (
@@ -59,7 +72,9 @@ export default async function handler(req, res) {
       skillCategoryBaseError ||
       skillCategoryI18nError ||
       skillItemBaseError ||
-      skillItemI18nError
+      skillItemI18nError ||
+      skillCategoryI18nFallbackError ||
+      skillItemI18nFallbackError
     ) {
       console.error('Supabase error:', {
         techBaseError,
@@ -69,6 +84,8 @@ export default async function handler(req, res) {
         skillCategoryI18nError,
         skillItemBaseError,
         skillItemI18nError,
+        skillCategoryI18nFallbackError,
+        skillItemI18nFallbackError,
       });
       return res.status(500).json({ error: 'Database error' });
     }
@@ -112,8 +129,20 @@ export default async function handler(req, res) {
         row.category_name ?? row.category ?? row.name,
       ])
     );
+    const skillCategoryFallbackNameById = new Map(
+      (skillCategoryI18nFallbackRows || []).map((row) => [
+        row.skill_category_id ?? row.category_id ?? row.skillCategoryId,
+        row.category_name ?? row.category ?? row.name,
+      ])
+    );
     const skillItemLabelById = new Map(
       (skillItemI18nRows || []).map((row) => [
+        row.skill_item_id ?? row.item_id ?? row.skillItemId,
+        row.label ?? row.name,
+      ])
+    );
+    const skillItemFallbackLabelById = new Map(
+      (skillItemI18nFallbackRows || []).map((row) => [
         row.skill_item_id ?? row.item_id ?? row.skillItemId,
         row.label ?? row.name,
       ])
@@ -125,7 +154,9 @@ export default async function handler(req, res) {
     for (const row of sortedSkillItems) {
       const categoryId =
         row.skill_category_id ?? row.category_id ?? row.skillCategoryId;
-      const label = skillItemLabelById.get(row.id);
+      const label =
+        skillItemLabelById.get(row.id) ||
+        skillItemFallbackLabelById.get(row.id);
       if (!categoryId || !label) continue;
       if (!skillItemsByCategoryId.has(categoryId)) {
         skillItemsByCategoryId.set(categoryId, []);
@@ -133,14 +164,25 @@ export default async function handler(req, res) {
       skillItemsByCategoryId.get(categoryId).push(label);
     }
 
-    const categories = (skillCategoryBaseRows || [])
+    let categories = (skillCategoryBaseRows || [])
       .slice()
       .sort((a, b) => (a.order_index ?? a.id ?? 0) - (b.order_index ?? b.id ?? 0))
       .map((row) => ({
-        category: skillCategoryNameById.get(row.id) || row.name || '',
+        category:
+          skillCategoryNameById.get(row.id) ||
+          skillCategoryFallbackNameById.get(row.id) ||
+          row.name ||
+          '',
         skills: skillItemsByCategoryId.get(row.id) || [],
       }))
       .filter((row) => row.category);
+
+    if (categories.length === 0) {
+      return res.status(500).json({
+        error:
+          'No skill category rows found in DB. Ensure skill_categories, skill_categories_i18n, skill_items, and skill_items_i18n are populated.',
+      });
+    }
 
     const payload = {
       techStack,

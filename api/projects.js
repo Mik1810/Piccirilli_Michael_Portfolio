@@ -21,6 +21,7 @@ export default async function handler(req, res) {
       { data: projectRows, error: projectError },
       { data: i18nRows, error: i18nError },
       { data: tagRows, error: tagError },
+      { data: i18nFallbackRows, error: i18nFallbackError },
     ] = await Promise.all([
       supabaseAdmin
         .from('projects')
@@ -32,15 +33,27 @@ export default async function handler(req, res) {
       supabaseAdmin
         .from('project_tags')
         .select('*'),
+      supabaseAdmin
+        .from('projects_i18n')
+        .select('*')
+        .eq('locale', lang === 'it' ? 'en' : 'it'),
     ]);
 
-    if (projectError || i18nError || tagError) {
-      console.error('Supabase error:', { projectError, i18nError, tagError });
+    if (projectError || i18nError || tagError || i18nFallbackError) {
+      console.error('Supabase error:', {
+        projectError,
+        i18nError,
+        tagError,
+        i18nFallbackError,
+      });
       return res.status(500).json({ error: 'Database error' });
     }
 
     const textByProjectId = new Map(
       (i18nRows || []).map((row) => [row.project_id, row])
+    );
+    const fallbackTextByProjectId = new Map(
+      (i18nFallbackRows || []).map((row) => [row.project_id, row])
     );
     const tagsByProjectId = new Map();
     const sortedTags = (tagRows || [])
@@ -57,20 +70,32 @@ export default async function handler(req, res) {
       .slice()
       .sort((a, b) => (a.order_index ?? a.id ?? 0) - (b.order_index ?? b.id ?? 0));
 
-    const payload = sortedProjects
+    let payload = sortedProjects
       .map((row) => {
         const i18n = textByProjectId.get(row.id);
+        const i18nFallback = fallbackTextByProjectId.get(row.id);
         return {
           id: row.id,
           slug: row.slug ?? `project-${row.id}`,
-          title: i18n?.title ?? row.title ?? '',
-          description: i18n?.description ?? row.description ?? '',
+          title: i18n?.title ?? i18nFallback?.title ?? row.title ?? '',
+          description:
+            i18n?.description ??
+            i18nFallback?.description ??
+            row.description ??
+            '',
           tags: tagsByProjectId.get(row.id) || [],
           live: row.live_url ?? row.live ?? null,
           github: row.github_url ?? row.github ?? null,
         };
       })
       .filter((row) => row.title);
+
+    if (payload.length === 0) {
+      return res.status(500).json({
+        error:
+          'No project rows found in DB. Ensure projects, projects_i18n, and project_tags are populated.',
+      });
+    }
 
     cache.set(cacheKey, { at: Date.now(), value: payload });
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
