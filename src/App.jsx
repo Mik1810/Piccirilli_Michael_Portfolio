@@ -9,6 +9,9 @@ import Contact from './components/jsx/Contact';
 import Footer from './components/jsx/Footer';
 import ScrollToTop from './components/jsx/ScrollToTop';
 import ScrollProgress from './components/jsx/ScrollProgress';
+import SupabaseTest from './components/jsx/SupabaseTest';
+import AdminLogin from './components/jsx/AdminLogin';
+import { Routes, Route } from 'react-router-dom';
 
 function App() {
   // Scroll-reveal with IntersectionObserver
@@ -24,13 +27,8 @@ function App() {
       },
       { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     );
-
-    const timer = setTimeout(() => {
-      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    }, 100);
-
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => {
-      clearTimeout(timer);
       observer.disconnect();
     };
   }, []);
@@ -39,14 +37,19 @@ function App() {
     <>
       <ScrollProgress />
       <Navbar />
-      <main>
-        <HeroTyping />
-        <About />
-        <Projects />
-        <Experience />
-        <Skills />
-        <Contact />
-      </main>
+      <Routes>
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/" element={
+          <main>
+            <HeroTyping />
+            <About />
+            <Projects />
+            <Experience />
+            <Skills />
+            <Contact />
+          </main>
+        } />
+      </Routes>
       <Footer />
       <ScrollToTop />
     </>

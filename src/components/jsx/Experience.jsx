@@ -1,4 +1,5 @@
-import experiencesData from '../../data/experiences.json';
+import { useEffect, useRef, useState } from 'react';
+import { supabase } from '../../supabaseClient';
 import educationData from '../../data/education.json';
 import { useLanguage } from '../../context/LanguageContext';
 import '../css/Experience.css';
@@ -8,50 +9,125 @@ function Experience() {
   const translatedExp = t('experience.experiences');
   const translatedEdu = t('experience.education');
 
-  // Merge translated text with static data (logos)
-  const experiences = experiencesData.map((exp, i) => ({
-    ...exp,
-    ...(translatedExp[i] || {}),
-  }));
+  const [experiences, setExperiences] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from('experiences')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        setExperiences([]);
+      } else {
+        const merged = data.map((exp, i) => ({
+          ...exp,
+          ...(translatedExp[i] || {}),
+        }));
+
+        console.log('Supabase experiences:', data);
+        setExperiences(merged);
+      }
+
+      setLoading(false);
+    };
+
+    fetchExperiences();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!sectionRef.current) return;
+
+    const elements = sectionRef.current.querySelectorAll('.reveal');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      {
+        threshold: 0.15,
+      }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [loading, experiences, translatedEdu, t]);
+
   const education = educationData.map((edu, i) => ({
     ...edu,
     ...(translatedEdu[i] || {}),
   }));
 
+  console.log('Experience render:', { loading, experiences });
+
   return (
-    <section id="experience" className="experience">
+    <section id="experience" className="experience" ref={sectionRef}>
       <div className="section-container">
         <h2 className="section-title reveal">{t('experience.title')}</h2>
-        <p className="section-subtitle reveal reveal-delay-1">{t('experience.subtitle')}</p>
+        <p className="section-subtitle reveal reveal-delay-1">
+          {t('experience.subtitle')}
+        </p>
 
         <div className="timeline">
-          <h3 className="timeline-heading reveal">{t('experience.activitiesHeading')}</h3>
-          {experiences.map((exp, index) => (
-            <div key={index} className={`timeline-item reveal reveal-delay-${Math.min(index + 1, 4)}`}>
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <div className="timeline-header">
-                  <div className="timeline-header-left">
-                    <span className={`timeline-icon${exp.logoBg ? ' has-logo-bg' : ''}`} style={exp.logoBg ? {'--logo-bg': exp.logoBg} : undefined}>
-                      {exp.logo ? <img src={exp.logo} alt={exp.role} /> : exp.icon}
-                    </span>
-                    <div>
-                      <h4 className="timeline-role">{exp.role}</h4>
-                      <p className="timeline-company">{exp.company}</p>
+          <h3 className="timeline-heading">{t('experience.activitiesHeading')}</h3>
+
+          {loading ? (
+            <div className="timeline-item">Caricamento esperienze...</div>
+          ) : experiences.length === 0 ? (
+            <div className="timeline-item">Nessuna esperienza trovata.</div>
+          ) : (
+            experiences.map((exp, index) => (
+              <div
+                key={exp.id || index}
+                className={`timeline-item reveal reveal-delay-${Math.min(index + 1, 4)}`}
+              >
+                <div className="timeline-dot"></div>
+                <div className="timeline-content">
+                  <div className="timeline-header">
+                    <div className="timeline-header-left">
+                      <span
+                        className={`timeline-icon${exp.logo_bg ? ' has-logo-bg' : ''}`}
+                        style={exp.logo_bg ? { '--logo-bg': exp.logo_bg } : undefined}
+                      >
+                        {exp.logo ? <img src={exp.logo} alt={exp.role} /> : exp.icon}
+                      </span>
+                      <div>
+                        <h4 className="timeline-role">{exp.role}</h4>
+                        <p className="timeline-company">{exp.company}</p>
+                      </div>
                     </div>
+                    <span className="timeline-period">
+                      {exp.period || `${exp.start_date} - ${exp.end_date}`}
+                    </span>
                   </div>
-                  <span className="timeline-period">{exp.period}</span>
+                  <p className="timeline-description">{exp.description}</p>
                 </div>
-                <p className="timeline-description">{exp.description}</p>
               </div>
-            </div>
-          ))}
+            ))
+          )}
 
           <h3 className="timeline-heading reveal" style={{ marginTop: '3rem' }}>
             {t('experience.educationHeading')}
           </h3>
+
           {education.map((edu, index) => (
-            <div key={index} className={`timeline-item reveal reveal-delay-${Math.min(index + 1, 4)}`}>
+            <div
+              key={index}
+              className={`timeline-item reveal reveal-delay-${Math.min(index + 1, 4)}`}
+            >
               <div className="timeline-dot"></div>
               <div className="timeline-content">
                 <div className="timeline-header">
