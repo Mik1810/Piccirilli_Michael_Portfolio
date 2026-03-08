@@ -3,6 +3,38 @@ import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 const CACHE_TTL_MS = 60 * 1000;
 const cache = new Map();
 
+const firstDefined = (...vals) => vals.find((v) => v !== undefined && v !== null);
+
+const techCategoryFk = (row) =>
+  firstDefined(
+    row.tech_category_id,
+    row.category_id,
+    row.techCategoryId,
+    row.id_category,
+    row.idCategory,
+    row.id
+  );
+
+const skillCategoryFk = (row) =>
+  firstDefined(
+    row.skill_category_id,
+    row.category_id,
+    row.skillCategoryId,
+    row.id_category,
+    row.idCategory,
+    row.id
+  );
+
+const skillItemFk = (row) =>
+  firstDefined(
+    row.skill_item_id,
+    row.item_id,
+    row.skillItemId,
+    row.id_item,
+    row.idItem,
+    row.id
+  );
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -92,7 +124,7 @@ export default async function handler(req, res) {
 
     const techNameById = new Map(
       (techI18nRows || []).map((row) => [
-        row.tech_category_id ?? row.category_id ?? row.techCategoryId,
+        techCategoryFk(row),
         row.name ?? row.category_name ?? row.category,
       ])
     );
@@ -101,8 +133,7 @@ export default async function handler(req, res) {
       .slice()
       .sort((a, b) => (a.order_index ?? a.id ?? 0) - (b.order_index ?? b.id ?? 0));
     for (const row of sortedTechItems) {
-      const categoryId =
-        row.tech_category_id ?? row.category_id ?? row.techCategoryId;
+      const categoryId = techCategoryFk(row);
       if (!categoryId) continue;
       if (!techItemsByCategoryId.has(categoryId)) {
         techItemsByCategoryId.set(categoryId, []);
@@ -125,25 +156,25 @@ export default async function handler(req, res) {
 
     const skillCategoryNameById = new Map(
       (skillCategoryI18nRows || []).map((row) => [
-        row.skill_category_id ?? row.category_id ?? row.skillCategoryId,
+        skillCategoryFk(row),
         row.category_name ?? row.category ?? row.name,
       ])
     );
     const skillCategoryFallbackNameById = new Map(
       (skillCategoryI18nFallbackRows || []).map((row) => [
-        row.skill_category_id ?? row.category_id ?? row.skillCategoryId,
+        skillCategoryFk(row),
         row.category_name ?? row.category ?? row.name,
       ])
     );
     const skillItemLabelById = new Map(
       (skillItemI18nRows || []).map((row) => [
-        row.skill_item_id ?? row.item_id ?? row.skillItemId,
+        skillItemFk(row),
         row.label ?? row.name,
       ])
     );
     const skillItemFallbackLabelById = new Map(
       (skillItemI18nFallbackRows || []).map((row) => [
-        row.skill_item_id ?? row.item_id ?? row.skillItemId,
+        skillItemFk(row),
         row.label ?? row.name,
       ])
     );
@@ -152,8 +183,7 @@ export default async function handler(req, res) {
       .slice()
       .sort((a, b) => (a.order_index ?? a.id ?? 0) - (b.order_index ?? b.id ?? 0));
     for (const row of sortedSkillItems) {
-      const categoryId =
-        row.skill_category_id ?? row.category_id ?? row.skillCategoryId;
+      const categoryId = skillCategoryFk(row);
       const label =
         skillItemLabelById.get(row.id) ||
         skillItemFallbackLabelById.get(row.id);

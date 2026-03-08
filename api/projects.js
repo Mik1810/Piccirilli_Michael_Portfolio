@@ -3,6 +3,18 @@ import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 const CACHE_TTL_MS = 60 * 1000;
 const cache = new Map();
 
+const firstDefined = (...vals) => vals.find((v) => v !== undefined && v !== null);
+
+const projectFk = (row) =>
+  firstDefined(
+    row.project_id,
+    row.projects_id,
+    row.projectId,
+    row.id_project,
+    row.idProject,
+    row.id
+  );
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -50,17 +62,21 @@ export default async function handler(req, res) {
     }
 
     const textByProjectId = new Map(
-      (i18nRows || []).map((row) => [row.project_id, row])
+      (i18nRows || [])
+        .map((row) => [projectFk(row), row])
+        .filter(([id]) => id !== undefined && id !== null)
     );
     const fallbackTextByProjectId = new Map(
-      (i18nFallbackRows || []).map((row) => [row.project_id, row])
+      (i18nFallbackRows || [])
+        .map((row) => [projectFk(row), row])
+        .filter(([id]) => id !== undefined && id !== null)
     );
     const tagsByProjectId = new Map();
     const sortedTags = (tagRows || [])
       .slice()
       .sort((a, b) => (a.order_index ?? a.id ?? 0) - (b.order_index ?? b.id ?? 0));
     for (const row of sortedTags) {
-      const projectId = row.project_id ?? row.projects_id ?? row.projectId;
+      const projectId = projectFk(row);
       if (!projectId) continue;
       if (!tagsByProjectId.has(projectId)) tagsByProjectId.set(projectId, []);
       tagsByProjectId.get(projectId).push(row.tag ?? row.name ?? '');
