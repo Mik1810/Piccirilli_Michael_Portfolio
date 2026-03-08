@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import staticI18n from '../data/staticI18n.json';
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
@@ -11,35 +12,8 @@ export function LanguageProvider({ children }) {
     document.documentElement.setAttribute('lang', lang);
   }, [lang]);
 
-  const [translations, setTranslations] = useState({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadTranslations = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/ui?lang=${lang}`, {
-          signal: controller.signal,
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setTranslations(data || {});
-        } else {
-          setTranslations({});
-        }
-      } catch (error) {
-        if (error.name !== 'AbortError') {
-          setTranslations({});
-        }
-      }
-      setLoading(false);
-    };
-
-    loadTranslations();
-    return () => controller.abort();
-  }, [lang]);
+  const translations = staticI18n[lang] || staticI18n.it || {};
+  const loading = false;
 
   const toggleLang = useCallback(() => {
     setLang((prev) => (prev === 'it' ? 'en' : 'it'));
