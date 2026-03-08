@@ -104,7 +104,10 @@ function Experience() {
             experiences.map((exp, index) => (
               <div
                 key={exp.id || index}
-                className="timeline-item reveal"
+                className={`timeline-item reveal reveal-delay-${Math.min(
+                  index + 1,
+                  4
+                )}`}
               >
                 <div className="timeline-dot"></div>
 
@@ -155,7 +158,10 @@ function Experience() {
           {education.map((edu, index) => (
             <div
               key={index}
-              className="timeline-item reveal"
+              className={`timeline-item reveal reveal-delay-${Math.min(
+                index + 1,
+                4
+              )}`}
             >
               <div className="timeline-dot"></div>
 
