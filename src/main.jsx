@@ -4,6 +4,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { ProfileProvider } from './context/ProfileContext';
 import { ContentProvider } from './context/ContentContext';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import './index.css';
 import App from './App.jsx';
 import { BrowserRouter } from 'react-router-dom';
@@ -14,9 +15,11 @@ createRoot(document.getElementById('root')).render(
       <ProfileProvider>
         <ContentProvider>
           <AuthProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
+            <ThemeProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </ThemeProvider>
           </AuthProvider>
         </ContentProvider>
       </ProfileProvider>

@@ -39,7 +39,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${isAdminRoute ? 'admin-navbar' : ''}`.trim()}>
       <div className="navbar-container">
         <a href={showHomeLinks ? '#hero' : '/'} className="navbar-logo">
           {name}

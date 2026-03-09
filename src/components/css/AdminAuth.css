@@ -12,6 +12,14 @@
   );
 }
 
+.admin-page-login {
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+  padding: 0 1rem;
+  align-items: center;
+  overflow: visible;
+}
+
 .admin-card {
   width: min(100%, 460px);
   background: var(--color-bg-primary);
@@ -107,6 +115,7 @@
 .admin-card-wide {
   width: 100%;
   max-width: none;
+  padding: 0;
   border-radius: 0;
   border-left: none;
   border-right: none;
@@ -167,14 +176,19 @@
 }
 
 .admin-content {
+  position: fixed;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  left: 280px;
   border: none;
   border-radius: 0;
   padding: 1rem 1.2rem 2rem;
   background: var(--color-bg-primary);
   min-width: 0;
-  width: 100%;
-  margin-left: 280px;
-  height: calc(100vh - 64px);
+  width: auto;
+  max-width: none;
+  box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -242,8 +256,12 @@
 }
 
 .admin-table-wrap {
+  display: block;
   width: 100%;
-  overflow-x: hidden;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   margin-bottom: 0.9rem;
@@ -251,8 +269,21 @@
 
 .admin-data-table {
   width: 100%;
+  min-width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+}
+
+.admin-col-index {
+  width: 52px;
+}
+
+.admin-col-key {
+  width: 92px;
+}
+
+.admin-col-action {
+  width: 64px;
 }
 
 .admin-data-table th,
@@ -265,6 +296,7 @@
   font-size: 0.84rem;
   overflow-wrap: anywhere;
   word-break: break-word;
+  max-width: 0;
 }
 
 .admin-data-table th {
@@ -272,6 +304,33 @@
   top: 0;
   background: var(--color-bg-primary);
   z-index: 1;
+}
+
+.admin-action-col {
+  white-space: nowrap;
+  text-align: center !important;
+}
+
+.admin-index-col,
+.admin-index-cell {
+  white-space: nowrap;
+  text-align: center !important;
+}
+
+.admin-key-col,
+.admin-key-cell {
+  white-space: nowrap;
+  text-align: left !important;
+}
+
+.admin-action-cell {
+  white-space: nowrap;
+  text-align: center !important;
+}
+
+.admin-data-col,
+.admin-data-cell {
+  white-space: normal;
 }
 
 .admin-data-table tr {
@@ -288,6 +347,7 @@
   justify-content: center;
   width: 30px;
   height: 30px;
+  margin: 0 auto;
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
@@ -397,8 +457,14 @@
   }
 
   .admin-content {
+    position: static;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
     padding: 0.8rem;
     margin-left: 0;
+    max-width: 100%;
     min-height: auto;
     height: auto;
     overflow: visible;

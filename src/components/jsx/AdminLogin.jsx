@@ -37,7 +37,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <main className="admin-page">
+    <main className="admin-page admin-page-login">
       <section className="admin-card">
         <h3>Admin Login</h3>
         <form className="admin-form" onSubmit={handleLogin}>

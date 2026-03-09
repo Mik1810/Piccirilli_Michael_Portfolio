@@ -3,6 +3,16 @@ import { useContent } from '../../context/ContentContext';
 import '../css/Skills.css';
 
 const DEVICON_BASE = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons';
+const normalizeLabel = (value) => String(value || '').trim().toLowerCase();
+
+function getTechCategoryLabel(label, t) {
+  const normalized = normalizeLabel(label);
+  if (normalized === 'libraries' || normalized === 'librerie') {
+    const mapped = t('skills.pythonAiStack');
+    return mapped === 'skills.pythonAiStack' ? label : mapped;
+  }
+  return label;
+}
 
 function Skills() {
   const { t } = useLanguage();
@@ -24,7 +34,9 @@ function Skills() {
         <div className="tech-stack reveal reveal-delay-2">
           {safeTechStack.map((cat) => (
             <div key={cat.category} className="tech-category">
-              <h3 className="tech-category-title">{cat.category}</h3>
+              <h3 className="tech-category-title">
+                {getTechCategoryLabel(cat.category, t)}
+              </h3>
               <div className="tech-items">
                 {(Array.isArray(cat.items) ? cat.items : []).map((item) => (
                   <div key={item.name} className="tech-item" style={{ '--tech-color': item.color }}>

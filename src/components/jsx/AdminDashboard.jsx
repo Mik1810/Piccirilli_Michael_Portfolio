@@ -48,6 +48,16 @@ function isLikelyUrlField(fieldName) {
   return normalized === 'url' || normalized.endsWith('_url') || normalized.endsWith('url');
 }
 
+function isKeyColumnName(column) {
+  const normalized = column.toLowerCase();
+  return (
+    normalized === 'id' ||
+    normalized.endsWith('_id') ||
+    normalized === 'order_index' ||
+    normalized.endsWith('_index')
+  );
+}
+
 function isValidUrlLike(value) {
   if (typeof value !== 'string') return false;
   const trimmed = value.trim();
@@ -382,14 +392,30 @@ function AdminDashboard() {
 
             <div className="admin-table-wrap">
               <table className="admin-data-table">
+                <colgroup>
+                  <col className="admin-col-index" />
+                  {visibleColumns.map((column) => (
+                    <col
+                      key={`col-${column}`}
+                      className={isKeyColumnName(column) ? 'admin-col-key' : 'admin-col-data'}
+                    />
+                  ))}
+                  <col className="admin-col-action" />
+                  <col className="admin-col-action" />
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>#</th>
+                    <th className="admin-index-col">#</th>
                     {visibleColumns.map((column) => (
-                      <th key={column}>{column}</th>
+                      <th
+                        key={column}
+                        className={isKeyColumnName(column) ? 'admin-key-col' : 'admin-data-col'}
+                      >
+                        {column}
+                      </th>
                     ))}
-                    <th>Delete</th>
-                    <th>Modify</th>
+                    <th className="admin-action-col">Delete</th>
+                    <th className="admin-action-col">Modify</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -411,11 +437,16 @@ function AdminDashboard() {
                         key={`${activeTableName}-${absoluteIndex}`}
                         className={absoluteIndex === selectedIndex ? 'is-active' : ''}
                       >
-                        <td>{absoluteIndex + 1}</td>
+                        <td className="admin-index-cell">{absoluteIndex + 1}</td>
                         {visibleColumns.map((column) => (
-                          <td key={`${absoluteIndex}-${column}`}>{prettyValue(row?.[column])}</td>
+                          <td
+                            key={`${absoluteIndex}-${column}`}
+                            className={isKeyColumnName(column) ? 'admin-key-cell' : 'admin-data-cell'}
+                          >
+                            {prettyValue(row?.[column])}
+                          </td>
                         ))}
-                        <td>
+                        <td className="admin-action-cell">
                           <button
                             className="admin-icon-btn admin-delete-icon-btn"
                             type="button"
@@ -472,7 +503,7 @@ function AdminDashboard() {
                             </svg>
                           </button>
                         </td>
-                        <td>
+                        <td className="admin-action-cell">
                           <button
                             className="admin-icon-btn admin-modify-icon-btn"
                             type="button"

@@ -1,32 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import '../css/ThemeToggle.css';
 
 function ThemeToggle() {
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.add('theme-transition');
-
-    if (isDark) {
-      root.setAttribute('data-theme', 'dark');
-    } else {
-      root.removeAttribute('data-theme');
-    }
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-
-    const timer = setTimeout(() => root.classList.remove('theme-transition'), 500);
-    return () => clearTimeout(timer);
-  }, [isDark]);
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <button
       className="theme-toggle navbar-icon-btn"
-      onClick={() => setIsDark(!isDark)}
+      onClick={toggleTheme}
       aria-label={isDark ? 'Light mode' : 'Dark mode'}
       title={isDark ? 'Light mode' : 'Dark mode'}
     >
