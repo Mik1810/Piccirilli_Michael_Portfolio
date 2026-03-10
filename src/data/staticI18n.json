@@ -21,8 +21,11 @@
     "projects": {
       "title": "Progetti e Competizioni",
       "subtitle": "Una selezione dei miei lavori più significativi",
+      "githubTitle": "Selected GitHub Projects",
+      "githubSubtitle": "Una raccolta di repository che mostra progetti web, interfacce e sperimentazione tecnica. Le card supportano immagini preview dedicate per i progetti che vuoi mettere piu in evidenza.",
       "codeLabel": "Codice",
-      "siteLabel": "Sito"
+      "siteLabel": "Sito",
+      "repoLabel": "Repository"
     },
     "experience": {
       "title": "Esperienze",
@@ -75,8 +78,11 @@
     "projects": {
       "title": "Projects & Competitions",
       "subtitle": "A selection of my most significant work",
+      "githubTitle": "Selected GitHub Projects",
+      "githubSubtitle": "A curated set of repositories showcasing web projects, interface work, and technical experimentation. These cards support dedicated preview images for the projects you want to feature the most.",
       "codeLabel": "Code",
-      "siteLabel": "Site"
+      "siteLabel": "Site",
+      "repoLabel": "Repository"
     },
     "experience": {
       "title": "Experience",

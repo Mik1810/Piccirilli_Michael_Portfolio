@@ -28,3 +28,6 @@ chatgpt.md
 .env
 .vercel
 *.sql
+
+# Exclude the vscode workspace
+*.code-workspace
