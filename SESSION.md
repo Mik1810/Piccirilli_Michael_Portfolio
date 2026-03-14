@@ -1027,3 +1027,10 @@ Conclusione:
 - Simplified [projects.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/projects.ts) so it now handles HTTP concerns and cache only.
 - Simplified [profile.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/profile.ts) so it now delegates data access to the repository layer.
 - Next step after verification: decide whether to keep extracting more repositories first or introduce a thin service layer on top of these two repositories.
+## 2026-03-14 21:05 CET - Repository layer extended to remaining public endpoints
+
+- Added [aboutRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/aboutRepository.ts) for about interests data access.
+- Added [skillsRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/skillsRepository.ts) for tech stack and skill category aggregation.
+- Added [experiencesRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/experiencesRepository.ts) for experiences and education mapping.
+- Simplified [about.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/about.ts), [skills.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/skills.ts), and [experiences.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/experiences.ts) so they now focus on HTTP and cache concerns.
+- Reused the existing repository locale normalization to keep locale handling consistent across all public API endpoints.
