@@ -28,8 +28,7 @@ chatgpt.md
 .env
 .env.local
 .vercel
-db/
-db
+/dump
 
 # Exclude the vscode workspace
 *.code-workspace

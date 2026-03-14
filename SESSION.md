@@ -1020,3 +1020,10 @@ Conclusione:
 - The workflow runs on `deployment_status` success, marks older deployments as `inactive`, then deletes them via the GitHub Deployments API.
 - Environment grouping is inferred from deployment environment names containing `production` or `preview`.
 - Follow-up check needed after the first runs: confirm the actual deployment environment names emitted by Vercel/GitHub match the workflow classification.
+## 2026-03-14 20:45 CET - Repository layer kickoff
+
+- Added [projectsRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/projectsRepository.ts) to isolate Supabase reads and data mapping for projects and featured GitHub projects.
+- Added [profileRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/profileRepository.ts) to isolate profile, socials, and hero role reads, including the legacy `bio` fallback.
+- Simplified [projects.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/projects.ts) so it now handles HTTP concerns and cache only.
+- Simplified [profile.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/profile.ts) so it now delegates data access to the repository layer.
+- Next step after verification: decide whether to keep extracting more repositories first or introduce a thin service layer on top of these two repositories.
