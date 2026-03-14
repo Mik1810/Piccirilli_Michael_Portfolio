@@ -411,3 +411,77 @@ Output sintetico:
 - Inclusa nel commit anche la modifica locale gia presente su `IMPROVEMENTS.md`
 - La modifica rimuove la sezione `Fase 10 — Sync GitHub automatica` e i relativi riferimenti nella matrice/struttura proposta
 - Questa modifica non e stata generata durante i fix lint, ma viene tracciata intenzionalmente nel commit finale per mantenere il branch coerente con lo stato attuale del documento
+
+## Migrazione TypeScript endpoint pubblici
+
+### Obiettivo
+
+Proseguire la roadmap completando la migrazione a TypeScript degli endpoint pubblici rimasti, prima di introdurre `repository layer` e `service layer`.
+
+### File migrati
+
+- `api/profile.js` -> `api/profile.ts`
+- `api/about.js` -> `api/about.ts`
+- `api/skills.js` -> `api/skills.ts`
+- `api/experiences.js` -> `api/experiences.ts`
+
+### Cosa e stato fatto
+
+- mantenuto invariato il comportamento degli endpoint
+- introdotti tipi locali per:
+  - righe Supabase
+  - payload finali
+  - cache in memoria
+  - normalizzazione locale `it/en`
+- mantenute le compatibilita gia presenti:
+  - fallback `bio` opzionale in `profile`
+  - mapping flessibile di chiavi in `skills`
+  - caching `s-maxage` / `stale-while-revalidate`
+
+### Note per endpoint
+
+#### `api/profile.ts`
+
+- tipizzato il payload profile consumato dal frontend
+- mantenuto il fallback per schema `profile_i18n` senza colonna `bio`
+
+#### `api/about.ts`
+
+- tipizzato il mapping tra `about_interests` e `about_interests_i18n`
+- cache tipizzata `AboutResponse`
+
+#### `api/skills.ts`
+
+- tipizzati i record con naming alternativo delle foreign key
+- mantenuti helper `keyOf` e `pick` per compatibilita con shape dati non uniformi
+
+#### `api/experiences.ts`
+
+- tipizzati `experiences` ed `education`
+- preservato il filtro che scarta righe senza traduzione associata
+
+### Verifiche eseguite
+
+Comandi:
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+npx tsx -e "Promise.all([import('./api/profile.ts'), import('./api/about.ts'), import('./api/skills.ts'), import('./api/experiences.ts')]).then((mods) => console.log(mods.map((m) => typeof m.default).join(',')))"
+```
+
+Esito:
+- `PASS`
+- import runtime confermato per tutti e quattro gli endpoint
+
+Output sintetico:
+
+```txt
+function,function,function,function
+```
+
+## Ultimo aggiornamento
+
+- Ora locale: `2026-03-14 18:20:30 +01:00`
+- Stato: `Endpoint pubblici migrati a TypeScript, backend pubblico quasi interamente tipizzato`
