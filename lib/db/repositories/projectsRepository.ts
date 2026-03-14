@@ -1,73 +1,17 @@
-import { supabaseAdmin } from '../../supabaseAdmin.js'
+import { asc, eq } from 'drizzle-orm'
+
+import { db } from '../client.js'
+import {
+  githubProjectImages,
+  githubProjectTags,
+  githubProjects,
+  githubProjectsI18n,
+  projectTags,
+  projects,
+  projectsI18n,
+} from '../schema.js'
 
 export type RepositoryLocale = 'it' | 'en'
-
-interface ProjectRecord {
-  id: number | string
-  slug?: string | null
-  order_index?: number | null
-  live_url?: string | null
-}
-
-interface ProjectI18nRecord {
-  project_id?: number | string | null
-  projects_id?: number | string | null
-  id_project?: number | string | null
-  projectId?: number | string | null
-  title?: string | null
-  description?: string | null
-}
-
-interface ProjectTagRecord {
-  project_id?: number | string | null
-  projects_id?: number | string | null
-  id_project?: number | string | null
-  projectId?: number | string | null
-  order_index?: number | null
-  tag?: string | null
-  name?: string | null
-  value?: string | null
-}
-
-interface GithubProjectRecord {
-  id: number | string
-  slug?: string | null
-  order_index?: number | null
-  github_url?: string | null
-  live_url?: string | null
-  image_url?: string | null
-  featured?: boolean | null
-}
-
-interface GithubProjectI18nRecord {
-  github_project_id?: number | string | null
-  github_projects_id?: number | string | null
-  id_github_project?: number | string | null
-  githubProjectId?: number | string | null
-  title?: string | null
-  description?: string | null
-}
-
-interface GithubProjectTagRecord {
-  github_project_id?: number | string | null
-  github_projects_id?: number | string | null
-  id_github_project?: number | string | null
-  githubProjectId?: number | string | null
-  order_index?: number | null
-  tag?: string | null
-  name?: string | null
-  value?: string | null
-}
-
-interface GithubProjectImageRecord {
-  github_project_id?: number | string | null
-  github_projects_id?: number | string | null
-  id_github_project?: number | string | null
-  githubProjectId?: number | string | null
-  order_index?: number | null
-  image_url?: string | null
-  url?: string | null
-}
 
 export interface ProjectSummary {
   id: number | string
@@ -96,17 +40,6 @@ export interface ProjectsResponse {
   githubProjects: GithubProjectSummary[]
 }
 
-const keyOf = (value: unknown) =>
-  value === undefined || value === null ? null : String(value)
-
-const pick = <T>(...values: Array<T | undefined | null>) =>
-  values.find((value) => value !== undefined && value !== null)
-
-const isMissingRelationError = (error: { code?: string; message?: string } | null) =>
-  error?.code === 'PGRST205' ||
-  error?.code === '42P01' ||
-  /could not find the table|relation .* does not exist/i.test(error?.message || '')
-
 export const normalizeRepositoryLocale = (value: string | undefined): RepositoryLocale =>
   value === 'en' ? 'en' : 'it'
 
@@ -114,160 +47,136 @@ export const fetchProjects = async (
   locale: RepositoryLocale
 ): Promise<ProjectsResponse> => {
   const [
-    { data: projectsBase, error: projectsError },
-    { data: i18nRows, error: i18nError },
-    { data: tagsRows, error: tagsError },
-    { data: githubBase, error: githubBaseError },
-    { data: githubI18nRows, error: githubI18nError },
-    { data: githubTagsRows, error: githubTagsError },
-    { data: githubImagesRows, error: githubImagesError },
+    projectRows,
+    projectI18nRows,
+    projectTagRows,
+    githubProjectRows,
+    githubProjectI18nRows,
+    githubProjectTagRows,
+    githubProjectImageRows,
   ] = await Promise.all([
-    supabaseAdmin
-      .from('projects')
-      .select('id, slug, order_index, live_url')
-      .order('order_index', { ascending: true }),
-    supabaseAdmin
-      .from('projects_i18n')
-      .select('project_id, title, description')
-      .eq('locale', locale),
-    supabaseAdmin
-      .from('project_tags')
-      .select('project_id, order_index, tag')
-      .order('order_index', { ascending: true }),
-    supabaseAdmin
-      .from('github_projects')
-      .select('id, slug, order_index, github_url, live_url, image_url, featured')
-      .eq('featured', true)
-      .order('order_index', { ascending: true }),
-    supabaseAdmin
-      .from('github_projects_i18n')
-      .select('github_project_id, title, description')
-      .eq('locale', locale),
-    supabaseAdmin
-      .from('github_project_tags')
-      .select('github_project_id, order_index, tag')
-      .order('order_index', { ascending: true }),
-    supabaseAdmin
-      .from('github_project_images')
-      .select('github_project_id, order_index, image_url, alt_text')
-      .order('order_index', { ascending: true }),
+    db
+      .select({
+        id: projects.id,
+        slug: projects.slug,
+        orderIndex: projects.orderIndex,
+        liveUrl: projects.liveUrl,
+      })
+      .from(projects)
+      .orderBy(asc(projects.orderIndex)),
+    db
+      .select({
+        projectId: projectsI18n.projectId,
+        title: projectsI18n.title,
+        description: projectsI18n.description,
+      })
+      .from(projectsI18n)
+      .where(eq(projectsI18n.locale, locale)),
+    db
+      .select({
+        projectId: projectTags.projectId,
+        orderIndex: projectTags.orderIndex,
+        tag: projectTags.tag,
+      })
+      .from(projectTags)
+      .orderBy(asc(projectTags.orderIndex)),
+    db
+      .select({
+        id: githubProjects.id,
+        slug: githubProjects.slug,
+        orderIndex: githubProjects.orderIndex,
+        githubUrl: githubProjects.githubUrl,
+        liveUrl: githubProjects.liveUrl,
+        imageUrl: githubProjects.imageUrl,
+      })
+      .from(githubProjects)
+      .where(eq(githubProjects.featured, true))
+      .orderBy(asc(githubProjects.orderIndex)),
+    db
+      .select({
+        githubProjectId: githubProjectsI18n.githubProjectId,
+        title: githubProjectsI18n.title,
+        description: githubProjectsI18n.description,
+      })
+      .from(githubProjectsI18n)
+      .where(eq(githubProjectsI18n.locale, locale)),
+    db
+      .select({
+        githubProjectId: githubProjectTags.githubProjectId,
+        orderIndex: githubProjectTags.orderIndex,
+        tag: githubProjectTags.tag,
+      })
+      .from(githubProjectTags)
+      .orderBy(asc(githubProjectTags.orderIndex)),
+    db
+      .select({
+        githubProjectId: githubProjectImages.githubProjectId,
+        orderIndex: githubProjectImages.orderIndex,
+        imageUrl: githubProjectImages.imageUrl,
+      })
+      .from(githubProjectImages)
+      .orderBy(asc(githubProjectImages.orderIndex)),
   ])
 
-  const githubImagesMissing = isMissingRelationError(githubImagesError)
-
-  if (
-    projectsError ||
-    i18nError ||
-    tagsError ||
-    githubBaseError ||
-    githubI18nError ||
-    githubTagsError ||
-    (githubImagesError && !githubImagesMissing)
-  ) {
-    throw new Error('Database error')
-  }
-
-  if (githubImagesMissing) {
-    console.warn(
-      'github_project_images table not found, falling back to image_url previews'
-    )
-  }
-
   const textByProjectId = new Map(
-    ((i18nRows || []) as ProjectI18nRecord[]).map((row) => [
-      keyOf(pick(row.project_id, row.projects_id, row.id_project, row.projectId)),
-      row,
-    ])
+    projectI18nRows.map((row) => [row.projectId, row])
   )
 
-  const tagsByProjectId = new Map<string, string[]>()
-  for (const row of (tagsRows || []) as ProjectTagRecord[]) {
-    const projectId = keyOf(
-      pick(row.project_id, row.projects_id, row.id_project, row.projectId)
-    )
-    if (!projectId) continue
+  const tagsByProjectId = new Map<number, string[]>()
+  for (const row of projectTagRows) {
+    const projectId = row.projectId
     if (!tagsByProjectId.has(projectId)) tagsByProjectId.set(projectId, [])
-    tagsByProjectId.get(projectId)?.push(pick(row.tag, row.name, row.value, '') || '')
+    tagsByProjectId.get(projectId)?.push(row.tag || '')
   }
 
-  const projects = ((projectsBase || []) as ProjectRecord[]).map((row) => {
-    const rowKey = keyOf(row.id)
-    const i18n = rowKey ? textByProjectId.get(rowKey) : undefined
+  const projectList = projectRows.map((row) => {
+    const i18n = textByProjectId.get(row.id)
     return {
       id: row.id,
       slug: row.slug || `project-${row.id}`,
       title: i18n?.title || '',
       description: i18n?.description || '',
-      tags: (rowKey && tagsByProjectId.get(rowKey)) || [],
-      live: row.live_url || null,
+      tags: tagsByProjectId.get(row.id) || [],
+      live: row.liveUrl || null,
       github: null,
     }
   })
 
   const githubTextByProjectId = new Map(
-    ((githubI18nRows || []) as GithubProjectI18nRecord[]).map((row) => [
-      keyOf(
-        pick(
-          row.github_project_id,
-          row.github_projects_id,
-          row.id_github_project,
-          row.githubProjectId
-        )
-      ),
-      row,
-    ])
+    githubProjectI18nRows.map((row) => [row.githubProjectId, row])
   )
 
-  const githubTagsByProjectId = new Map<string, string[]>()
-  for (const row of (githubTagsRows || []) as GithubProjectTagRecord[]) {
-    const projectId = keyOf(
-      pick(
-        row.github_project_id,
-        row.github_projects_id,
-        row.id_github_project,
-        row.githubProjectId
-      )
-    )
-    if (!projectId) continue
+  const githubTagsByProjectId = new Map<number, string[]>()
+  for (const row of githubProjectTagRows) {
+    const projectId = row.githubProjectId
     if (!githubTagsByProjectId.has(projectId)) githubTagsByProjectId.set(projectId, [])
-    githubTagsByProjectId
-      .get(projectId)
-      ?.push(pick(row.tag, row.name, row.value, '') || '')
+    githubTagsByProjectId.get(projectId)?.push(row.tag || '')
   }
 
-  const githubImagesByProjectId = new Map<string, string[]>()
-  for (const row of (githubImagesRows || []) as GithubProjectImageRecord[]) {
-    const projectId = keyOf(
-      pick(
-        row.github_project_id,
-        row.github_projects_id,
-        row.id_github_project,
-        row.githubProjectId
-      )
-    )
-    if (!projectId) continue
+  const githubImagesByProjectId = new Map<number, string[]>()
+  for (const row of githubProjectImageRows) {
+    const projectId = row.githubProjectId
     if (!githubImagesByProjectId.has(projectId)) {
       githubImagesByProjectId.set(projectId, [])
     }
-    const image = pick(row.image_url, row.url, '') || ''
+    const image = row.imageUrl || ''
     if (image) githubImagesByProjectId.get(projectId)?.push(image)
   }
 
-  const githubProjects = ((githubBase || []) as GithubProjectRecord[]).map((row) => {
-    const rowKey = keyOf(row.id)
-    const i18n = rowKey ? githubTextByProjectId.get(rowKey) : undefined
+  const githubProjectList = githubProjectRows.map((row) => {
+    const i18n = githubTextByProjectId.get(row.id)
     return {
       id: row.id,
       slug: row.slug || `github-project-${row.id}`,
       title: i18n?.title || '',
       description: i18n?.description || '',
-      tags: (rowKey && githubTagsByProjectId.get(rowKey)) || [],
-      githubUrl: row.github_url || null,
-      liveUrl: row.live_url || null,
-      image: row.image_url || null,
-      images: (rowKey && githubImagesByProjectId.get(rowKey)) || [],
+      tags: githubTagsByProjectId.get(row.id) || [],
+      githubUrl: row.githubUrl || null,
+      liveUrl: row.liveUrl || null,
+      image: row.imageUrl || null,
+      images: githubImagesByProjectId.get(row.id) || [],
     }
   })
 
-  return { projects, githubProjects }
+  return { projects: projectList, githubProjects: githubProjectList }
 }

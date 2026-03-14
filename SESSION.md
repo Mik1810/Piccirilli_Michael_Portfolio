@@ -1107,3 +1107,10 @@ Conclusione:
 - Replaced Supabase reads with typed Drizzle selects over [experiences](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/schema.ts), [experiencesI18n](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/schema.ts), [education](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/schema.ts), and [educationI18n](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/schema.ts), preserving the existing payload shape and the rule that untranslated rows are skipped.
 - Verified the migrated repository against live data: locale `it` returned `3` experiences and `2` education entries, with `Cybersecurity National Lab` and `Università degli Studi dell'Aquila` as the first labels.
 - `npm run typecheck`, `npm run lint`, and `npm run build` all passed after this migration as well.
+## 2026-03-15 00:20 CET - Fifth Drizzle migration: projects repository
+
+- Updated [projectsRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/projectsRepository.ts) to use Drizzle for the full public projects flow: portfolio projects, localized project content, tags, featured GitHub projects, GitHub tags, and GitHub image galleries.
+- Removed the old Supabase compatibility layer for alternate foreign-key field names because the real database schema is now modeled explicitly in [schema.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/schema.ts).
+- Preserved the external payload shape used by [projects.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/projects.ts), including `live`, `githubUrl`, `liveUrl`, primary preview image, and gallery images.
+- Verified the migrated repository against live data: locale `it` returned `2` standard projects and `4` featured GitHub projects; the first GitHub project (`Unify`) exposed `5` gallery images through Drizzle.
+- `npm run typecheck`, `npm run lint`, and `npm run build` all passed after the final repository migration.
