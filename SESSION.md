@@ -1151,3 +1151,12 @@ Conclusione:
   - authentication, admin CRUD, caching, validation, and deploy model
   - engineering properties and current system limits
 - Explicitly removed the previous emphasis on refactor history and replaced it with a more formal, technical, and quasi-scientific description of the repository's present architecture.
+## 2026-03-15 01:20 CET - README deepened with code-level and architectural rationale
+
+- Rewrote [README.md](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/README.md) again with a stronger technical focus.
+- Added:
+  - Mermaid diagrams for component, request, authentication, and ER-level views
+  - real code snippets from handlers, repositories, schema, admin auth, and admin SQL execution
+  - explicit technology-selection rationale with trade-offs versus alternatives such as Next.js, Prisma, Redux/Zustand, `supabase-js`, and Redis
+  - a dedicated section explaining why architecture diagrams are more useful than screenshots for this repository at the current stage
+- The README now behaves more like a technical system dossier than a generic project introduction.
