@@ -1,5 +1,5 @@
 import { requireAdminSession } from '../../lib/requireAdminSession.js'
-import { ADMIN_TABLES } from '../../lib/adminTables.js'
+import { getAdminTablesList } from '../../lib/services/adminTableService.js'
 import type { ApiHandler } from '../../lib/types/http.js'
 
 const handler: ApiHandler = async (req, res) => {
@@ -10,13 +10,7 @@ const handler: ApiHandler = async (req, res) => {
   const admin = requireAdminSession(req, res)
   if (!admin) return
 
-  const tables = Object.entries(ADMIN_TABLES).map(([name, config]) => ({
-    name,
-    label: config.label,
-    primaryKeys: config.primaryKeys,
-    defaultRow: config.defaultRow || {},
-  }))
-
+  const tables = getAdminTablesList()
   return res.status(200).json({ tables })
 }
 

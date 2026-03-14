@@ -1,7 +1,5 @@
-import { supabaseAdmin } from '../../lib/supabaseAdmin.js'
-import { createSessionCookie, createSessionToken } from '../../lib/authSession.js'
+import { loginAdmin } from '../../lib/services/adminAuthService.js'
 import type { ApiHandler, ApiRequest } from '../../lib/types/http.js'
-import type { SessionUser } from '../../lib/types/auth.js'
 
 interface LoginBody {
   email?: string
@@ -19,29 +17,20 @@ const handler: ApiHandler<LoginBody> = async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabaseAdmin.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      return res.status(401).json({ error: error.message })
-    }
-
-    const user: SessionUser | null = data?.user
-      ? { id: data.user.id, email: data.user.email || '' }
-      : null
-    if (!user || !user.email) {
-      return res.status(401).json({ error: 'Invalid user session' })
-    }
-
-    const token = createSessionToken(user)
-    res.setHeader('Set-Cookie', createSessionCookie(token))
+    const { user, cookie } = await loginAdmin(email, password)
+    res.setHeader('Set-Cookie', cookie)
 
     return res.status(200).json({
       user,
     })
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    if (message === 'Invalid user session') {
+      return res.status(401).json({ error: message })
+    }
+    if (message && message !== 'Internal server error') {
+      return res.status(401).json({ error: message })
+    }
     return res.status(500).json({ error: 'Internal server error' })
   }
 }

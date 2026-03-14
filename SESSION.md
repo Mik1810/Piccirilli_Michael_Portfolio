@@ -1040,3 +1040,10 @@ Conclusione:
 - Updated [about.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/about.ts), [profile.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/profile.ts), [projects.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/projects.ts), [skills.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/skills.ts), and [experiences.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/experiences.ts) to call the service layer instead of repositories directly.
 - Centralized locale normalization export in the service layer so handlers no longer need to know which repository defines it.
 - The service layer is intentionally thin for now, giving us a stable place to add orchestration, cross-repository composition, logging, or validation later without rewriting handlers again.
+## 2026-03-14 21:40 CET - Admin repositories and services introduced
+
+- Added [adminAuthRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/adminAuthRepository.ts) to isolate Supabase admin sign-in.
+- Added [adminTableRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/adminTableRepository.ts) to isolate dynamic CRUD operations for allowed admin tables.
+- Added [adminAuthService.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/services/adminAuthService.ts) for login, logout, and session response orchestration.
+- Added [adminTableService.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/services/adminTableService.ts) for table validation, payload normalization, limit parsing, and CRUD delegation.
+- Updated [login.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/login.ts), [logout.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/logout.ts), [session.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/session.ts), [tables.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/tables.ts), and [table.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/table.ts) to use the new admin service layer.

@@ -1,7 +1,15 @@
-import { supabaseAdmin } from '../../lib/supabaseAdmin.js'
 import { requireAdminSession } from '../../lib/requireAdminSession.js'
-import { getAdminTableConfig } from '../../lib/adminTables.js'
-import type { AdminTableConfig } from '../../lib/types/admin.js'
+import {
+  createAdminRow,
+  editAdminRow,
+  getAdminRows,
+  getAdminTableConfigOrNull,
+  getAllowedAdminTable,
+  hasAllPrimaryKeys,
+  normalizeAdminPayload,
+  parseAdminTableLimit,
+  removeAdminRow,
+} from '../../lib/services/adminTableService.js'
 import type { ApiHandler, ApiRequest } from '../../lib/types/http.js'
 
 interface TableBody {
@@ -9,104 +17,60 @@ interface TableBody {
   keys?: Record<string, unknown>
 }
 
-const parseLimit = (rawValue: string | undefined) => {
-  const parsed = Number.parseInt(rawValue || '', 10)
-  if (!Number.isFinite(parsed)) return 200
-  return Math.min(Math.max(parsed, 1), 1000)
-}
-
-const normalizePayload = (value: unknown): Record<string, unknown> => {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
-  return value as Record<string, unknown>
-}
-
-const hasAllPrimaryKeys = (
-  config: AdminTableConfig,
-  keys: Record<string, unknown>
-) => config.primaryKeys.every((key) => keys[key] !== undefined && keys[key] !== null)
-
 const handler: ApiHandler<TableBody> = async (req, res) => {
   const admin = requireAdminSession(req, res)
   if (!admin) return
 
-  const table = req.query?.table
-  if (!table || typeof table !== 'string') {
+  const table = getAllowedAdminTable(req.query?.table)
+  if (!table) {
     return res.status(400).json({ error: 'Missing table parameter' })
   }
 
-  const config = getAdminTableConfig(table)
+  const config = getAdminTableConfigOrNull(table)
   if (!config) {
     return res.status(400).json({ error: 'Table not allowed' })
   }
 
   try {
     if (req.method === 'GET') {
-      const limit = parseLimit(req.query?.limit)
-      const { data, error } = await supabaseAdmin.from(table).select('*').limit(limit)
-      if (error) {
-        return res.status(500).json({ error: error.message || 'Database error' })
-      }
-      return res.status(200).json({ rows: data || [] })
+      const limit = parseAdminTableLimit(req.query?.limit)
+      const rows = await getAdminRows(table, limit)
+      return res.status(200).json({ rows })
     }
 
     const body = (req as ApiRequest<TableBody>).body || {}
 
     if (req.method === 'POST') {
-      const row = normalizePayload(body.row)
-      const { data, error } = await supabaseAdmin
-        .from(table)
-        .insert(row)
-        .select('*')
-        .limit(1)
-        .maybeSingle()
-      if (error) {
-        return res.status(500).json({ error: error.message || 'Database error' })
-      }
-      return res.status(201).json({ row: data || null })
+      const row = normalizeAdminPayload(body.row)
+      const createdRow = await createAdminRow(table, row)
+      return res.status(201).json({ row: createdRow })
     }
 
     if (req.method === 'PATCH') {
-      const keys = normalizePayload(body.keys)
-      const row = normalizePayload(body.row)
+      const keys = normalizeAdminPayload(body.keys)
+      const row = normalizeAdminPayload(body.row)
       if (!hasAllPrimaryKeys(config, keys)) {
         return res.status(400).json({ error: 'Missing primary key fields in keys payload' })
       }
 
-      // Supabase's builder types become impractical when composing dynamic keys.
-      // Keeping this local avoids leaking `any` into the rest of the endpoint.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query: any = supabaseAdmin.from(table).update(row)
-      for (const [key, value] of Object.entries(keys)) {
-        query = query.eq(key, value)
-      }
-      const { data, error } = await query.select('*').limit(1).maybeSingle()
-      if (error) {
-        return res.status(500).json({ error: error.message || 'Database error' })
-      }
-      return res.status(200).json({ row: data || null })
+      const updatedRow = await editAdminRow(table, keys, row)
+      return res.status(200).json({ row: updatedRow })
     }
 
     if (req.method === 'DELETE') {
-      const keys = normalizePayload(body.keys)
+      const keys = normalizeAdminPayload(body.keys)
       if (!hasAllPrimaryKeys(config, keys)) {
         return res.status(400).json({ error: 'Missing primary key fields in keys payload' })
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query: any = supabaseAdmin.from(table).delete()
-      for (const [key, value] of Object.entries(keys)) {
-        query = query.eq(key, value)
-      }
-      const { error } = await query
-      if (error) {
-        return res.status(500).json({ error: error.message || 'Database error' })
-      }
-      return res.status(200).json({ ok: true })
+      const result = await removeAdminRow(table, keys)
+      return res.status(200).json(result)
     }
 
     return res.status(405).json({ error: 'Method not allowed' })
-  } catch {
-    return res.status(500).json({ error: 'Internal server error' })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return res.status(500).json({ error: message || 'Internal server error' })
   }
 }
 
