@@ -10,6 +10,8 @@ import {
   parseAdminTableLimit,
   removeAdminRow,
 } from '../../lib/services/adminTableService.js'
+import { HttpError, respondWithError } from '../../lib/http/apiUtils.js'
+import { logApiError } from '../../lib/logger.js'
 import type { ApiHandler, ApiRequest } from '../../lib/types/http.js'
 
 interface TableBody {
@@ -21,15 +23,16 @@ const handler: ApiHandler<TableBody> = async (req, res) => {
   const admin = requireAdminSession(req, res)
   if (!admin) return
 
-  const table = getAllowedAdminTable(req.query?.table)
-  if (!table) {
+  const rawTable = req.query?.table
+  if (!rawTable || typeof rawTable !== 'string') {
     return res.status(400).json({ error: 'Missing table parameter' })
   }
+  const table = getAllowedAdminTable(rawTable)
 
-  const config = getAdminTableConfigOrNull(table)
-  if (!config) {
+  if (!table) {
     return res.status(400).json({ error: 'Table not allowed' })
   }
+  const config = getAdminTableConfigOrNull(table)
 
   try {
     if (req.method === 'GET') {
@@ -69,8 +72,15 @@ const handler: ApiHandler<TableBody> = async (req, res) => {
 
     return res.status(405).json({ error: 'Method not allowed' })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Internal server error'
-    return res.status(500).json({ error: message || 'Internal server error' })
+    if (error instanceof Error && error.message === 'Database error') {
+      logApiError('admin.table', error, { table, method: req.method, url: req.url })
+      return respondWithError(res, new HttpError(500, 'Database error'))
+    }
+    if (error instanceof Error && error.message) {
+      return respondWithError(res, new HttpError(500, error.message))
+    }
+    logApiError('admin.table', error, { table, method: req.method, url: req.url })
+    return respondWithError(res, error)
   }
 }
 

@@ -1,4 +1,11 @@
 import { loginAdmin } from '../../lib/services/adminAuthService.js'
+import {
+  HttpError,
+  enforceMethod,
+  requireNonEmptyString,
+  respondWithError,
+} from '../../lib/http/apiUtils.js'
+import { logApiError } from '../../lib/logger.js'
 import type { ApiHandler, ApiRequest } from '../../lib/types/http.js'
 
 interface LoginBody {
@@ -7,31 +14,37 @@ interface LoginBody {
 }
 
 const handler: ApiHandler<LoginBody> = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
-
-  const { email, password } = (req as ApiRequest<LoginBody>).body || {}
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email e password obbligatorie' })
-  }
+  if (!enforceMethod(req, res, 'POST')) return
 
   try {
-    const { user, cookie } = await loginAdmin(email, password)
+    const { email, password } = (req as ApiRequest<LoginBody>).body || {}
+    const safeEmail = requireNonEmptyString(email, 'Email e password obbligatorie', {
+      maxLength: 320,
+    })
+    const safePassword = requireNonEmptyString(
+      password,
+      'Email e password obbligatorie',
+      { maxLength: 4096 }
+    )
+
+    const { user, cookie } = await loginAdmin(safeEmail, safePassword)
     res.setHeader('Set-Cookie', cookie)
 
     return res.status(200).json({
       user,
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Internal server error'
-    if (message === 'Invalid user session') {
-      return res.status(401).json({ error: message })
+    if (error instanceof Error && error.message === 'Invalid user session') {
+      return respondWithError(res, new HttpError(401, error.message))
     }
-    if (message && message !== 'Internal server error') {
-      return res.status(401).json({ error: message })
+    if (error instanceof HttpError) {
+      return respondWithError(res, error)
     }
-    return res.status(500).json({ error: 'Internal server error' })
+    if (error instanceof Error && error.message) {
+      return respondWithError(res, new HttpError(401, error.message))
+    }
+    logApiError('admin.login', error, { url: req.url })
+    return respondWithError(res, error)
   }
 }
 

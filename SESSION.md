@@ -1047,3 +1047,10 @@ Conclusione:
 - Added [adminAuthService.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/services/adminAuthService.ts) for login, logout, and session response orchestration.
 - Added [adminTableService.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/services/adminTableService.ts) for table validation, payload normalization, limit parsing, and CRUD delegation.
 - Updated [login.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/login.ts), [logout.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/logout.ts), [session.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/session.ts), [tables.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/tables.ts), and [table.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/table.ts) to use the new admin service layer.
+## 2026-03-14 22:00 CET - Backend hardening baseline
+
+- Added [apiUtils.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/http/apiUtils.ts) with shared helpers for method enforcement, typed HTTP errors, generic error responses, and simple non-empty string validation.
+- Added [logger.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/logger.ts) for structured API error logging with context metadata.
+- Updated public endpoints and [health.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/health.ts) to use shared method enforcement and centralized error handling.
+- Hardened [login.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/login.ts) with explicit trimmed string validation and more predictable auth error mapping.
+- Improved [table.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/table.ts) so missing-vs-disallowed table errors are distinguished and server-side failures are logged with request metadata.
