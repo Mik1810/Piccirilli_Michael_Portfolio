@@ -1268,3 +1268,14 @@ Conclusione:
 - Goal:
   - reduce transient pool contention on Vercel
   - make public content reads less bursty and more tolerant of temporary connection/query instability
+## 2026-03-15 00:35 CET - Added explicit Postgres statement timeout for hung Vercel requests
+
+- Observed that `GET /api/profile?lang=it` could remain pending for more than 25 seconds with no response body, while [health.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/health.ts) continued to return `200`.
+- This indicated that some public DB-backed requests were no longer failing fast, but instead hanging inside the DB client / pooler path.
+- Updated [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts) again to make the DB behavior stricter in serverless:
+  - `ssl: 'require'`
+  - `connection.statement_timeout: 8000`
+- Purpose:
+  - prevent public functions from hanging indefinitely on a stalled DB query
+  - turn indefinite waits into explicit Postgres-side failures that surface in logs
+  - improve diagnosability if the pooler or connection string is still not ideal in production

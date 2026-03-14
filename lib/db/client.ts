@@ -27,7 +27,11 @@ const getClient = () => {
       max: 1,
       idle_timeout: 5,
       connect_timeout: 15,
+      ssl: 'require',
       prepare: false,
+      connection: {
+        statement_timeout: 8000,
+      },
     })
   }
 
