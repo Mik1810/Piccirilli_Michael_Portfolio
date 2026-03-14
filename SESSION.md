@@ -1094,3 +1094,10 @@ Conclusione:
 - Updated [profileRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/profileRepository.ts) to use Drizzle for profile, profile_i18n, social links, and hero roles.
 - Replaced Supabase query builder calls with typed Drizzle selects, filters, and order clauses while keeping the public `ProfileResponse` payload unchanged.
 - This second migration gives us a better signal than `about` because it spans multiple tables and preserves aggregation logic for socials and localized hero roles.
+## 2026-03-14 23:50 CET - Third Drizzle migration: skills repository
+
+- Updated [skillsRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/skillsRepository.ts) to use Drizzle for tech categories, tech items, skill categories, and skill item translations.
+- Replaced the old defensive Supabase row-shape compatibility helpers with typed Drizzle selects based on the normalized schema in [schema.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/schema.ts).
+- Verified the migrated repository against live data: `4` tech categories and `4` skill categories were returned for locale `it`, with `Linguaggi` and `Programmazione` as the first labels.
+- `npm run typecheck`, `npm run lint`, and `npm run build` all passed after the migration.
+- Build note: the one temporary Vite failure during verification was caused by launching the build from the old junction path `mik1810.github.io`; the real repo path [Piccirilli_Michael_Portfolio](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio) builds correctly and should be preferred for future commands.
