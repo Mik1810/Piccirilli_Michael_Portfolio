@@ -1,8 +1,8 @@
 import {
-  fetchExperiences,
-  type ExperiencesResponse,
-} from '../lib/db/repositories/experiencesRepository.js'
-import { normalizeRepositoryLocale } from '../lib/db/repositories/projectsRepository.js'
+  getExperiencesContent,
+  normalizeRepositoryLocale,
+} from '../lib/services/publicContentService.js'
+import type { ExperiencesResponse } from '../lib/db/repositories/experiencesRepository.js'
 import type { ApiHandler } from '../lib/types/http.js'
 
 const CACHE_TTL_MS = 60 * 1000
@@ -26,7 +26,7 @@ const handler: ApiHandler = async (req, res) => {
   }
 
   try {
-    const payload = await fetchExperiences(lang)
+    const payload = await getExperiencesContent(lang)
     cache.set(cacheKey, { at: Date.now(), value: payload })
 
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')

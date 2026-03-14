@@ -1034,3 +1034,9 @@ Conclusione:
 - Added [experiencesRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/experiencesRepository.ts) for experiences and education mapping.
 - Simplified [about.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/about.ts), [skills.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/skills.ts), and [experiences.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/experiences.ts) so they now focus on HTTP and cache concerns.
 - Reused the existing repository locale normalization to keep locale handling consistent across all public API endpoints.
+## 2026-03-14 21:20 CET - Public service layer introduced
+
+- Added [publicContentService.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/services/publicContentService.ts) as a thin application layer between public API handlers and repositories.
+- Updated [about.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/about.ts), [profile.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/profile.ts), [projects.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/projects.ts), [skills.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/skills.ts), and [experiences.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/experiences.ts) to call the service layer instead of repositories directly.
+- Centralized locale normalization export in the service layer so handlers no longer need to know which repository defines it.
+- The service layer is intentionally thin for now, giving us a stable place to add orchestration, cross-repository composition, logging, or validation later without rewriting handlers again.

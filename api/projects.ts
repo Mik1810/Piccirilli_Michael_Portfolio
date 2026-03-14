@@ -1,8 +1,8 @@
 import {
-  fetchProjects,
+  getProjectsContent,
   normalizeRepositoryLocale,
-  type ProjectsResponse,
-} from '../lib/db/repositories/projectsRepository.js'
+} from '../lib/services/publicContentService.js'
+import type { ProjectsResponse } from '../lib/db/repositories/projectsRepository.js'
 import type { ApiHandler } from '../lib/types/http.js'
 
 const CACHE_TTL_MS = 60 * 1000
@@ -22,7 +22,7 @@ const handler: ApiHandler = async (req, res) => {
   }
 
   try {
-    const payload = await fetchProjects(lang)
+    const payload = await getProjectsContent(lang)
     const { projects, githubProjects } = payload
 
     if (

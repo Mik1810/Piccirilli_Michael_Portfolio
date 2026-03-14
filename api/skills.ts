@@ -1,8 +1,8 @@
 import {
-  fetchSkills,
-  type SkillsResponse,
-} from '../lib/db/repositories/skillsRepository.js'
-import { normalizeRepositoryLocale } from '../lib/db/repositories/projectsRepository.js'
+  getSkillsContent,
+  normalizeRepositoryLocale,
+} from '../lib/services/publicContentService.js'
+import type { SkillsResponse } from '../lib/db/repositories/skillsRepository.js'
 import type { ApiHandler } from '../lib/types/http.js'
 
 const CACHE_TTL_MS = 60 * 1000
@@ -23,7 +23,7 @@ const handler: ApiHandler = async (req, res) => {
   }
 
   try {
-    const payload = await fetchSkills(lang)
+    const payload = await getSkillsContent(lang)
     const { techStack, categories } = payload
     if (techStack.length > 0 || categories.length > 0) {
       cache.set(cacheKey, { at: Date.now(), value: payload })

@@ -1,8 +1,8 @@
 import {
-  fetchProfile,
+  getProfileContent,
   normalizeRepositoryLocale,
-  type ProfileResponse,
-} from '../lib/db/repositories/profileRepository.js'
+} from '../lib/services/publicContentService.js'
+import type { ProfileResponse } from '../lib/db/repositories/profileRepository.js'
 import type { ApiHandler } from '../lib/types/http.js'
 
 const CACHE_TTL_MS = 60 * 1000
@@ -23,7 +23,7 @@ const handler: ApiHandler = async (req, res) => {
   }
 
   try {
-    const payload = await fetchProfile(lang)
+    const payload = await getProfileContent(lang)
     cache.set(cacheKey, { at: Date.now(), value: payload })
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')
     return res.status(200).json(payload)
