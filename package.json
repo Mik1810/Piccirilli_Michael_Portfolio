@@ -14,13 +14,18 @@
     "start": "vite build && vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
     "format": "prettier --write .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
     "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.1",
     "pdf-parse": "^2.4.5",
+    "postgres": "^3.4.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1"
@@ -32,6 +37,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "concurrently": "^9.2.1",
+    "drizzle-kit": "^0.31.9",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",

@@ -1072,3 +1072,20 @@ Conclusione:
 - Updated [about.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/about.ts), [profile.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/profile.ts), [projects.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/projects.ts), [skills.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/skills.ts), and [experiences.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/experiences.ts) to use the shared cache utility instead of duplicating map-and-timestamp logic.
 - Hardened [adminTableService.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/services/adminTableService.ts) so invalid `limit` values now return a `400` instead of silently falling back, and empty object payloads are rejected explicitly.
 - Updated [table.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/admin/table.ts) so `POST`, `PATCH`, and `DELETE` reject missing or empty `row`/`keys` payloads with clearer client errors.
+## 2026-03-14 22:50 CET - Drizzle foundation
+
+- Added Drizzle scripts in [package.json](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/package.json): `db:generate`, `db:migrate`, and `db:studio`.
+- Added [drizzle.config.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/drizzle.config.ts) using `DATABASE_URL` or `SUPABASE_DB_URL`, without switching runtime queries yet.
+- Added [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts) as the shared Drizzle client entrypoint.
+- Added [schema.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/schema.ts) with the current content tables modeled in Drizzle for the gradual migration away from raw query builders.
+## 2026-03-14 23:05 CET - Drizzle env loading clarified
+
+- Updated [drizzle.config.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/drizzle.config.ts) and [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts) to load `.env.local` explicitly via `dotenv`.
+- Drizzle now also checks `SUPABASE_URL` as a fallback name, but only if it is actually a PostgreSQL connection string.
+- Added an explicit error message for the common mismatch where `SUPABASE_URL` is the Supabase HTTP project URL rather than the Postgres DSN.
+- `SUPABASE_SECRET_KEY` is not used by Drizzle ORM and does not help for `pg_dump` or direct SQL connections.
+## 2026-03-14 23:20 CET - First Drizzle repository pilot
+
+- Updated [aboutRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/aboutRepository.ts) to use Drizzle instead of the Supabase query builder.
+- The pilot uses [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts), [schema.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/schema.ts), and typed Drizzle filters/order clauses (`eq`, `asc`).
+- Chosen pilot scope: `about` because it is small enough to validate the Drizzle path without opening the higher-complexity `projects` flow immediately.
