@@ -554,6 +554,65 @@ Why direct SQL for generic admin CRUD:
 - a fully typed query builder becomes awkward for table/column names known only at runtime;
 - the direct SQL layer can still be made safe through identifier validation and parameterized values.
 
+### 10.4.1 Why the admin layer is not fully Drizzle-driven yet
+
+At first glance, it might seem desirable to use Drizzle for the admin layer as well. In practice, the current admin model is not a natural fit for Drizzle's strongest properties.
+
+The public side has the following characteristics:
+
+- table set known at design time;
+- query shape known at design time;
+- DTO shape known at design time;
+- relation graph stable and explicit.
+
+This is exactly the situation where Drizzle provides maximum leverage.
+
+The admin side is different:
+
+- the target table is selected at runtime through a controlled query parameter;
+- the mutable columns are only known after resolving the selected table;
+- the same HTTP endpoint performs CRUD over multiple heterogeneous tables;
+- the frontend admin UI is intentionally generic rather than entity-specific.
+
+From a type-theoretic perspective, this means the admin layer is operating over a runtime-selected schema fragment, whereas Drizzle is most ergonomic when the schema fragment is selected statically at compile time.
+
+In other words:
+
+- public repositories are schema-specific;
+- admin CRUD is schema-aware but runtime-generic.
+
+That distinction is the main reason the repository currently uses:
+
+- Drizzle for read-oriented, schema-stable public repositories;
+- validated SQL templates for write-oriented, runtime-generic admin CRUD.
+
+This is not a claim that Drizzle cannot be used for admin operations. It can, but only if the admin architecture itself changes.
+
+The realistic migration paths are:
+
+1. table-specific admin repositories
+   - one repository/service pair per entity;
+   - highest type safety;
+   - highest boilerplate cost.
+
+2. schema-driven admin registry
+   - a registry mapping table name to:
+     - Drizzle table object
+     - primary keys
+     - editable columns
+     - validators
+     - adapters
+   - preserves a generic UI while making backend behavior more typed.
+
+3. fully generic runtime CRUD
+   - the current model;
+   - minimal boilerplate;
+   - lower static type precision.
+
+Therefore, the current choice is best interpreted as an architectural staging decision rather than as a rejection of Drizzle for the admin domain.
+
+If the repository later moves toward a typed admin registry, then extending Drizzle to the admin path becomes both reasonable and desirable.
+
 ### 10.5 Server-owned session cookies instead of client-owned Supabase auth state
 
 Current choice:

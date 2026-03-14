@@ -1193,3 +1193,14 @@ Conclusione:
   - Supabase
   - Vercel
 - Purpose: make the initial section communicate both the software identity of the project and its concrete implementation stack without requiring the reader to scroll into the body of the document.
+## 2026-03-15 02:00 CET - README expanded with an explicit admin-vs-Drizzle rationale
+
+- Added a dedicated section in [README.md](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/README.md) explaining why the admin layer does not yet use Drizzle in the same way as the public repositories.
+- The new section documents the core distinction between:
+  - schema-stable, compile-time known read paths
+  - runtime-generic, table-selected admin CRUD paths
+- It also outlines the realistic evolution strategies for a future Drizzle-based admin path:
+  - table-specific admin repositories
+  - schema-driven admin registry
+  - keeping the current generic CRUD model
+- Purpose: make the current architectural trade-off explicit and prevent the design from looking inconsistent or accidental in the documentation.
