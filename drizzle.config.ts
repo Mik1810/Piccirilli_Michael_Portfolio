@@ -6,11 +6,12 @@ loadEnv({ path: '.env.local' })
 const connectionString =
   process.env.DATABASE_URL ||
   process.env.SUPABASE_DB_URL ||
-  process.env.SUPABASE_URL ||
   ''
 
 if (!connectionString) {
-  throw new Error('Missing DATABASE_URL, SUPABASE_DB_URL, or SUPABASE_URL for Drizzle config')
+  throw new Error(
+    'Missing DATABASE_URL or SUPABASE_DB_URL for Drizzle config. Drizzle requires a PostgreSQL DSN and cannot use SUPABASE_URL, which is the HTTP project endpoint.'
+  )
 }
 
 if (!/^postgres(ql)?:\/\//i.test(connectionString)) {

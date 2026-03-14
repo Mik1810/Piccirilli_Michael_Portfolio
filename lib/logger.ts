@@ -5,7 +5,18 @@ export const logApiError = (
 ) => {
   const details =
     error instanceof Error
-      ? { message: error.message, stack: error.stack }
+      ? {
+          message: error.message,
+          stack: error.stack,
+          cause:
+            error.cause instanceof Error
+              ? {
+                  message: error.cause.message,
+                  stack: error.cause.stack,
+                  name: error.cause.name,
+                }
+              : error.cause,
+        }
       : { error }
 
   console.error(`[api] ${context}`, {

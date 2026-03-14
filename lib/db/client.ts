@@ -9,24 +9,24 @@ loadEnv({ path: '.env.local' })
 const connectionString =
   process.env.DATABASE_URL ||
   process.env.SUPABASE_DB_URL ||
-  process.env.SUPABASE_URL ||
   ''
 
 let client: postgres.Sql | null = null
 
 const getClient = () => {
   if (!connectionString) {
-    throw new Error('Missing DATABASE_URL, SUPABASE_DB_URL, or SUPABASE_URL')
-  }
-
-  if (!/^postgres(ql)?:\/\//i.test(connectionString)) {
     throw new Error(
-      'Drizzle requires a PostgreSQL connection string. SUPABASE_URL currently looks like an HTTP project URL, not a DB URL.'
+      'Missing DATABASE_URL or SUPABASE_DB_URL. Drizzle requires a PostgreSQL DSN and cannot use SUPABASE_URL, which is the HTTP project endpoint.'
     )
   }
 
   if (!client) {
     client = postgres(connectionString, {
+      // Vercel functions are short-lived and scale horizontally:
+      // keep the local pool minimal and disable prepared statements for Supavisor.
+      max: 1,
+      idle_timeout: 5,
+      connect_timeout: 15,
       prepare: false,
     })
   }

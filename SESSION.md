@@ -1204,3 +1204,44 @@ Conclusione:
   - schema-driven admin registry
   - keeping the current generic CRUD model
 - Purpose: make the current architectural trade-off explicit and prevent the design from looking inconsistent or accidental in the documentation.
+## 2026-03-14 23:54 CET - Diagnosed Vercel 500s on public endpoints as missing DB runtime config
+
+- Investigated the production `500` errors affecting all public endpoints:
+  - `/api/about`
+  - `/api/profile`
+  - `/api/projects`
+  - `/api/skills`
+  - `/api/experiences`
+- Root cause analysis:
+  - all public handlers now depend on Drizzle-backed repositories through [publicContentService.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/services/publicContentService.ts)
+  - all those repositories import [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts)
+  - therefore a missing PostgreSQL DSN at runtime causes all public read endpoints to fail together
+- Tightened the configuration contract:
+  - updated [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts) so runtime DB access only accepts `DATABASE_URL` or `SUPABASE_DB_URL`
+  - updated [drizzle.config.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/drizzle.config.ts) to follow the same rule
+  - explicitly removed the misleading fallback to `SUPABASE_URL`, because that value is the Supabase HTTP project endpoint, not a PostgreSQL connection string
+- Expected production fix:
+  - add the real Supabase/Postgres DSN as `DATABASE_URL` (or `SUPABASE_DB_URL`) in Vercel environment variables
+  - redeploy production after saving the environment variable
+- Verification during diagnosis:
+  - `npm run typecheck` passed
+  - `npm run lint` passed
+  - local `vite build` failed for a separate path/junction issue and is unrelated to the API `500` investigation
+## 2026-03-15 00:10 CET - Refined Vercel DB diagnosis after function logs
+
+- Production runtime logs confirmed that the public API no longer fails because of a missing `DATABASE_URL`.
+- The new failure mode is downstream of DB connectivity and query execution:
+  - Drizzle reaches the database layer
+  - public queries fail intermittently inside repository reads
+  - `/api/health` and `/api/admin/session` continue to work, confirming the issue is isolated to DB-backed public endpoints
+- The Vercel `DATABASE_URL` currently points to the Supabase shared pooler in session mode (`:5432`).
+- Supabase documents that serverless platforms should use the transaction pooler (`:6543`) for transient connections, while session mode is intended for long-lived/persistent servers.
+- Applied serverless-oriented client tuning in [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts):
+  - `max: 1`
+  - `idle_timeout: 5`
+  - `connect_timeout: 15`
+  - `prepare: false` retained
+- Improved [logger.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/logger.ts) to include `error.cause` in server logs, so future production errors expose the underlying Postgres/postgres-js cause instead of only Drizzle's wrapper message.
+- Expected external follow-up:
+  - replace the Vercel `DATABASE_URL` with the Supabase transaction pooler connection string on port `6543`
+  - redeploy production after saving the environment variable
