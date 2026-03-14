@@ -1127,3 +1127,17 @@ Conclusione:
   - live admin table read test returned one `profile` row
   - invalid admin sign-in test failed cleanly with `Invalid login credentials`
 - Remaining mentions of `supabaseAdmin` now live only in historical notes/documentation (`SESSION.md`, `IMPROVEMENTS.md`), not in runtime code.
+## 2026-03-15 00:50 CET - Technical README added
+
+- Added [README.md](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/README.md) from scratch as the main technical project documentation.
+- The README documents:
+  - stack and runtime architecture
+  - repo structure
+  - data model and i18n table pattern
+  - environment variables
+  - development and quality scripts
+  - backend cache / error handling / rate limiting
+  - admin auth and CRUD internals
+  - API surface and deployment notes
+  - database dump usage and roadmap status
+- The document was written from the real codebase state plus [SESSION.md](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/SESSION.md) and [API_CONTRACT.md](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/docs/API_CONTRACT.md), so it reflects the post-Drizzle, post-`supabaseAdmin` architecture rather than the original project shape.
