@@ -34,5 +34,6 @@ const getClient = () => {
   return client
 }
 
-export const db = drizzle(getClient(), { schema })
+export const sqlClient = getClient()
+export const db = drizzle(sqlClient, { schema })
 export { schema }

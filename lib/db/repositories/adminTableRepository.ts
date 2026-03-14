@@ -1,42 +1,72 @@
-import { supabaseAdmin } from '../../supabaseAdmin.js'
+import { sqlClient } from '../client.js'
 
-const withPrimaryKeyFilters = <TQuery>(
-  query: TQuery,
-  keys: Record<string, unknown>
-) => {
-  // Supabase dynamic filters require runtime composition.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let nextQuery: any = query
-  for (const [key, value] of Object.entries(keys)) {
-    nextQuery = nextQuery.eq(key, value)
+const IDENTIFIER_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/
+
+const quoteIdentifier = (value: string) => {
+  if (!IDENTIFIER_PATTERN.test(value)) {
+    throw new Error(`Invalid SQL identifier: ${value}`)
   }
-  return nextQuery
+  return `"${value}"`
+}
+
+const buildWhereClause = (
+  keys: Record<string, unknown>,
+  startIndex: number
+) => {
+  const entries = Object.entries(keys)
+  const values = entries.map(([, value]) => value)
+  const clause = entries
+    .map(([key], index) => `${quoteIdentifier(key)} = $${startIndex + index}`)
+    .join(' AND ')
+
+  return { clause, values }
+}
+
+const ensureRowColumns = (row: Record<string, unknown>) => {
+  const columns = Object.keys(row)
+  if (columns.length === 0) {
+    throw new Error('Missing row payload')
+  }
+  columns.forEach((column) => {
+    quoteIdentifier(column)
+  })
+  return columns
+}
+
+const runUnsafe = async <TRow = Record<string, unknown>>(
+  query: string,
+  values: unknown[]
+) => {
+  try {
+    return (await sqlClient.unsafe(query, values as never[])) as TRow[]
+  } catch {
+    throw new Error('Database error')
+  }
 }
 
 export const listAdminRows = async (table: string, limit: number) => {
-  const { data, error } = await supabaseAdmin.from(table).select('*').limit(limit)
-  if (error) {
-    throw new Error(error.message || 'Database error')
-  }
-  return data || []
+  const rows = await runUnsafe(
+    `select * from ${quoteIdentifier(table)} limit $1`,
+    [limit]
+  )
+  return rows
 }
 
 export const insertAdminRow = async (
   table: string,
   row: Record<string, unknown>
 ) => {
-  const { data, error } = await supabaseAdmin
-    .from(table)
-    .insert(row)
-    .select('*')
-    .limit(1)
-    .maybeSingle()
+  const columns = ensureRowColumns(row)
+  const values = columns.map((column) => row[column])
+  const columnList = columns.map(quoteIdentifier).join(', ')
+  const valuePlaceholders = columns.map((_, index) => `$${index + 1}`).join(', ')
 
-  if (error) {
-    throw new Error(error.message || 'Database error')
-  }
+  const rows = await runUnsafe(
+    `insert into ${quoteIdentifier(table)} (${columnList}) values (${valuePlaceholders}) returning *`,
+    values
+  )
 
-  return data || null
+  return rows[0] || null
 }
 
 export const updateAdminRow = async (
@@ -44,24 +74,28 @@ export const updateAdminRow = async (
   keys: Record<string, unknown>,
   row: Record<string, unknown>
 ) => {
-  const query = withPrimaryKeyFilters(supabaseAdmin.from(table).update(row), keys)
-  const { data, error } = await query.select('*').limit(1).maybeSingle()
+  const columns = ensureRowColumns(row)
+  const setValues = columns.map((column) => row[column])
+  const setClause = columns
+    .map((column, index) => `${quoteIdentifier(column)} = $${index + 1}`)
+    .join(', ')
+  const where = buildWhereClause(keys, columns.length + 1)
 
-  if (error) {
-    throw new Error(error.message || 'Database error')
-  }
+  const rows = await runUnsafe(
+    `update ${quoteIdentifier(table)} set ${setClause} where ${where.clause} returning *`,
+    [...setValues, ...where.values]
+  )
 
-  return data || null
+  return rows[0] || null
 }
 
 export const deleteAdminRow = async (
   table: string,
   keys: Record<string, unknown>
 ) => {
-  const query = withPrimaryKeyFilters(supabaseAdmin.from(table).delete(), keys)
-  const { error } = await query
-
-  if (error) {
-    throw new Error(error.message || 'Database error')
-  }
+  const where = buildWhereClause(keys, 1)
+  await runUnsafe(
+    `delete from ${quoteIdentifier(table)} where ${where.clause}`,
+    where.values
+  )
 }

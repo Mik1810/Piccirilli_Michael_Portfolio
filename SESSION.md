@@ -1114,3 +1114,16 @@ Conclusione:
 - Preserved the external payload shape used by [projects.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/api/projects.ts), including `live`, `githubUrl`, `liveUrl`, primary preview image, and gallery images.
 - Verified the migrated repository against live data: locale `it` returned `2` standard projects and `4` featured GitHub projects; the first GitHub project (`Unify`) exposed `5` gallery images through Drizzle.
 - `npm run typecheck`, `npm run lint`, and `npm run build` all passed after the final repository migration.
+## 2026-03-15 00:35 CET - Removed supabaseAdmin.ts dependency
+
+- Reworked [adminTableRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/adminTableRepository.ts) to use direct SQL through [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts) instead of the Supabase query builder.
+- Added identifier validation and parameterized query construction for the generic admin CRUD flow so the admin area keeps its current flexibility without relying on `supabase-js`.
+- Reworked [adminAuthRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/adminAuthRepository.ts) to authenticate against Supabase Auth over HTTP (`/auth/v1/token?grant_type=password`) using `SUPABASE_URL` and `SUPABASE_SECRET_KEY`.
+- Removed [supabaseAdmin.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/supabaseAdmin.ts) entirely and removed `@supabase/supabase-js` from [package.json](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/package.json).
+- Verification:
+  - `npm run typecheck` passed
+  - `npm run lint` passed
+  - `npm run build` passed
+  - live admin table read test returned one `profile` row
+  - invalid admin sign-in test failed cleanly with `Invalid login credentials`
+- Remaining mentions of `supabaseAdmin` now live only in historical notes/documentation (`SESSION.md`, `IMPROVEMENTS.md`), not in runtime code.
