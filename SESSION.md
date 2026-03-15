@@ -2910,3 +2910,20 @@ Conclusione:
 - Expected result:
   - each CI run now enforces lint in addition to typecheck and build
   - GitHub Actions retains a downloadable `ci-logs` artifact that can be inspected after both successful and failed runs.
+
+## 2026-03-15 20:45 CET - Fixed lint blockers reported by the new GitHub CI workflow
+
+- The first CI run surfaced two real frontend issues:
+  - an unused `warmImageBatch` import and unstable `images` dependencies in `GithubProjectMedia`
+  - `setState` calls inside effects in `HeroTyping`, flagged by `react-hooks/set-state-in-effect`
+- Updated:
+  - [GithubProjectMedia.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/GithubProjectMedia.tsx)
+  - [HeroTyping.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/HeroTyping.tsx)
+- Changes:
+  - removed the unused `warmImageBatch` import
+  - memoized `images` and `loopedImages` so the related effects have stable dependencies
+  - replaced the portrait loading effects with a callback-ref based cache-path check plus load/error handlers
+  - preserved the existing hero reveal behavior while removing the lint-flagged synchronous state updates from effect bodies
+- Expected result:
+  - local lint should now pass for the two affected components
+  - the GitHub CI workflow should stop failing on these reported frontend issues.

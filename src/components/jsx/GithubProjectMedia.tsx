@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import type {
   GithubProjectItem,
@@ -8,7 +8,6 @@ import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion.js'
 import {
   scheduleWarmImageBatch,
   warmImage,
-  warmImageBatch,
 } from '../../utils/imageWarmup.js'
 import '../css/GithubProjectMedia.css'
 import GithubProjectLightbox from './GithubProjectLightbox'
@@ -225,9 +224,15 @@ function GithubProjectMedia({
   expandHintLabel: string
   emptyMediaLabel: string
 }) {
-  const images = Array.isArray(project.images) ? project.images : []
-  const loopedImages =
-    images.length > 1 ? [images[images.length - 1], ...images, images[0]] : images
+  const images = useMemo(
+    () => (Array.isArray(project.images) ? project.images : []),
+    [project.images]
+  )
+  const loopedImages = useMemo(
+    () =>
+      images.length > 1 ? [images[images.length - 1], ...images, images[0]] : images,
+    [images]
+  )
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
   const [activeLightboxIndex, setActiveLightboxIndex] = useState(0)
   const [isMediaVisible, setIsMediaVisible] = useState(false)

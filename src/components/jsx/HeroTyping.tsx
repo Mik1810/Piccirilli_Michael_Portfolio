@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { useLanguage } from '../../context/useLanguage'
 import { useProfile } from '../../context/useProfile'
@@ -21,21 +21,19 @@ function HeroPortrait({
   contentReady: boolean
   ariaHidden?: boolean
 }) {
-  const [photoLoaded, setPhotoLoaded] = useState(false)
-  const photoRef = useRef<HTMLImageElement | null>(null)
+  const [loadedPhoto, setLoadedPhoto] = useState<string | null>(null)
+  const photoLoaded = loadedPhoto === photo
 
-  useEffect(() => {
-    setPhotoLoaded(false)
-  }, [photo])
+  const handlePhotoRef = useCallback(
+    (image: HTMLImageElement | null) => {
+      if (!photo || !image) return
 
-  useLayoutEffect(() => {
-    const image = photoRef.current
-    if (!photo || !image) return
-
-    if (image.complete && image.naturalWidth > 0) {
-      setPhotoLoaded(true)
-    }
-  }, [photo])
+      if (image.complete && image.naturalWidth > 0) {
+        setLoadedPhoto((current) => (current === photo ? current : photo))
+      }
+    },
+    [photo]
+  )
 
   return (
     <div
@@ -44,14 +42,14 @@ function HeroPortrait({
     >
       {photo ? (
         <img
-          ref={photoRef}
+          ref={handlePhotoRef}
           className="float-animation"
           src={photo}
           alt={alt}
           decoding="async"
           fetchPriority="high"
-          onLoad={() => setPhotoLoaded(true)}
-          onError={() => setPhotoLoaded(true)}
+          onLoad={() => setLoadedPhoto(photo)}
+          onError={() => setLoadedPhoto(photo)}
         />
       ) : null}
     </div>
