@@ -3107,3 +3107,69 @@ Conclusione:
   - the version was set to `1.0.0` rather than raw `1` because npm expects semantic versioning
 - Expected result:
   - local scripts, CI logs, and package metadata should now identify the project with a name closer to the repository name and a real initial release version.
+
+## 2026-03-15 21:58 CET - Pruned IMPROVEMENTS.md to only the remaining open work
+
+- The roadmap file still mixed together completed work, skipped-by-choice items, and truly open items, which made it less useful as a live planning document.
+- Updated:
+  - [IMPROVEMENTS.md](/c:/Users/micha/Desktop/mik1810.github.io/IMPROVEMENTS.md)
+- Changes:
+  - removed sections that are already completed
+  - removed sections explicitly skipped by project choice
+  - rewrote the file as a shorter roadmap containing only:
+    - backend hardening
+    - database/schema hardening
+    - contact flow
+    - final performance pass
+    - minimal automated tests
+    - cross-device QA
+- Expected result:
+  - the improvements document should now reflect only the remaining realistic work, instead of acting as a historical wishlist.
+
+## 2026-03-15 22:00 CET - Added explicit DB-backed endpoint coverage to the remaining roadmap
+
+- One remaining testing goal was still implicit: adding automated coverage specifically for the public endpoints that actually execute database queries.
+- Updated:
+  - [IMPROVEMENTS.md](/c:/Users/micha/Desktop/mik1810.github.io/IMPROVEMENTS.md)
+- Changes:
+  - expanded the `Test automatici minimi` section
+  - added an explicit follow-up item for a dedicated test suite covering DB-backed endpoints, starting from:
+    - `/api/profile`
+    - `/api/about`
+    - `/api/projects`
+    - `/api/experiences`
+    - `/api/skills`
+- Expected result:
+  - the roadmap should now make it explicit that endpoint-level verification of database-backed APIs is still planned work, not just a generic testing note.
+
+## 2026-03-15 22:06 CET - Merged the remaining TODO items into IMPROVEMENTS.md
+
+- The repository still had a separate `todo.md` file with open ideas that were not yet reflected in the trimmed roadmap.
+- Updated:
+  - [IMPROVEMENTS.md](/c:/Users/micha/Desktop/mik1810.github.io/IMPROVEMENTS.md)
+- Changes:
+  - merged the still-relevant TODO items into the main roadmap, especially around:
+    - linking skills to related projects
+    - adding a `Cloud & Infra` section
+    - devicon fallback behavior
+    - skill ordering UX in admin
+    - deferred upload/media workflow in admin
+    - a targeted `Experience` UI polish item
+  - kept the roadmap filtered so already completed items were not reintroduced
+- Expected result:
+  - `IMPROVEMENTS.md` should now act as the single current roadmap, without requiring a second planning file for still-open ideas.
+
+## 2026-03-15 22:11 CET - Added operational roadmap items after the TODO merge
+
+- Some useful follow-up ideas were still outside the roadmap even after merging `todo.md`, especially on the operational side.
+- Updated:
+  - [IMPROVEMENTS.md](/c:/Users/micha/Desktop/mik1810.github.io/IMPROVEMENTS.md)
+- Changes:
+  - added environment validation to backend hardening
+  - introduced a dedicated `Tooling e manutenzione operativa` section containing:
+    - `Dependabot` / `Renovate`
+    - a minimal health/dashboard view
+    - lightweight release discipline
+  - renumbered the remaining sections and refreshed the suggested order
+- Expected result:
+  - the roadmap should now cover the most useful operational improvements too, not only product-facing and backend-facing work.
