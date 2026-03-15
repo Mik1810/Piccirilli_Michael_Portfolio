@@ -2616,3 +2616,69 @@ Conclusione:
   - preload the active and adjacent screenshots more aggressively when opening the lightbox
   - warm the full gallery while navigating so image-to-image skipping is less dependent on last-second network fetches
 - Verified with `npm run typecheck` and `npm run build`.
+
+## 2026-03-15 23:54 CET - Added a repeatable WebP optimization pass for GitHub project screenshots
+
+- Introduced a repeatable asset-optimization step for local GitHub project screenshots without forcing an immediate database migration.
+- Updated:
+  - [package.json](/c:/Users/micha/Desktop/mik1810.github.io/package.json)
+  - [optimizeProjectImages.mjs](/c:/Users/micha/Desktop/mik1810.github.io/scripts/optimizeProjectImages.mjs)
+  - [projectImageUrl.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/utils/projectImageUrl.ts)
+  - [projectsRepository.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/db/repositories/projectsRepository.ts)
+- Changes:
+  - added `npm run assets:projects:webp`, implemented via `ffmpeg` in WSL, to convert local `/public/imgs/projects/*.png` screenshots into `.webp`
+  - capped the generated screenshots to a maximum width of `1600px` with Lanczos scaling and WebP picture compression
+  - added a server-side helper that rewrites local `/imgs/projects/*.png` URLs to `.webp` before returning public project payloads
+  - kept the original PNG files in place so the optimization pass is low-risk and reversible
+- Result:
+  - converted `28` screenshots from about `2.73 MB` total to about `1.10 MB`
+  - the public GitHub project gallery should now load and skip more quickly because the API serves lighter local image assets by default.
+
+## 2026-03-16 00:08 CET - Extended the WebP pass to all local public images under /imgs
+
+- Generalized the image-optimization path so the same approach can cover local profile, logo, and event imagery under `/public/imgs`, not only project screenshots.
+- Updated:
+  - [package.json](/c:/Users/micha/Desktop/mik1810.github.io/package.json)
+  - [optimizeProjectImages.mjs](/c:/Users/micha/Desktop/mik1810.github.io/scripts/optimizeProjectImages.mjs)
+  - [optimizedImageUrl.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/utils/optimizedImageUrl.ts)
+  - [projectsRepository.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/db/repositories/projectsRepository.ts)
+  - [profileRepository.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/db/repositories/profileRepository.ts)
+  - [experiencesRepository.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/db/repositories/experiencesRepository.ts)
+  - [index.html](/c:/Users/micha/Desktop/mik1810.github.io/index.html)
+- Changes:
+  - expanded the optimizer to recurse through all raster images under `/public/imgs`
+  - added a generic server-side URL rewriter that swaps to `.webp` only when an optimized counterpart actually exists on disk
+  - kept original formats for assets where `.webp` was not beneficial, avoiding regressions on already-small icons, the profile photo, and the university logo
+- Result:
+  - the project screenshot gains remain intact
+  - `Street_Science.png` also benefits from the same optimization path
+  - all other local public images keep their original formats unless the generated `.webp` is genuinely smaller.
+
+## 2026-03-16 00:16 CET - Prepared the database-side WebP reference update
+
+- Added a dedicated SQL patch to move database references onto the optimized local `.webp` assets where those assets are now canonical.
+- Updated:
+  - [updateImageUrlsToWebp.sql](/c:/Users/micha/Desktop/mik1810.github.io/scripts/updateImageUrlsToWebp.sql)
+  - [index.html](/c:/Users/micha/Desktop/mik1810.github.io/index.html)
+- Changes:
+  - prepared an explicit `UPDATE` for `public.github_project_images` so project screenshot URLs move from `.png` to `.webp`
+  - prepared an explicit `UPDATE` for `public.experiences.logo` so `Street_Science` points to its optimized `.webp`
+  - restored the social/SEO metadata image to `/imgs/michael.jpg`, because the generated `.webp` for the profile photo was not an improvement worth keeping
+- Result:
+  - the codebase and the pending DB patch now agree on which local assets should truly become `.webp`
+  - profile and other small/local images that do not benefit remain in their original formats.
+
+## 2026-03-16 00:24 CET - Removed temporary migration helpers and dropped dead raster assets
+
+- Finalized the image optimization pass by removing the temporary runtime rewrite layer and deleting raster files that are no longer referenced.
+- Updated:
+  - [package.json](/c:/Users/micha/Desktop/mik1810.github.io/package.json)
+  - [projectsRepository.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/db/repositories/projectsRepository.ts)
+  - [profileRepository.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/db/repositories/profileRepository.ts)
+  - [experiencesRepository.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/db/repositories/experiencesRepository.ts)
+- Changes:
+  - removed the temporary optimization scripts and the server-side URL rewrite helper now that the database references are already aligned
+  - deleted the old project PNG screenshots and `Street_Science.png`
+  - kept the new `.webp` assets as the canonical local sources
+  - left unrelated dirty files outside this cleanup block untouched
+- Verified with `npm run typecheck` and `npm run build`.
