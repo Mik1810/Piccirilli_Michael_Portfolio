@@ -1309,3 +1309,16 @@ Conclusione:
 - Intention:
   - retain the structural fixes that improved stability
   - remove “panic-mode” retry layers that added complexity and made behavior harder to reason about
+## 2026-03-15 10:40 CET - Silenced dotenv runtime noise in production logs
+
+- Observed that some successful Vercel requests were visually flagged by noisy runtime messages even when the HTTP status was `200`.
+- Confirmed that part of the noise came from `dotenv` itself, which was printing informational tips such as:
+  - `injecting env (0) from .env`
+  - miscellaneous `dotenvx` tips
+- Updated the environment loading calls to use `quiet: true` in:
+  - [client.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/client.ts)
+  - [adminAuthRepository.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/lib/db/repositories/adminAuthRepository.ts)
+  - [drizzle.config.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/drizzle.config.ts)
+- Outcome:
+  - successful requests should no longer be visually polluted by `dotenv`'s informational output
+  - the remaining `DEP0169` warning appears unrelated to the application code itself and is likely emitted by a dependency or the hosting/runtime layer rather than by the repository logic

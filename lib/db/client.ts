@@ -4,7 +4,7 @@ import postgres from 'postgres'
 
 import * as schema from './schema.js'
 
-loadEnv({ path: '.env.local' })
+loadEnv({ path: '.env.local', quiet: true })
 
 const connectionString =
   process.env.DATABASE_URL ||

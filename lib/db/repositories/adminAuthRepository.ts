@@ -1,8 +1,8 @@
 import { config as loadEnv } from 'dotenv'
 import type { SessionUser } from '../../types/auth.js'
 
-loadEnv({ path: '.env.local' })
-loadEnv()
+loadEnv({ path: '.env.local', quiet: true })
+loadEnv({ quiet: true })
 
 interface SupabaseAuthResponse {
   user?: {
