@@ -2927,3 +2927,33 @@ Conclusione:
 - Expected result:
   - local lint should now pass for the two affected components
   - the GitHub CI workflow should stop failing on these reported frontend issues.
+
+## 2026-03-15 20:49 CET - Documented the CI workflow directly inside ci.yml
+
+- The workflow was working, but the file itself did not explain why each trigger and step existed.
+- Updated:
+  - [ci.yml](/c:/Users/micha/Desktop/mik1810.github.io/.github/workflows/ci.yml)
+- Changes:
+  - added short YAML comments above each trigger and step
+  - documented the purpose of:
+    - push and pull request triggers
+    - checkout and Node setup
+    - log directory creation
+    - install, lint, typecheck, and build
+    - artifact upload
+- Expected result:
+  - the CI file should now be easier to read and remember without opening external documentation.
+
+## 2026-03-15 20:53 CET - Added an inline GitHub Actions summary for CI logs
+
+- The uploaded CI artifact is useful for backup, but GitHub downloads artifacts as zip files, which makes quick inspection less convenient than reading directly from the run page.
+- Updated:
+  - [ci.yml](/c:/Users/micha/Desktop/mik1810.github.io/.github/workflows/ci.yml)
+- Changes:
+  - added a `Publish CI log summary` step with `if: always()`
+  - mirrored a readable digest of each generated log file into `$GITHUB_STEP_SUMMARY`
+  - documented in the summary itself that:
+    - full logs remain visible in each step output
+    - the artifact is only a downloadable backup and will still be zipped by GitHub
+- Expected result:
+  - future CI runs should expose a readable summary directly in the GitHub Actions UI without requiring an artifact download first.
