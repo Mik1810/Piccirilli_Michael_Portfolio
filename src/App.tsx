@@ -1,22 +1,23 @@
-import { useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 
 import About from './components/jsx/About'
-import AdminDashboard from './components/jsx/AdminDashboard'
-import AdminLogin from './components/jsx/AdminLogin'
 import Contact from './components/jsx/Contact'
 import Experience from './components/jsx/Experience'
 import Footer from './components/jsx/Footer'
 import HeroTyping from './components/jsx/HeroTyping'
 import Navbar from './components/jsx/Navbar'
 import Projects from './components/jsx/Projects'
-import RequireAdmin from './components/jsx/RequireAdmin'
 import ScrollProgress from './components/jsx/ScrollProgress'
 import ScrollToTop from './components/jsx/ScrollToTop'
 import Skills from './components/jsx/Skills'
 import './components/css/SectionSkeletons.css'
 import { useContent } from './context/useContent'
 import { useProfile } from './context/useProfile'
+
+const AdminDashboard = lazy(() => import('./components/jsx/AdminDashboard'))
+const AdminLogin = lazy(() => import('./components/jsx/AdminLogin'))
+const RequireAdmin = lazy(() => import('./components/jsx/RequireAdmin'))
 
 function App() {
   const { pathname } = useLocation()
@@ -72,13 +73,22 @@ function App() {
       <ScrollProgress />
       <Navbar />
       <Routes>
-        <Route path="/login" element={<AdminLogin />} />
+        <Route
+          path="/login"
+          element={
+            <Suspense fallback={<AdminRouteFallback />}>
+              <AdminLogin />
+            </Suspense>
+          }
+        />
         <Route
           path="/admin"
           element={
-            <RequireAdmin>
-              <AdminDashboard />
-            </RequireAdmin>
+            <Suspense fallback={<AdminRouteFallback />}>
+              <RequireAdmin>
+                <AdminDashboard />
+              </RequireAdmin>
+            </Suspense>
           }
         />
         <Route
@@ -98,6 +108,21 @@ function App() {
       <Footer className={isAdminRoute ? 'footer-admin' : ''} />
       <ScrollToTop />
     </>
+  )
+}
+
+function AdminRouteFallback() {
+  return (
+    <main
+      className="section-loading-wrapper"
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <div className="section-loading-content">
+        <span className="section-loading-line section-loading-line-title" />
+        <span className="section-loading-line section-loading-line-copy" />
+      </div>
+    </main>
   )
 }
 

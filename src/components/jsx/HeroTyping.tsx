@@ -48,6 +48,11 @@ function HeroTypingAnimation({
   const [roleCharIndex, setRoleCharIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
   const [hasRoleRendered, setHasRoleRendered] = useState(false)
+  const [photoLoaded, setPhotoLoaded] = useState(false)
+
+  useEffect(() => {
+    setPhotoLoaded(false)
+  }, [photo])
 
   useEffect(() => {
     const currentRole = roles[roleIndex]
@@ -135,7 +140,9 @@ function HeroTypingAnimation({
             ))}
           </div>
         </div>
-        <div className="hero-typing-image photo-glow">
+        <div
+          className={`hero-typing-image photo-glow${photoLoaded ? ' is-loaded' : ' is-loading'}`}
+        >
           {photo ? (
             <img
               className="float-animation"
@@ -143,6 +150,7 @@ function HeroTypingAnimation({
               alt={nameText}
               decoding="async"
               fetchPriority="high"
+              onLoad={() => setPhotoLoaded(true)}
             />
           ) : null}
         </div>

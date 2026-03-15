@@ -2699,3 +2699,78 @@ Conclusione:
   - removed direct reads of `req.query` from the public content endpoints and the admin table endpoint
   - kept the request semantics unchanged while avoiding the Vercel runtime code path that internally calls `url.parse()`
 - Verified with `npm run typecheck` and `npm run build`.
+
+## 2026-03-16 00:43 CET - Reduced the hero portrait to match its actual rendering size
+
+- Ran a first targeted asset optimization pass on the above-the-fold hero portrait, which was still oversized relative to its rendered dimensions.
+- Updated:
+  - [michael.jpg](/c:/Users/micha/Desktop/mik1810.github.io/public/imgs/michael.jpg)
+- Changes:
+  - resized the portrait from `951x1280` down to `720x969`
+  - kept the same file format and general quality profile to avoid unnecessary format churn for the hero image
+- Result:
+  - file size dropped from about `280 KB` to about `143 KB`
+  - the largest always-visible image on the home page is now much closer to its actual rendering footprint.
+
+## 2026-03-16 00:52 CET - Split the admin UI out of the public entry bundle
+
+- Continued the performance pass by targeting the highest-value code-splitting opportunity: the admin UI was still imported eagerly by the top-level application shell, which meant `/admin` code could leak into the main public bundle.
+- Updated:
+  - [App.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/App.tsx)
+- Changes:
+  - replaced eager imports of `AdminLogin`, `RequireAdmin`, and `AdminDashboard` with `React.lazy(...)`
+  - wrapped the `/login` and `/admin` routes in route-local `Suspense` boundaries
+  - added a lightweight admin-only fallback so the public home route keeps rendering immediately while the admin chunk loads on demand
+- Expected result:
+  - the main client bundle for `/` should shrink
+  - the admin experience should move into a separate async chunk that only loads when visiting `/login` or `/admin`.
+
+## 2026-03-16 01:06 CET - Added responsive hero and project gallery image variants
+
+- Continued the performance pass by moving from monolithic image assets to viewport-specific variants on the highest-impact public surfaces.
+- Updated:
+  - [michael-360w.jpg](/c:/Users/micha/Desktop/mik1810.github.io/public/imgs/michael-360w.jpg)
+  - [public/imgs/projects](/c:/Users/micha/Desktop/mik1810.github.io/public/imgs/projects)
+  - [HeroTyping.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/HeroTyping.tsx)
+  - [GithubProjectMedia.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/GithubProjectMedia.tsx)
+  - [GithubProjectLightbox.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/GithubProjectLightbox.tsx)
+  - [responsiveImages.ts](/c:/Users/micha/Desktop/mik1810.github.io/src/utils/responsiveImages.ts)
+- Changes:
+  - generated a `360w` portrait variant for the hero image
+  - generated `640w` and `1200w` variants for each GitHub project screenshot under `public/imgs/projects`
+  - switched the hero portrait to a compact-first `src/srcSet` pair
+  - switched GitHub project cards to card-sized variants and the lightbox to a larger dedicated variant, with the original file reserved for high-density displays
+  - updated image warmup logic so preview and lightbox states prefetch the same variant family that the UI actually renders
+- Expected result:
+  - lower image transfer cost for the initial home view
+  - materially faster GitHub project card rendering on small screens
+  - less jarring image swaps when opening the viewer or moving between screenshots.
+
+## 2026-03-16 01:18 CET - Reverted the responsive image variant experiment
+
+- Rolled back the responsive-image experiment after reviewing the tradeoff and deciding not to increase asset fan-out and prefetch complexity on the public site.
+- Updated:
+  - [HeroTyping.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/HeroTyping.tsx)
+  - [GithubProjectMedia.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/GithubProjectMedia.tsx)
+  - [GithubProjectLightbox.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/GithubProjectLightbox.tsx)
+- Changes:
+  - removed the `srcSet` wiring for the hero portrait and GitHub project screenshots
+  - restored the simpler warmup logic that preloads the canonical image paths already stored in the data layer
+  - discarded the generated `-360w`, `-640w`, and `-1200w` image variants instead of introducing them into the runtime
+- Result:
+  - the site returns to the previous single-asset-per-image strategy
+  - the earlier improvements to WebP conversion, admin code splitting, and viewer behavior stay intact.
+
+## 2026-03-16 01:29 CET - Smoothed the hero portrait reveal to avoid partial JPEG painting
+
+- Investigated the odd top-half-then-bottom hero portrait rendering during initial load and confirmed the image itself was already a baseline JPEG, so the cleaner fix was to control reveal timing in the UI.
+- Updated:
+  - [HeroTyping.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/HeroTyping.tsx)
+  - [HeroTyping.css](/c:/Users/micha/Desktop/mik1810.github.io/src/components/css/HeroTyping.css)
+- Changes:
+  - added a small load state for the hero portrait
+  - kept the circular image shell visible as a soft placeholder while the file is loading
+  - fade the portrait in only once the browser has fully loaded the image instead of showing partial scanline painting
+- Result:
+  - the hero photo should appear as a clean single reveal
+  - the layout and shadow footprint stay stable while the image is still loading.
