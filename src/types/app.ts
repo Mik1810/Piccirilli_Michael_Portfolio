@@ -133,6 +133,10 @@ export interface GithubProjectMediaCarouselProps {
   project: GithubProjectItem
   images: string[]
   loopedImages: string[]
+  onOpenPreview: (index: number) => void
+  previewCtaLabel: string
+  expandHintLabel: string
+  emptyMediaLabel: string
 }
 
 export interface ContentContextValue {

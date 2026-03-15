@@ -23,6 +23,9 @@
       "subtitle": "Una selezione dei miei lavori più significativi",
       "githubTitle": "Selected GitHub Projects",
       "githubSubtitle": "Una raccolta di repository che mostra progetti web, interfacce e sperimentazione tecnica.",
+      "previewLabel": "Apri anteprima",
+      "expandHint": "Clicca per espandere",
+      "mediaUnavailable": "Preview non ancora disponibile",
       "codeLabel": "Codice",
       "siteLabel": "Sito",
       "repoLabel": "Repository"
@@ -80,6 +83,9 @@
       "subtitle": "A selection of my most significant work",
       "githubTitle": "Selected GitHub Projects",
       "githubSubtitle": "A curated set of repositories showcasing web projects, interface work, and technical experimentation.",
+      "previewLabel": "Open preview",
+      "expandHint": "Click to expand",
+      "mediaUnavailable": "Preview not available yet",
       "codeLabel": "Code",
       "siteLabel": "Site",
       "repoLabel": "Repository"

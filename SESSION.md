@@ -1183,6 +1183,45 @@ Conclusione:
   - `npm run lint` passed
   - `npm run build` passed
   - direct runtime check of `fetchProjects('it')` confirmed GitHub projects still resolve `images` correctly from `github_project_images`
+
+## 2026-03-15 18:58 CET - Rewrote README in a more paper-like technical style
+
+- Rewrote [README.md](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/README.md) to document the repository as a technical system rather than as a changelog or generic project summary.
+- The new README now emphasizes:
+  - abstract and problem framing
+  - explicit system objectives
+  - current factual repository state
+  - two-plane architecture (public read plane and admin control plane)
+  - schema-driven admin backed by Drizzle
+  - current data model and invariants
+  - deployment/runtime constraints for Vercel and Supabase
+  - limitations and forward-looking work
+- Important correction:
+  - the document now reflects the current admin architecture accurately and no longer describes the older validated-SQL phase as if it were the present runtime state
+
+## 2026-03-15 19:12 CET - Refined GitHub project media states and added lightbox preview
+
+- Improved the single-page `Projects` section so GitHub project media behaves more explicitly and no longer relies on ambiguous placeholder treatment.
+- Updated:
+  - [Projects.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/Projects.tsx)
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+  - [staticI18n.json](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/data/staticI18n.json)
+  - [app.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/types/app.ts)
+- Changes:
+  - introduced clearer media behavior for GitHub projects:
+    - no-image state now renders an explicit fallback message
+    - media blocks expose a preview CTA instead of behaving like opaque placeholders
+  - added a lightbox-style modal for GitHub project media
+  - the modal opens from the media block and renders images with `object-fit: contain`, so screenshots are no longer cropped in the enlarged preview
+  - added keyboard and backdrop close behavior for the media viewer
+- Result:
+  - the portfolio remains single-page
+  - GitHub project media feels more intentional and less placeholder-driven
+  - screenshots can now be inspected at a larger scale without losing content due to cropping
+- Verification:
+  - `npm run typecheck` passed
+  - `npm run lint` passed
+  - `npm run build` passed
   - live admin table read test returned one `profile` row
   - invalid admin sign-in test failed cleanly with `Invalid login credentials`
 - Remaining mentions of `supabaseAdmin` now live only in historical notes/documentation (`SESSION.md`, `IMPROVEMENTS.md`), not in runtime code.
@@ -2125,3 +2164,292 @@ Conclusione:
   - `npm run typecheck` passed
   - `npm run lint` passed
   - `npm run build` passed
+
+## 2026-03-15 19:18 CET - SESSION append-only correction and README realignment
+
+- Corrected the logging practice for this session:
+  - `SESSION.md` should be treated as an append-only log
+  - some recent notes had been inserted earlier in the file instead of being appended at the end
+  - from this point onward, new notes are appended only in the tail section
+- Re-stated at the end of the log the current documentation status:
+  - [README.md](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/README.md) was rewritten in a more technical and paper-like style
+  - the README now describes the current architecture as it actually exists, including:
+    - public read plane
+    - admin control plane
+    - schema-driven admin backed by Drizzle
+    - current runtime constraints on Vercel/Supabase
+    - current limitations and next-step directions
+
+## 2026-03-15 19:19 CET - Appended recap of GitHub project media lightbox work
+
+- Refined the single-page `Projects` section with a clearer GitHub media model.
+- Updated:
+  - [Projects.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/Projects.tsx)
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+  - [staticI18n.json](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/data/staticI18n.json)
+  - [app.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/types/app.ts)
+- Changes:
+  - GitHub project media now distinguishes better between:
+    - real screenshot galleries
+    - projects with no media available
+  - added a lightbox/modal preview for GitHub screenshots
+  - enlarged screenshots are rendered with `object-fit: contain`, so the preview avoids cropping the image content
+  - the viewer supports close via backdrop, close button, and `Esc`
+- Verification:
+  - `npm run typecheck` passed
+  - `npm run lint` passed
+  - `npm run build` passed
+
+## 2026-03-15 19:28 CET - Restricted GitHub media viewer opening to click only
+
+- Adjusted the GitHub project media interaction model in the single-page `Projects` section.
+- Updated:
+  - [Projects.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/Projects.tsx)
+  - [staticI18n.json](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/data/staticI18n.json)
+  - [app.ts](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/types/app.ts)
+- Changes:
+  - removed automatic lightbox opening on hover
+  - the media viewer now opens only on click (or keyboard activation)
+  - added a dedicated hover hint label:
+    - `Clicca per espandere`
+    - `Click to expand`
+- Result:
+  - the preview interaction is more predictable
+  - the enlarged viewer no longer opens accidentally while simply passing the pointer over a project card
+- Verification:
+  - `npm run typecheck` passed
+  - `npm run lint` passed
+  - `npm run build` passed
+
+## 2026-03-15 19:34 CET - Moved GitHub media expand hint above the carousel controls
+
+- Refined the GitHub project media hover hint placement in the single-page `Projects` section.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - moved the `Click to expand` hint from the bottom-right corner to the top-right corner of the media frame
+  - adjusted the reveal motion so the pill now animates downward into place from the top
+- Result:
+  - the expand hint no longer competes visually with the bottom carousel dots/scroll indicator
+  - the media overlay hierarchy is clearer on GitHub project cards
+
+## 2026-03-15 19:38 CET - Removed redundant browser tooltip from GitHub media preview trigger
+
+- Refined the GitHub project media interaction copy in the single-page `Projects` section.
+- Updated:
+  - [Projects.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/Projects.tsx)
+- Changes:
+  - removed the native browser `title` tooltip from the media trigger
+  - kept the custom `Click to expand` / `Clicca per espandere` overlay as the only visible affordance
+- Result:
+  - avoids duplicate messaging under the cursor
+  - keeps the interaction cleaner while preserving the accessible button label
+
+## 2026-03-15 19:45 CET - Reduced GitHub media lightbox size and fixed bottom-edge cropping
+
+- Refined the GitHub project lightbox layout in the single-page `Projects` section.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - reduced the overall lightbox footprint from an almost full-screen presentation to a more balanced viewport usage
+  - changed the lightbox layout to a two-row grid (`meta + stage`) instead of relying on manual height subtraction
+  - added inner padding to the media stage so screenshots no longer press against the frame edges
+  - stopped forcing enlarged screenshots to `width: 100%` and `height: 100%`, leaving them to scale naturally within `object-fit: contain`
+- Result:
+  - the enlarged media viewer feels less oversized
+  - screenshots keep their full proportions more reliably and avoid apparent clipping near the bottom edge
+
+## 2026-03-15 19:49 CET - Hid the global scroll-to-top control while the GitHub media lightbox is open
+
+- Refined cross-component interaction between the single-page GitHub media viewer and the global floating controls.
+- Updated:
+  - [Projects.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/Projects.tsx)
+  - [ScrollToTop.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/ScrollToTop.css)
+- Changes:
+  - added a temporary `github-project-lightbox-open` class on `document.body` while the portal lightbox is mounted
+  - used that global state to hide and disable the `scroll-to-top` floating button during image preview
+- Result:
+  - the enlarged media viewer no longer competes with the global upward navigation control
+  - the overlay feels more focused and modal in practice
+
+## 2026-03-15 20:02 CET - Split Projects.tsx into focused portfolio and GitHub media components
+
+- Refactored the single-page `Projects` section to reduce file size and separate responsibilities without changing behavior.
+- Added:
+  - [PortfolioProjectsGrid.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/PortfolioProjectsGrid.tsx)
+  - [GithubProjectsGrid.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/GithubProjectsGrid.tsx)
+  - [GithubProjectCard.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/GithubProjectCard.tsx)
+  - [GithubProjectMedia.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/GithubProjectMedia.tsx)
+  - [GithubProjectLightbox.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/GithubProjectLightbox.tsx)
+- Updated:
+  - [Projects.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/Projects.tsx)
+- Result:
+  - `Projects.tsx` is now an orchestrator for the section instead of a monolithic file
+  - portfolio cards, GitHub cards, media carousel, and modal viewer now evolve in smaller and more local components
+
+## 2026-03-15 20:09 CET - Tightened GitHub media lightbox proportions and reduced excess side space
+
+- Refined the GitHub screenshot viewer sizing after the component split.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - reduced the overall modal width and height so the viewer no longer feels overly wide
+  - decreased the frame padding and corner radius to keep the screenshot visually closer to the container
+  - slightly reduced the effective max size of the image so it sits more comfortably within the stage
+- Result:
+  - less unused side space around screenshots
+  - a more compact modal presentation that should no longer suggest bottom-edge clipping
+
+## 2026-03-15 20:18 CET - Smoothed the tilt interaction on portfolio project cards
+
+- Refined the single-page portfolio project hover motion.
+- Updated:
+  - [PortfolioProjectsGrid.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/PortfolioProjectsGrid.tsx)
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - replaced direct per-event transform updates with a `requestAnimationFrame`-scheduled tilt loop
+  - cached the card bounds at hover start instead of re-reading layout on every mouse move
+  - disabled the transform transition while the card is actively tilting, then restored the softer reset on mouse leave
+- Result:
+  - the portfolio card tilt is significantly less jittery and more responsive under pointer movement
+
+## 2026-03-15 20:24 CET - Switched the GitHub lightbox to image-first sizing
+
+- Refined the GitHub screenshot viewer to prioritize complete image visibility over filling a fixed frame.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - replaced the rigid fixed-size lightbox box with a more content-sized modal
+  - constrained the screenshot itself directly with viewport-based max width and max height
+  - allowed the stage to scroll instead of clipping if an edge case still exceeds the available space
+- Result:
+  - the enlarged screenshot should now fit in full inside the viewer
+  - the modal wastes less width and behaves more like a true image preview than a decorative frame
+
+## 2026-03-15 20:31 CET - Raised the GitHub lightbox above the navbar and moved navigation outside the image
+
+- Refined the GitHub screenshot viewer layering and navigation layout.
+- Updated:
+  - [GithubProjectLightbox.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/GithubProjectLightbox.tsx)
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - increased the lightbox backdrop `z-index` above the navbar stack
+  - added more outer backdrop padding so the modal no longer feels glued to the top edge
+  - moved previous/next controls into a dedicated side-by-side media shell, outside the image itself
+- Result:
+  - the viewer behaves more like a true fullscreen modal overlay
+  - navigation controls no longer cover screenshot content
+
+## 2026-03-15 20:36 CET - Locked the GitHub projects section to a two-column desktop grid
+
+- Refined the single-page GitHub projects layout to match the stronger skeleton presentation.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - replaced the `auto-fit` desktop grid with an explicit two-column layout
+  - kept the section responsive by collapsing back to one column on narrower widths
+- Result:
+  - the live GitHub projects section now keeps the same more structured visual rhythm suggested by its skeleton state
+
+## 2026-03-15 20:41 CET - Stabilized the GitHub lightbox shell size across different screenshots
+
+- Refined the GitHub screenshot viewer so navigation controls no longer shift when switching images with different aspect ratios.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - restored a fixed responsive width/height for the outer lightbox shell
+  - kept the screenshot itself in strict `contain` mode inside a flexible stage
+  - made the media shell consume the available modal height consistently
+- Result:
+  - the modal frame should remain stable from image to image
+  - previous/next controls should no longer jump as the active screenshot changes
+
+## 2026-03-15 20:46 CET - Normalized no-media GitHub cards to the same media shell as real galleries
+
+- Refined the GitHub project card layout for repositories without screenshots.
+- Updated:
+  - [GithubProjectMedia.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/GithubProjectMedia.tsx)
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - moved the no-media fallback into the same `.github-project-media` wrapper used by screenshot galleries
+  - kept the same aspect ratio and removed extra fallback padding
+- Result:
+  - cards like `Image Processing` now align with screenshot-backed cards more cleanly
+  - the media block ends where it should, matching the visual structure of the rest of the grid
+
+## 2026-03-15 20:53 CET - Constrained the GitHub lightbox image strictly inside the stage
+
+- Tightened the GitHub screenshot viewer after observing oversized screenshots escaping the fixed modal shell.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - switched the stage back to a centered grid container
+  - removed stage scrolling and restored hard clipping at the frame boundary
+  - made the enlarged screenshot fill the available stage box with `width: 100%`, `height: 100%`, and `object-fit: contain`
+- Result:
+  - the active screenshot should now always remain fully inside the visible stage
+  - the fixed-size lightbox shell keeps stable controls without letting large screenshots spill outside
+
+## 2026-03-15 20:58 CET - Switched the GitHub lightbox image back to intrinsic scaling inside the fixed stage
+
+- Refined the GitHub screenshot viewer after noticing that the stricter `100% x 100%` image sizing still hid part of some tall screenshots.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - kept the modal shell and stage dimensions stable
+  - restored intrinsic image sizing with `width: auto`, `height: auto`, plus `max-width: 100%` and `max-height: 100%`
+  - kept `object-fit: contain` and centered alignment inside the stage
+- Result:
+  - the lightbox should preserve the stable modal layout while still fitting the full screenshot into view
+
+## 2026-03-15 21:04 CET - Rebuilt the GitHub lightbox stage as a fixed grid row for true full-image containment
+
+- Refined the GitHub screenshot viewer after confirming that some larger screenshots were still visually clipped.
+- Updated:
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - switched the lightbox shell back to a two-row grid with an explicit media row
+  - converted the media shell into a three-column grid (`nav / stage / nav`) so the center stage has a predictable size
+  - constrained the enlarged screenshot with `max-width` and `max-height` that account for the stage padding itself
+- Result:
+  - the fixed modal shell remains stable
+  - the central screenshot now has a better-defined box to scale into fully, instead of spilling or appearing clipped
+
+## 2026-03-15 21:11 CET - Added aspect-ratio-aware lightbox variants for GitHub screenshots
+
+- Refined the GitHub screenshot viewer after comparing `unify` and `webmarket` image dimensions.
+- Updated:
+  - [GithubProjectLightbox.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/GithubProjectLightbox.tsx)
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - the lightbox now probes the active screenshot dimensions and classifies it as `wide` or `tall`
+  - `wide` screenshots keep the broader shell
+  - taller screenshots switch to a narrower, higher modal shell to preserve full-image visibility
+- Result:
+  - `webmarket`-like wide screenshots and `unify`-like taller screenshots no longer need to share exactly the same viewer proportions
+  - controls remain stable while the shell adapts more intelligently to the active image family
+
+## 2026-03-15 21:16 CET - Froze the GitHub lightbox layout for the whole viewing session
+
+- Refined the GitHub screenshot viewer after noticing that some galleries still resized while browsing between images.
+- Updated:
+  - [GithubProjectLightbox.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/GithubProjectLightbox.tsx)
+- Changes:
+  - the lightbox now decides its `wide` vs `tall` layout only from the image active at open time
+  - once opened, the shell no longer recalculates its proportions when navigating inside the same gallery
+- Result:
+  - controls remain stable while browsing screenshots of the same project
+  - mixed galleries no longer cause the modal itself to expand or contract from image to image
+
+## 2026-03-15 20:27 CET - Restored a smooth tilt reset on portfolio cards
+
+- Refined the hover exit motion for the single-page portfolio project cards.
+- Updated:
+  - [PortfolioProjectsGrid.tsx](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/jsx/PortfolioProjectsGrid.tsx)
+  - [Projects.css](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/src/components/css/Projects.css)
+- Changes:
+  - kept transform transitions disabled during active tilt tracking
+  - reintroduced a dedicated reset transition when the pointer leaves the card
+- Result:
+  - portfolio cards no longer snap back instantly after hover
+  - the return to the resting state feels smoother and more intentional
