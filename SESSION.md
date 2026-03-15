@@ -2682,3 +2682,20 @@ Conclusione:
   - kept the new `.webp` assets as the canonical local sources
   - left unrelated dirty files outside this cleanup block untouched
 - Verified with `npm run typecheck` and `npm run build`.
+
+## 2026-03-16 00:33 CET - Replaced Vercel runtime query getters with WHATWG URL parsing
+
+- Investigated the `DEP0169` warning seen on Vercel under Node `24.x` and confirmed from the traced stack that it was triggered by the runtime getter behind `req.query`, not by the business logic inside the handlers.
+- Updated:
+  - [apiUtils.ts](/c:/Users/micha/Desktop/mik1810.github.io/lib/http/apiUtils.ts)
+  - [about.ts](/c:/Users/micha/Desktop/mik1810.github.io/api/about.ts)
+  - [profile.ts](/c:/Users/micha/Desktop/mik1810.github.io/api/profile.ts)
+  - [skills.ts](/c:/Users/micha/Desktop/mik1810.github.io/api/skills.ts)
+  - [projects.ts](/c:/Users/micha/Desktop/mik1810.github.io/api/projects.ts)
+  - [experiences.ts](/c:/Users/micha/Desktop/mik1810.github.io/api/experiences.ts)
+  - [table.ts](/c:/Users/micha/Desktop/mik1810.github.io/api/admin/table.ts)
+- Changes:
+  - added a shared `getQueryParam(req, key)` helper based on the WHATWG `URL` API
+  - removed direct reads of `req.query` from the public content endpoints and the admin table endpoint
+  - kept the request semantics unchanged while avoiding the Vercel runtime code path that internally calls `url.parse()`
+- Verified with `npm run typecheck` and `npm run build`.

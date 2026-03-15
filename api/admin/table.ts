@@ -11,7 +11,11 @@ import {
   requireAdminPayload,
   removeAdminRow,
 } from '../../lib/services/adminTableService.js'
-import { HttpError, respondWithError } from '../../lib/http/apiUtils.js'
+import {
+  getQueryParam,
+  HttpError,
+  respondWithError,
+} from '../../lib/http/apiUtils.js'
 import { enforceRateLimit } from '../../lib/http/rateLimit.js'
 import { logApiError } from '../../lib/logger.js'
 import type { ApiHandler, ApiRequest } from '../../lib/types/http.js'
@@ -36,7 +40,7 @@ const handler: ApiHandler<TableBody> = async (req, res) => {
     return respondWithError(res, error)
   }
 
-  const rawTable = req.query?.table
+  const rawTable = getQueryParam(req, 'table')
   if (!rawTable || typeof rawTable !== 'string') {
     return res.status(400).json({ error: 'Missing table parameter' })
   }
@@ -49,7 +53,7 @@ const handler: ApiHandler<TableBody> = async (req, res) => {
 
   try {
     if (req.method === 'GET') {
-      const limit = parseAdminTableLimit(req.query?.limit)
+      const limit = parseAdminTableLimit(getQueryParam(req, 'limit'))
       const rows = await getAdminRows(table, limit)
       return res.status(200).json({ rows })
     }

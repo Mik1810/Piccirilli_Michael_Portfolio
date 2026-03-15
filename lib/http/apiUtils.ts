@@ -1,5 +1,7 @@
 import type { ApiMethod, ApiRequest, ApiResponse } from '../types/http.js'
 
+const REQUEST_URL_BASE = 'http://localhost'
+
 export class HttpError extends Error {
   statusCode: number
   expose: boolean
@@ -61,4 +63,15 @@ export const requireRecord = (value: unknown, errorMessage: string) => {
   }
 
   return value as Record<string, unknown>
+}
+
+export const getQueryParam = (req: ApiRequest, key: string) => {
+  if (!req.url) return undefined
+
+  try {
+    const url = new URL(req.url, REQUEST_URL_BASE)
+    return url.searchParams.get(key) ?? undefined
+  } catch {
+    return undefined
+  }
 }

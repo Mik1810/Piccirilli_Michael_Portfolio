@@ -4,7 +4,11 @@ import {
 } from '../lib/services/publicContentService.js'
 import { MemoryCache } from '../lib/cache/memoryCache.js'
 import type { ExperiencesResponse } from '../lib/db/repositories/experiencesRepository.js'
-import { enforceMethod, respondWithError } from '../lib/http/apiUtils.js'
+import {
+  enforceMethod,
+  getQueryParam,
+  respondWithError,
+} from '../lib/http/apiUtils.js'
 import { logApiError } from '../lib/logger.js'
 import type { ApiHandler } from '../lib/types/http.js'
 
@@ -15,7 +19,7 @@ const cache = new MemoryCache<ExperiencesResponse>()
 const handler: ApiHandler = async (req, res) => {
   if (!enforceMethod(req, res, 'GET')) return
 
-  const lang = normalizeRepositoryLocale(req.query?.lang)
+  const lang = normalizeRepositoryLocale(getQueryParam(req, 'lang'))
   const cacheKey = `experiences:${lang}`
 
   const cached = cache.get(cacheKey)
