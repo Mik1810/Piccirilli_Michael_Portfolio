@@ -299,7 +299,7 @@
   transition: opacity 0.24s ease;
 }
 
-.hero-typing-image.is-loaded::before {
+.hero-typing-image.is-loaded.is-content-ready::before {
   opacity: 0;
 }
 
@@ -314,7 +314,7 @@
   transition: opacity 0.24s ease;
 }
 
-.hero-typing-image.is-loaded img {
+.hero-typing-image.is-loaded.is-content-ready img {
   opacity: 1;
 }
 

@@ -2834,3 +2834,43 @@ Conclusione:
 - Result:
   - the local network panel should stop showing the dev-only aborted fetch cycle
   - bootstrap debugging is cleaner without changing the production runtime behavior.
+
+## 2026-03-16 02:33 CET - Kept the hero portrait mounted while swapping only the text content
+
+- The hero portrait could still look like it was rendering twice because the component switched from a full skeleton tree to a full content tree, remounting the portrait in the process.
+- Updated:
+  - [HeroTyping.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/HeroTyping.tsx)
+- Changes:
+  - refactored the hero so the portrait is mounted exactly once
+  - limited the loading/content swap to the text column only
+  - preserved the portrait cache-path logic and the role typing animation while removing the redundant portrait remount
+- Expected result:
+  - the hero image should feel visually steadier
+  - the transition from skeleton to loaded hero should no longer redraw the portrait as a separate second pass.
+
+## 2026-03-16 02:39 CET - Delayed the hero portrait reveal until the text column is ready
+
+- After keeping the portrait mounted once, the remaining issue was that the image could still appear slightly before the hero text finished leaving the skeleton state.
+- Updated:
+  - [HeroTyping.tsx](/c:/Users/micha/Desktop/mik1810.github.io/src/components/jsx/HeroTyping.tsx)
+  - [HeroTyping.css](/c:/Users/micha/Desktop/mik1810.github.io/src/components/css/HeroTyping.css)
+- Changes:
+  - passed an explicit `contentReady` flag into the portrait renderer
+  - made the portrait fade in only when both conditions are true:
+    - the image has loaded
+    - the hero text/content is ready
+- Expected result:
+  - the portrait and the text column should now appear as one coordinated reveal instead of two slightly offset moments.
+
+## 2026-03-16 02:42 CET - Kept the portrait skeleton visible until the hero text is ready
+
+- The previous tweak coordinated the real image reveal with the text, but the circular portrait placeholder itself could still disappear a little too early.
+- Updated:
+  - [HeroTyping.css](/c:/Users/micha/Desktop/mik1810.github.io/src/components/css/HeroTyping.css)
+- Changes:
+  - kept the portrait skeleton overlay visible until both conditions are true:
+    - the image has loaded
+    - the text column is ready to leave the skeleton state
+- Expected result:
+  - while the hero text is still skeletonized, the portrait area should remain skeletonized too
+  - the whole hero should now transition as one coherent block.

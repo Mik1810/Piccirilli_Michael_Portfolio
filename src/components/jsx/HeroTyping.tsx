@@ -8,14 +8,17 @@ import '../css/HeroTyping.css'
 
 const EMPTY_ROLES: string[] = []
 const DEFAULT_HERO_PHOTO = '/imgs/michael.jpg'
+const DEFAULT_HERO_NAME = 'Michael Piccirilli'
 
 function HeroPortrait({
   photo,
   alt,
+  contentReady,
   ariaHidden = false,
 }: {
   photo: string
   alt: string
+  contentReady: boolean
   ariaHidden?: boolean
 }) {
   const [photoLoaded, setPhotoLoaded] = useState(false)
@@ -36,7 +39,7 @@ function HeroPortrait({
 
   return (
     <div
-      className={`hero-typing-image photo-glow${photoLoaded ? ' is-loaded' : ' is-loading'}`}
+      className={`hero-typing-image photo-glow${photoLoaded ? ' is-loaded' : ' is-loading'}${contentReady ? ' is-content-ready' : ''}`}
       aria-hidden={ariaHidden}
     >
       {photo ? (
@@ -55,40 +58,34 @@ function HeroPortrait({
   )
 }
 
-function HeroTypingSkeleton() {
+function HeroTypingSkeletonText() {
   return (
-    <section id="hero" className="hero-typing">
-      <div className="hero-typing-container hero-animate">
-        <div className="hero-typing-text hero-skeleton-text">
-          <div className="hero-skeleton-line hero-skeleton-line-sm" />
-          <div className="hero-skeleton-line hero-skeleton-line-xl" />
-          <div className="hero-skeleton-line hero-skeleton-line-md" />
-          <div className="hero-skeleton-badge" />
-          <div className="hero-typing-actions">
-            <span className="hero-skeleton-btn" />
-            <span className="hero-skeleton-btn hero-skeleton-btn-outline" />
-          </div>
-          <div className="hero-typing-socials">
-            <span className="hero-skeleton-icon" />
-            <span className="hero-skeleton-icon" />
-          </div>
-        </div>
-        <HeroPortrait photo={DEFAULT_HERO_PHOTO} alt="" ariaHidden />
+    <div className="hero-typing-text hero-skeleton-text" aria-hidden="true">
+      <div className="hero-skeleton-line hero-skeleton-line-sm" />
+      <div className="hero-skeleton-line hero-skeleton-line-xl" />
+      <div className="hero-skeleton-line hero-skeleton-line-md" />
+      <div className="hero-skeleton-badge" />
+      <div className="hero-typing-actions">
+        <span className="hero-skeleton-btn" />
+        <span className="hero-skeleton-btn hero-skeleton-btn-outline" />
       </div>
-    </section>
+      <div className="hero-typing-socials">
+        <span className="hero-skeleton-icon" />
+        <span className="hero-skeleton-icon" />
+      </div>
+    </div>
   )
 }
 
-function HeroTypingAnimation({
+function HeroTypingAnimationText({
   nameText,
   roles,
-  photo,
   university,
   socials,
   greeting,
   uniName,
   t,
-}: HeroTypingAnimationProps) {
+}: Omit<HeroTypingAnimationProps, 'photo'>) {
   const [roleIndex, setRoleIndex] = useState(0)
   const [roleCharIndex, setRoleCharIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -97,6 +94,7 @@ function HeroTypingAnimation({
   useEffect(() => {
     const currentRole = roles[roleIndex]
     if (!currentRole) return
+
     let timeout: number | ReturnType<typeof setTimeout> | undefined
 
     if (!isDeleting && roleCharIndex < currentRole.length) {
@@ -125,64 +123,59 @@ function HeroTypingAnimation({
     roles.length > 0 && !hasRoleRendered && displayRole.length === 0
 
   return (
-    <section id="hero" className="hero-typing">
-      <div className="hero-typing-container hero-animate">
-        <div className="hero-typing-text">
-          <p className="hero-typing-greeting">{greeting}</p>
-          <h1 className="hero-typing-name">
-            <span className="typed-text">{nameText}</span>
-          </h1>
-          <h2 className="hero-typing-role">
-            {showRolePlaceholder ? (
-              <span
-                className="hero-inline-skeleton hero-inline-skeleton-role"
-                aria-hidden="true"
-              />
-            ) : (
-              <>
-                <span className="typed-text">{displayRole}</span>
-                <span className="cursor">|</span>
-              </>
-            )}
-          </h2>
-          {uniName ? (
-            <div className="hero-university-badge">
-              {university.logo ? (
-                <img
-                  src={university.logo}
-                  alt={uniName}
-                  className="hero-university-logo"
-                  decoding="async"
-                />
-              ) : null}
-              <span>{uniName}</span>
-            </div>
+    <div className="hero-typing-text">
+      <p className="hero-typing-greeting">{greeting}</p>
+      <h1 className="hero-typing-name">
+        <span className="typed-text">{nameText}</span>
+      </h1>
+      <h2 className="hero-typing-role">
+        {showRolePlaceholder ? (
+          <span
+            className="hero-inline-skeleton hero-inline-skeleton-role"
+            aria-hidden="true"
+          />
+        ) : (
+          <>
+            <span className="typed-text">{displayRole}</span>
+            <span className="cursor">|</span>
+          </>
+        )}
+      </h2>
+      {uniName ? (
+        <div className="hero-university-badge">
+          {university.logo ? (
+            <img
+              src={university.logo}
+              alt={uniName}
+              className="hero-university-logo"
+              decoding="async"
+            />
           ) : null}
-          <div className="hero-typing-actions">
-            <a href="#projects" className="btn btn-primary">
-              {t('hero.btnProjects')}
-            </a>
-            <a href="#contact" className="btn btn-outline">
-              {t('hero.btnContact')}
-            </a>
-          </div>
-          <div className="hero-typing-socials">
-            {socials.map((social) => (
-              <a
-                key={social.name}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={social.name}
-              >
-                {icons[social.icon]?.(22)}
-              </a>
-            ))}
-          </div>
+          <span>{uniName}</span>
         </div>
-        <HeroPortrait photo={photo} alt={nameText} />
+      ) : null}
+      <div className="hero-typing-actions">
+        <a href="#projects" className="btn btn-primary">
+          {t('hero.btnProjects')}
+        </a>
+        <a href="#contact" className="btn btn-outline">
+          {t('hero.btnContact')}
+        </a>
       </div>
-    </section>
+      <div className="hero-typing-socials">
+        {socials.map((social) => (
+          <a
+            key={social.name}
+            href={social.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={social.name}
+          >
+            {icons[social.icon]?.(22)}
+          </a>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -197,23 +190,34 @@ function HeroTyping() {
   const greeting = profile?.greeting || t('hero.greeting')
   const uniName = university.name || ''
   const animationKey = `${lang}:${nameText}:${roles.join('|')}`
-
-  if (!nameText.trim()) {
-    return <HeroTypingSkeleton />
-  }
+  const isReady = nameText.trim().length > 0
+  const portraitAlt = nameText || DEFAULT_HERO_NAME
 
   return (
-    <HeroTypingAnimation
-      key={animationKey}
-      nameText={nameText}
-      roles={roles}
-      photo={photo}
-      university={university}
-      socials={socials}
-      greeting={greeting}
-      uniName={uniName}
-      t={t}
-    />
+    <section id="hero" className="hero-typing">
+      <div className="hero-typing-container hero-animate">
+        {isReady ? (
+          <HeroTypingAnimationText
+            key={animationKey}
+            nameText={nameText}
+            roles={roles}
+            university={university}
+            socials={socials}
+            greeting={greeting}
+            uniName={uniName}
+            t={t}
+          />
+        ) : (
+          <HeroTypingSkeletonText />
+        )}
+        <HeroPortrait
+          photo={photo}
+          alt={portraitAlt}
+          contentReady={isReady}
+          ariaHidden={!isReady}
+        />
+      </div>
+    </section>
   )
 }
 
