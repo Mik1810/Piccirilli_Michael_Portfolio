@@ -2957,3 +2957,20 @@ Conclusione:
     - the artifact is only a downloadable backup and will still be zipped by GitHub
 - Expected result:
   - future CI runs should expose a readable summary directly in the GitHub Actions UI without requiring an artifact download first.
+
+## 2026-03-15 20:57 CET - Unified the GitHub CI logs into a single ci.log file
+
+- The CI workflow was still producing one log file per step, which made the artifact more fragmented than necessary.
+- Updated:
+  - [ci.yml](/c:/Users/micha/Desktop/mik1810.github.io/.github/workflows/ci.yml)
+- Changes:
+  - changed the logging strategy from multiple files (`install.log`, `lint.log`, `typecheck.log`, `build.log`) to one shared file: `logs/ci.log`
+  - initialized the file once in the `Prepare CI logs directory` step
+  - added clear section headers for:
+    - install dependencies
+    - lint
+    - typecheck
+    - build
+  - updated the Actions summary step to render the tail of `ci.log` instead of iterating over separate files
+- Expected result:
+  - the artifact and the run summary should now read as one chronological CI transcript, while still keeping the logs available both in the step output and as a downloadable backup.

@@ -25,39 +25,61 @@ jobs:
           node-version: 24
           cache: npm
 
-      # Store command output in separate files so failed runs are easier to inspect.
+      # Store command output in a single file so the run can be reviewed end-to-end.
       - name: Prepare CI logs directory
-        run: mkdir -p logs
+        shell: bash
+        run: |
+          mkdir -p logs
+          : > logs/ci.log
 
       # Install exactly what is locked in package-lock.json for reproducible CI runs.
       - name: Install dependencies
         shell: bash
         run: |
+          {
+            echo "===== Install dependencies ====="
+            echo
+          } | tee -a logs/ci.log
           set -o pipefail
-          npm ci 2>&1 | tee logs/install.log
+          npm ci 2>&1 | tee -a logs/ci.log
 
       # Catch style issues, unused code, and hook-rule violations early.
       - name: Lint
         shell: bash
         run: |
+          {
+            echo
+            echo "===== Lint ====="
+            echo
+          } | tee -a logs/ci.log
           set -o pipefail
-          npm run lint 2>&1 | tee logs/lint.log
+          npm run lint 2>&1 | tee -a logs/ci.log
 
       # Verify that the TypeScript codebase is still type-safe.
       - name: Typecheck
         shell: bash
         run: |
+          {
+            echo
+            echo "===== Typecheck ====="
+            echo
+          } | tee -a logs/ci.log
           set -o pipefail
-          npm run typecheck 2>&1 | tee logs/typecheck.log
+          npm run typecheck 2>&1 | tee -a logs/ci.log
 
       # Ensure the production bundle can actually be generated.
       - name: Build
         shell: bash
         run: |
+          {
+            echo
+            echo "===== Build ====="
+            echo
+          } | tee -a logs/ci.log
           set -o pipefail
-          npm run build 2>&1 | tee logs/build.log
+          npm run build 2>&1 | tee -a logs/ci.log
 
-      # Mirror a readable log digest into the Actions run summary.
+      # Mirror the tail of the unified log into the Actions run summary.
       - name: Publish CI log summary
         if: always()
         shell: bash
@@ -67,15 +89,11 @@ jobs:
             echo
             echo "Each full command log is already visible in the step output above."
             echo "The downloadable artifact is kept as a backup, but GitHub always serves artifacts as zip files."
-
-            for file in logs/*.log; do
-              [ -f "$file" ] || continue
-              echo
-              echo "### $(basename "$file")"
-              echo '```text'
-              tail -n 80 "$file"
-              echo '```'
-            done
+            echo
+            echo "### ci.log"
+            echo '```text'
+            tail -n 160 logs/ci.log
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
       # Keep the logs even on failure so the GitHub Actions run is debuggable.
