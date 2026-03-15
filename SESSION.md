@@ -2974,3 +2974,17 @@ Conclusione:
   - updated the Actions summary step to render the tail of `ci.log` instead of iterating over separate files
 - Expected result:
   - the artifact and the run summary should now read as one chronological CI transcript, while still keeping the logs available both in the step output and as a downloadable backup.
+
+## 2026-03-15 21:05 CET - Made the GitHub CI summary render the full plain-text log
+
+- The previous CI summary only showed the tail of `ci.log`, and color escape codes from tool output were still leaking into the log text.
+- Updated:
+  - [ci.yml](/c:/Users/micha/Desktop/mik1810.github.io/.github/workflows/ci.yml)
+- Changes:
+  - disabled colorized output for the workflow job via:
+    - `FORCE_COLOR=0`
+    - `NO_COLOR=1`
+    - `npm_config_color=false`
+  - changed the summary step to render the full `ci.log` with `cat` instead of truncating it with `tail`
+- Expected result:
+  - future GitHub Actions summaries should show the entire CI transcript in readable plain text, without the ANSI escape artifacts that were visible before.

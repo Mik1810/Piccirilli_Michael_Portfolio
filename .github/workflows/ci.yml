@@ -12,6 +12,11 @@ jobs:
   verify:
     # A single lightweight verification job is enough for this repo today.
     runs-on: ubuntu-latest
+    env:
+      # Keep CI logs plain-text so they stay readable in summaries and artifacts.
+      FORCE_COLOR: '0'
+      NO_COLOR: '1'
+      npm_config_color: 'false'
 
     steps:
       # Download the repository contents into the runner workspace.
@@ -79,7 +84,7 @@ jobs:
           set -o pipefail
           npm run build 2>&1 | tee -a logs/ci.log
 
-      # Mirror the tail of the unified log into the Actions run summary.
+      # Mirror the full unified log into the Actions run summary.
       - name: Publish CI log summary
         if: always()
         shell: bash
@@ -92,7 +97,7 @@ jobs:
             echo
             echo "### ci.log"
             echo '```text'
-            tail -n 160 logs/ci.log
+            cat logs/ci.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
