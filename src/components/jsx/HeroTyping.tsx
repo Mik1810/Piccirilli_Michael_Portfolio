@@ -103,7 +103,12 @@ function HeroTypingAnimation({
           {uniName ? (
             <div className="hero-university-badge">
               {university.logo ? (
-                <img src={university.logo} alt={uniName} className="hero-university-logo" />
+                <img
+                  src={university.logo}
+                  alt={uniName}
+                  className="hero-university-logo"
+                  decoding="async"
+                />
               ) : null}
               <span>{uniName}</span>
             </div>
@@ -131,7 +136,15 @@ function HeroTypingAnimation({
           </div>
         </div>
         <div className="hero-typing-image photo-glow">
-          {photo ? <img className="float-animation" src={photo} alt={nameText} /> : null}
+          {photo ? (
+            <img
+              className="float-animation"
+              src={photo}
+              alt={nameText}
+              decoding="async"
+              fetchPriority="high"
+            />
+          ) : null}
         </div>
       </div>
     </section>

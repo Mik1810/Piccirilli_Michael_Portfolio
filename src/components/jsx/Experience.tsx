@@ -122,7 +122,12 @@ function Experience() {
                         }
                       >
                         {experience.logo ? (
-                          <img src={experience.logo} alt={experience.role} loading="lazy" />
+                          <img
+                            src={experience.logo}
+                            alt={experience.role}
+                            loading="lazy"
+                            decoding="async"
+                          />
                         ) : (
                           experience.icon
                         )}
@@ -163,7 +168,12 @@ function Experience() {
                       <div className="timeline-header-left">
                         <span className="timeline-icon">
                           {item.logo ? (
-                            <img src={item.logo} alt={item.degree} loading="lazy" />
+                            <img
+                              src={item.logo}
+                              alt={item.degree}
+                              loading="lazy"
+                              decoding="async"
+                            />
                           ) : (
                             item.icon
                           )}

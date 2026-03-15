@@ -4,6 +4,7 @@ import type {
   GithubProjectItem,
   GithubProjectMediaCarouselProps,
 } from '../../types/app.js'
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion.js'
 import '../css/GithubProjectMedia.css'
 import GithubProjectLightbox from './GithubProjectLightbox'
 
@@ -16,6 +17,7 @@ function GithubProjectMediaCarousel({
   expandHintLabel,
   emptyMediaLabel,
 }: GithubProjectMediaCarouselProps) {
+  const prefersReducedMotion = usePrefersReducedMotion()
   const [currentIndex, setCurrentIndex] = useState(images.length > 1 ? 1 : 0)
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true)
 
@@ -30,7 +32,7 @@ function GithubProjectMediaCarousel({
   }, [images.length, project.slug])
 
   useEffect(() => {
-    if (images.length <= 1) return undefined
+    if (images.length <= 1 || prefersReducedMotion) return undefined
 
     const intervalId = window.setInterval(() => {
       if (document.hidden) return
@@ -43,7 +45,7 @@ function GithubProjectMediaCarousel({
     }, 3500)
 
     return () => window.clearInterval(intervalId)
-  }, [images.length])
+  }, [images.length, prefersReducedMotion])
 
   if (images.length === 0) {
     return (
@@ -109,6 +111,8 @@ function GithubProjectMediaCarousel({
       role="button"
       tabIndex={0}
       aria-label={`${previewCtaLabel} ${project.title}`}
+      aria-haspopup="dialog"
+      data-reduced-motion={prefersReducedMotion ? 'true' : 'false'}
     >
       <div
         className="github-project-media-track"
@@ -122,6 +126,7 @@ function GithubProjectMediaCarousel({
               src={imageSrc}
               alt={`${project.title} screenshot ${((index - 1 + images.length) % images.length) + 1}`}
               loading="lazy"
+              decoding="async"
               className="github-project-media-image"
               onError={(event) => {
                 event.currentTarget.style.display = 'none'

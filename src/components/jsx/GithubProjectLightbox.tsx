@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import type { GithubProjectItem } from '../../types/app.js'
@@ -23,11 +23,22 @@ function GithubProjectLightbox({
   const showControls = images.length > 1
   const [initialImageSrc] = useState(imageSrc)
   const [layoutMode, setLayoutMode] = useState<'wide' | 'tall'>('wide')
+  const dialogRef = useRef<HTMLDivElement | null>(null)
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+  const headingId = useId()
+  const metaId = useId()
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
+    previousFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
     document.body.classList.add('github-project-lightbox-open')
     document.body.style.overflow = 'hidden'
+
+    window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus({ preventScroll: true })
+    })
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -40,6 +51,40 @@ function GithubProjectLightbox({
       }
       if (showControls && event.key === 'ArrowLeft') {
         onPrev()
+        return
+      }
+      if (event.key === 'Tab') {
+        const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+
+        if (!focusableElements || focusableElements.length === 0) {
+          event.preventDefault()
+          return
+        }
+
+        const focusable = Array.from(focusableElements).filter(
+          (element) => !element.hasAttribute('hidden') && element.getAttribute('aria-hidden') !== 'true'
+        )
+
+        if (focusable.length === 0) {
+          event.preventDefault()
+          return
+        }
+
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault()
+          last.focus()
+          return
+        }
+
+        if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault()
+          first.focus()
+        }
       }
     }
 
@@ -49,6 +94,7 @@ function GithubProjectLightbox({
       document.body.classList.remove('github-project-lightbox-open')
       document.body.style.overflow = previousOverflow
       window.removeEventListener('keydown', handleKeyDown)
+      previousFocusRef.current?.focus({ preventScroll: true })
     }
   }, [onClose, onNext, onPrev, showControls])
 
@@ -85,7 +131,9 @@ function GithubProjectLightbox({
         className={`github-project-lightbox github-project-lightbox-${layoutMode}`}
         role="dialog"
         aria-modal="true"
-        aria-label={`${project.title} media preview`}
+        aria-labelledby={headingId}
+        aria-describedby={metaId}
+        ref={dialogRef}
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -93,6 +141,7 @@ function GithubProjectLightbox({
           className="github-project-lightbox-close"
           onClick={onClose}
           aria-label={`Close ${project.title} preview`}
+          ref={closeButtonRef}
         >
           <svg
             viewBox="0 0 24 24"
@@ -110,8 +159,8 @@ function GithubProjectLightbox({
         </button>
 
         <div className="github-project-lightbox-meta">
-          <strong>{project.title}</strong>
-          <span>
+          <strong id={headingId}>{project.title}</strong>
+          <span id={metaId}>
             {activeIndex + 1}/{images.length}
           </span>
         </div>
@@ -144,6 +193,7 @@ function GithubProjectLightbox({
               src={imageSrc}
               alt={`${project.title} screenshot ${activeIndex + 1}`}
               className="github-project-lightbox-image"
+              decoding="async"
             />
           </div>
 

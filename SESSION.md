@@ -2448,6 +2448,24 @@ Conclusione:
   - the stylesheet layout now mirrors the React component architecture much more closely
   - future tweaks to portfolio cards, GitHub cards, media, and lightbox can be made in more local files
 
+## 2026-03-15 21:29 CET - Added single-page SEO metadata, JSON-LD, robots, sitemap, and manifest
+
+- Extended the static SEO surface of the portfolio after the projects/media refactor stabilized.
+- Updated:
+  - [index.html](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/index.html)
+- Added:
+  - [robots.txt](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/public/robots.txt)
+  - [sitemap.xml](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/public/sitemap.xml)
+  - [site.webmanifest](/c:/Users/micha/Desktop/Piccirilli_Michael_Portfolio/public/site.webmanifest)
+- Changes:
+  - switched canonical and social metadata to the live Vercel deployment URL
+  - enriched Open Graph and Twitter card metadata
+  - added static JSON-LD for `Person`, `WebSite`, and `WebPage`
+  - added robots and sitemap files for crawler discovery
+  - added a basic web manifest for application identity metadata
+- Result:
+  - the single-page portfolio now exposes a much more complete static metadata surface for crawlers, previews, and search engines
+
 ## 2026-03-15 21:16 CET - Froze the GitHub lightbox layout for the whole viewing session
 
 - Refined the GitHub screenshot viewer after noticing that some galleries still resized while browsing between images.
@@ -2472,3 +2490,22 @@ Conclusione:
 - Result:
   - portfolio cards no longer snap back instantly after hover
   - the return to the resting state feels smoother and more intentional
+
+## 2026-03-15 22:06 CET - Improved public accessibility and motion behavior
+
+- Added a reusable `usePrefersReducedMotion` hook and applied it to:
+  - GitHub project carousel autoplay
+  - portfolio card tilt behavior
+  - scroll-to-top smooth scrolling
+- Upgraded the GitHub project lightbox with:
+  - focus trapping
+  - focus restoration on close
+  - explicit `aria-labelledby` and `aria-describedby`
+  - focus-visible styles for close and navigation controls
+- Added stronger keyboard and focus affordances for public interactive UI:
+  - project links
+  - GitHub media controls
+  - scroll-to-top button
+  - portfolio cards via `:focus-within`
+- Reduced motion-heavy effects under `prefers-reduced-motion` in the projects area and scroll-to-top behavior.
+- Added `decoding=\"async\"` and related loading hints to public images in Hero, Skills, Experience, GitHub media, and the lightbox.

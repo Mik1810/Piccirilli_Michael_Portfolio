@@ -41,3 +41,19 @@ body.github-project-lightbox-open .scroll-to-top {
 .scroll-to-top:active {
   transform: translateY(-1px);
 }
+
+.scroll-to-top:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent, #66a3ff) 82%, white);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-to-top {
+    transition: opacity 0.2s ease, background 0.2s ease;
+  }
+
+  .scroll-to-top:hover,
+  .scroll-to-top:active {
+    transform: none;
+  }
+}

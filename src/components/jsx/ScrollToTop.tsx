@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion.js'
 import '../css/ScrollToTop.css'
 
 function ScrollToTop() {
   const [visible, setVisible] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 400)
@@ -10,7 +12,8 @@ function ScrollToTop() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const scrollUp = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+  const scrollUp = () =>
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
 
   return (
     <button

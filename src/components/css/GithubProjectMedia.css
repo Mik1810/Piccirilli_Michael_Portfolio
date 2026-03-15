@@ -114,6 +114,11 @@
   transform: translateY(-50%) scale(1.05);
 }
 
+.github-project-nav:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent, #66a3ff) 82%, white);
+  outline-offset: 2px;
+}
+
 .github-project-nav-left {
   left: 0.8rem;
 }
@@ -180,6 +185,26 @@
 .github-project-fallback-static {
   aspect-ratio: 16 / 10;
   padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .github-project-media-track,
+  .github-project-media-image,
+  .github-project-media-hint,
+  .github-project-nav {
+    transition: none;
+  }
+
+  .github-project-card:hover .github-project-media img,
+  .github-project-media-trigger:hover .github-project-media-hint,
+  .github-project-media-trigger:focus-visible .github-project-media-hint,
+  .github-project-nav:hover {
+    transform: none;
+  }
+
+  .github-project-media-hint {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {

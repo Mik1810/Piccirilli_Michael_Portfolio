@@ -27,6 +27,11 @@
   box-shadow: var(--shadow-md);
 }
 
+.project-card:focus-within {
+  border-color: color-mix(in srgb, var(--color-accent, #66a3ff) 55%, var(--color-border));
+  box-shadow: 0 0 0 3px rgba(102, 163, 255, 0.18), var(--shadow-md);
+}
+
 .project-card-content {
   padding: 1.75rem;
 }
@@ -43,6 +48,18 @@
   color: var(--color-text-muted);
   line-height: 1.6;
   margin-bottom: 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-card,
+  .project-card.is-tilting,
+  .project-card.is-resetting-tilt {
+    transition: box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  .project-card:hover {
+    transform: none;
+  }
 }
 
 @media (max-width: 768px) {

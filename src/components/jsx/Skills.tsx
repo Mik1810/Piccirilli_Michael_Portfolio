@@ -81,6 +81,7 @@ function Skills() {
                           alt={item.name}
                           className="tech-icon"
                           loading="lazy"
+                          decoding="async"
                         />
                         <span className="tech-name">{item.name}</span>
                       </div>

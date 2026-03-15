@@ -62,6 +62,12 @@
   transform: scale(1.05);
 }
 
+.github-project-lightbox-close:focus-visible,
+.github-project-lightbox-nav:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent, #66a3ff) 86%, white);
+  outline-offset: 3px;
+}
+
 .github-project-lightbox-close {
   top: 1rem;
   right: 1rem;
@@ -128,6 +134,13 @@
   object-fit: contain;
   object-position: center;
   display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .github-project-lightbox-close,
+  .github-project-lightbox-nav {
+    transition: none;
+  }
 }
 
 @media (max-width: 768px) {
