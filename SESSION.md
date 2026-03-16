@@ -3320,3 +3320,9 @@ pm run build passed
   - `DATABASE_URL` from GitHub secret `DATABASE_URL` or fallback `SUPABASE_DB_URL`
 - Added an explicit preflight failure in CI when the DB secret is missing, so the run fails with a clear message instead of an opaque Vitest error.
 - Marked the DB-backed endpoint suite in [TODO.md](./TODO.md) as `🟡 Partial` rather than `❌ Non fatto`.
+
+## 2026-03-16 22:39 CET - Split DB-backed Vitest cases to avoid CI timeout coupling
+
+- Reworked [publicEndpoints.test.ts](./tests/api/publicEndpoints.test.ts) so each DB-backed public endpoint has its own Vitest case instead of one aggregated test.
+- Raised the Vitest timeout in [vitest.config.ts](./vitest.config.ts) to `15000` for this DB-backed suite, because CI latency is higher than local runs.
+- The goal is better CI diagnostics and less chance of one slow endpoint making the whole integration block fail ambiguously.

@@ -20,16 +20,16 @@ afterEach(() => {
 })
 
 describe('DB-backed public endpoints', () => {
-  it('returns stable payloads and rate-limit headers', async () => {
-    const profileResponse = await invokeApiHandler(profileHandler, {
+  it('GET /api/profile returns a stable payload and rate-limit headers', async () => {
+    const response = await invokeApiHandler(profileHandler, {
       url: '/api/profile?lang=it',
       ip: '127.0.0.11',
     })
 
-    expect(profileResponse.statusCode).toBe(200)
-    assertRateLimitHeaders(profileResponse)
-    expect(profileResponse.getHeader('cache-control')).toBe('s-maxage=60, stale-while-revalidate=300')
-    expect(profileResponse.body).toEqual(
+    expect(response.statusCode).toBe(200)
+    assertRateLimitHeaders(response)
+    expect(response.getHeader('cache-control')).toBe('s-maxage=60, stale-while-revalidate=300')
+    expect(response.body).toEqual(
       expect.objectContaining({
         name: expect.any(String),
         greeting: expect.any(String),
@@ -37,54 +37,62 @@ describe('DB-backed public endpoints', () => {
         socials: expect.any(Array),
       })
     )
+  })
 
-    const aboutResponse = await invokeApiHandler(aboutHandler, {
+  it('GET /api/about returns a stable payload and rate-limit headers', async () => {
+    const response = await invokeApiHandler(aboutHandler, {
       url: '/api/about?lang=en',
       ip: '127.0.0.12',
     })
 
-    expect(aboutResponse.statusCode).toBe(200)
-    assertRateLimitHeaders(aboutResponse)
-    expect(aboutResponse.body).toEqual(
+    expect(response.statusCode).toBe(200)
+    assertRateLimitHeaders(response)
+    expect(response.body).toEqual(
       expect.objectContaining({ interests: expect.any(Array) })
     )
+  })
 
-    const projectsResponse = await invokeApiHandler(projectsHandler, {
+  it('GET /api/projects returns a stable payload and rate-limit headers', async () => {
+    const response = await invokeApiHandler(projectsHandler, {
       url: '/api/projects?lang=it',
       ip: '127.0.0.13',
     })
 
-    expect(projectsResponse.statusCode).toBe(200)
-    assertRateLimitHeaders(projectsResponse)
-    expect(projectsResponse.body).toEqual(
+    expect(response.statusCode).toBe(200)
+    assertRateLimitHeaders(response)
+    expect(response.body).toEqual(
       expect.objectContaining({
         projects: expect.any(Array),
         githubProjects: expect.any(Array),
       })
     )
+  })
 
-    const skillsResponse = await invokeApiHandler(skillsHandler, {
+  it('GET /api/skills returns a stable payload and rate-limit headers', async () => {
+    const response = await invokeApiHandler(skillsHandler, {
       url: '/api/skills?lang=it',
       ip: '127.0.0.14',
     })
 
-    expect(skillsResponse.statusCode).toBe(200)
-    assertRateLimitHeaders(skillsResponse)
-    expect(skillsResponse.body).toEqual(
+    expect(response.statusCode).toBe(200)
+    assertRateLimitHeaders(response)
+    expect(response.body).toEqual(
       expect.objectContaining({
         techStack: expect.any(Array),
         categories: expect.any(Array),
       })
     )
+  })
 
-    const experiencesResponse = await invokeApiHandler(experiencesHandler, {
+  it('GET /api/experiences returns a stable payload and rate-limit headers', async () => {
+    const response = await invokeApiHandler(experiencesHandler, {
       url: '/api/experiences?lang=it',
       ip: '127.0.0.15',
     })
 
-    expect(experiencesResponse.statusCode).toBe(200)
-    assertRateLimitHeaders(experiencesResponse)
-    expect(experiencesResponse.body).toEqual(
+    expect(response.statusCode).toBe(200)
+    assertRateLimitHeaders(response)
+    expect(response.body).toEqual(
       expect.objectContaining({
         experiences: expect.any(Array),
         education: expect.any(Array),

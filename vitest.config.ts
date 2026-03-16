@@ -6,5 +6,6 @@ export default defineConfig({
     include: ['tests/api/**/*.test.ts'],
     passWithNoTests: false,
     reporters: 'default',
+    testTimeout: 15000,
   },
 })
