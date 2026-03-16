@@ -3393,3 +3393,9 @@ pm run build passed
   - DB health and latency
 - The endpoint now responds with `503` when the database check fails and `200` when it succeeds.
 - Marked the health/dashboard item in [TODO.md](./TODO.md) as `✅ Fatto`.
+
+## 2026-03-16 23:18 CET - Hardened Dependabot config against incompatible ESLint major bumps
+
+- Updated [dependabot.yml](./.github/dependabot.yml) to ignore semver-major updates for @eslint/js and slint.
+- This prevents automatic PRs that move the lint stack to ESLint 10 while the rest of the repository is still aligned to ESLint 9.
+- Kept the previously removed custom labels out of the config so Dependabot no longer fails on missing repository labels.
