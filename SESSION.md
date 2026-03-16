@@ -3326,3 +3326,10 @@ pm run build passed
 - Reworked [publicEndpoints.test.ts](./tests/api/publicEndpoints.test.ts) so each DB-backed public endpoint has its own Vitest case instead of one aggregated test.
 - Raised the Vitest timeout in [vitest.config.ts](./vitest.config.ts) to `15000` for this DB-backed suite, because CI latency is higher than local runs.
 - The goal is better CI diagnostics and less chance of one slow endpoint making the whole integration block fail ambiguously.
+
+## 2026-03-16 22:49 CET - Scoped CI test env away from production build
+
+- Reproduced the large-chunk warning locally by running `npm run build` with `NODE_ENV=test`.
+- Confirmed that the CI job-level `NODE_ENV=test` was inflating the production bundle size even though Vite was building in production mode.
+- Updated [.github/workflows/ci.yml](./.github/workflows/ci.yml) so DB-backed tests keep their dedicated env, while the build step runs with `NODE_ENV=production`.
+- Expected result: the GitHub Actions build output should return to the normal ~283 kB public bundle and stop warning about chunks above 500 kB.

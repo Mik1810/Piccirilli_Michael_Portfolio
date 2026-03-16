@@ -17,9 +17,6 @@ jobs:
       FORCE_COLOR: '0'
       NO_COLOR: '1'
       npm_config_color: 'false'
-      NODE_ENV: test
-      AUTH_SESSION_SECRET: ci-test-secret
-      DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL }}
 
     steps:
       # Download the repository contents into the runner workspace.
@@ -78,6 +75,10 @@ jobs:
       # Verify the DB-backed public API handlers against the configured CI database.
       - name: DB-backed API tests
         shell: bash
+        env:
+          NODE_ENV: test
+          AUTH_SESSION_SECRET: ci-test-secret
+          DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL }}
         run: |
           {
             echo
@@ -96,6 +97,8 @@ jobs:
       # Ensure the production bundle can actually be generated.
       - name: Build
         shell: bash
+        env:
+          NODE_ENV: production
         run: |
           {
             echo
