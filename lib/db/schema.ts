@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   check,
+  index,
   integer,
   pgTable,
   primaryKey,
@@ -39,7 +40,10 @@ export const profileI18n = pgTable(
     universityName: text('university_name').notNull(),
     bio: text('bio'),
   },
-  (table) => [primaryKey({ columns: [table.profileId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.profileId, table.locale] }),
+    index('profile_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const socialLinks = pgTable(
@@ -76,7 +80,10 @@ export const heroRolesI18n = pgTable(
     locale: text('locale').notNull(),
     role: text('role').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.heroRoleId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.heroRoleId, table.locale] }),
+    index('hero_roles_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const aboutInterests = pgTable(
@@ -95,7 +102,10 @@ export const aboutInterestsI18n = pgTable(
     locale: text('locale').notNull(),
     interest: text('interest').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.aboutInterestId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.aboutInterestId, table.locale] }),
+    index('about_interests_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const projects = pgTable(
@@ -120,7 +130,10 @@ export const projectsI18n = pgTable(
     title: text('title').notNull(),
     description: text('description').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.projectId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.locale] }),
+    index('projects_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const projectTags = pgTable(
@@ -152,6 +165,10 @@ export const githubProjects = pgTable(
   (table) => [
     unique('github_projects_order_index_key').on(table.orderIndex),
     unique('github_projects_slug_key').on(table.slug),
+    index('github_projects_featured_order_index_idx').on(
+      table.featured,
+      table.orderIndex
+    ),
   ]
 )
 
@@ -163,7 +180,10 @@ export const githubProjectsI18n = pgTable(
     title: text('title').notNull(),
     description: text('description').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.githubProjectId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.githubProjectId, table.locale] }),
+    index('github_projects_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const githubProjectTags = pgTable(
@@ -222,7 +242,10 @@ export const experiencesI18n = pgTable(
     period: text('period').notNull(),
     description: text('description').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.experienceId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.experienceId, table.locale] }),
+    index('experiences_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const education = pgTable(
@@ -249,7 +272,10 @@ export const educationI18n = pgTable(
     period: text('period').notNull(),
     description: text('description').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.educationId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.educationId, table.locale] }),
+    index('education_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const techCategories = pgTable(
@@ -272,7 +298,10 @@ export const techCategoriesI18n = pgTable(
     locale: text('locale').notNull(),
     name: text('name').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.techCategoryId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.techCategoryId, table.locale] }),
+    index('tech_categories_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const techItems = pgTable(
@@ -309,7 +338,10 @@ export const skillCategoriesI18n = pgTable(
     locale: text('locale').notNull(),
     categoryName: text('category_name').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.skillCategoryId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.skillCategoryId, table.locale] }),
+    index('skill_categories_i18n_locale_idx').on(table.locale),
+  ]
 )
 
 export const skillItems = pgTable(
@@ -334,5 +366,8 @@ export const skillItemsI18n = pgTable(
     locale: text('locale').notNull(),
     label: text('label').notNull(),
   },
-  (table) => [primaryKey({ columns: [table.skillItemId, table.locale] })]
+  (table) => [
+    primaryKey({ columns: [table.skillItemId, table.locale] }),
+    index('skill_items_i18n_locale_idx').on(table.locale),
+  ]
 )

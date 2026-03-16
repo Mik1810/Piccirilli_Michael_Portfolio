@@ -3333,3 +3333,13 @@ pm run build passed
 - Confirmed that the CI job-level `NODE_ENV=test` was inflating the production bundle size even though Vite was building in production mode.
 - Updated [.github/workflows/ci.yml](./.github/workflows/ci.yml) so DB-backed tests keep their dedicated env, while the build step runs with `NODE_ENV=production`.
 - Expected result: the GitHub Actions build output should return to the normal ~283 kB public bundle and stop warning about chunks above 500 kB.
+
+## 2026-03-16 23:03 CET - Added first schema hardening pass for read-heavy tables
+
+- Updated [schema.ts](./lib/db/schema.ts) to declare explicit Drizzle indexes for the most common public read patterns.
+- Added locale indexes for all `*_i18n` tables queried primarily by locale.
+- Added `github_projects_featured_order_index_idx` for the featured GitHub project listing path.
+- Added a ready-to-apply SQL migration in [0001_public_read_indexes.sql](./drizzle/0001_public_read_indexes.sql).
+- Updated [TODO.md](./TODO.md):
+  - marked the `_i18n` uniqueness item as `✅ Fatto` because composite primary keys already enforce it
+  - marked the indexing task as `🟡 Partial` after this first pass
