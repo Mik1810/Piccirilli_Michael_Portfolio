@@ -3372,3 +3372,12 @@ pm run build passed
 
 - Deleted [0001_public_read_indexes.sql](./drizzle/0001_public_read_indexes.sql) from the repository after the index migration had already been applied to the live database and reflected in dumps.
 - Removed direct dump references from [README.md](./README.md) to avoid documenting operational DB artifacts as part of the public project narrative.
+
+## 2026-03-16 23:47 CET - Added Dependabot for npm and workflow maintenance
+
+- Added [.github/dependabot.yml](./.github/dependabot.yml).
+- Enabled weekly updates for:
+  - npm dependencies in the repository root
+  - GitHub Actions workflow dependencies
+- Added conservative PR limits and simple labels so automated maintenance stays readable.
+- Marked the Dependabot item in [TODO.md](./TODO.md) as `✅ Fatto`.
