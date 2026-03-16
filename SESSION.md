@@ -3381,3 +3381,15 @@ pm run build passed
   - GitHub Actions workflow dependencies
 - Added conservative PR limits and simple labels so automated maintenance stays readable.
 - Marked the Dependabot item in [TODO.md](./TODO.md) as `✅ Fatto`.
+
+## 2026-03-16 23:58 CET - Upgraded health endpoint into an operational app snapshot
+
+- Added [appMetadata.ts](./lib/appMetadata.ts) for app name/version, uptime tracking, and minimal deployment metadata.
+- Extended [health.ts](./api/health.ts) so `/api/health` now returns:
+  - app name and version
+  - environment
+  - uptime
+  - deploy metadata when available
+  - DB health and latency
+- The endpoint now responds with `503` when the database check fails and `200` when it succeeds.
+- Marked the health/dashboard item in [TODO.md](./TODO.md) as `✅ Fatto`.

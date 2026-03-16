@@ -65,11 +65,12 @@ Ridurre il lavoro manuale di manutenzione e aumentare la visibilità operativa d
 
 ### Interventi residui
 
-- `❌ Non fatto` introdurre `Dependabot` o `Renovate` per aggiornamenti automatici delle dipendenze
-- `❌ Non fatto` aggiungere una health/dashboard minima per stato applicativo e operativo, per esempio:
+- `✅ Fatto` introdotto `Dependabot` per aggiornamenti automatici di dipendenze npm e GitHub Actions con pianificazione settimanale
+- `✅ Fatto` aggiungere una health/dashboard minima per stato applicativo e operativo, tramite `/api/health`, con:
   - stato DB
   - versione app
   - informazioni minime di integrità
+  - environment, uptime e metadati minimi di deploy
 - `❌ Non fatto` introdurre una disciplina di release leggera, per esempio:
   - changelog minimo
   - tag coerenti con le versioni
@@ -194,7 +195,7 @@ Aggiungere una rete di sicurezza leggera sopra la CI già presente.
   - `/api/projects`
   - `/api/skills`
 - `❌ Non fatto` valutare un test minimo di accesso admin o sessione
-- `❌ Non fatto` creare una suite di test dedicata agli endpoint che eseguono query sul database, con focus iniziale su:
+- `✅ Fatto` creare una suite di test dedicata agli endpoint che eseguono query sul database, con focus iniziale su:
   - `/api/profile`
   - `/api/about`
   - `/api/projects`
@@ -251,3 +252,5 @@ Medio-Alto
 ## Nota pratica
 
 Se il progetto resta volutamente single-page e già soddisfa il livello desiderato, le sezioni dalla `2` in poi possono anche essere trattate come rifiniture opzionali e non come blocchi obbligatori prima della chiusura.
+
+
