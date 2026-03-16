@@ -3399,3 +3399,8 @@ pm run build passed
 - Updated [dependabot.yml](./.github/dependabot.yml) to ignore semver-major updates for @eslint/js and slint.
 - This prevents automatic PRs that move the lint stack to ESLint 10 while the rest of the repository is still aligned to ESLint 9.
 - Kept the previously removed custom labels out of the config so Dependabot no longer fails on missing repository labels.
+
+## 2026-03-16 23:28 CET - Extended Dependabot guardrails to the Vite toolchain
+
+- Updated [dependabot.yml](./.github/dependabot.yml) to ignore semver-major updates for ite and @vitejs/plugin-react.
+- This avoids automatic PRs that upgrade only one side of the Vite toolchain and break installation or preview deploys.
