@@ -3,13 +3,14 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
+import { appEnv } from './config/env.js'
 import type { ApiHeaders, ApiQuery, ApiResponse } from './types/http.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const rootDir = path.resolve(__dirname, '..')
 const apiDir = path.join(rootDir, 'api')
-const port = Number(process.env.API_PORT || 3000)
+const port = appEnv.apiPort
 
 interface DevApiRequest {
   method?: string

@@ -12,13 +12,19 @@ import {
   removeAdminRow,
 } from '../../lib/services/adminTableService.js'
 import {
-  getQueryParam,
+  enforceMethods,
   HttpError,
+  parseBodyWithSchema,
+  parseQueryWithSchema,
   respondWithError,
 } from '../../lib/http/apiUtils.js'
+import {
+  adminTableBodySchema,
+  adminTableQuerySchema,
+} from '../../lib/http/requestSchemas.js'
 import { enforceRateLimit } from '../../lib/http/rateLimit.js'
 import { logApiError } from '../../lib/logger.js'
-import type { ApiHandler, ApiRequest } from '../../lib/types/http.js'
+import type { ApiHandler } from '../../lib/types/http.js'
 
 interface TableBody {
   row?: Record<string, unknown>
@@ -27,11 +33,13 @@ interface TableBody {
 }
 
 const handler: ApiHandler<TableBody> = async (req, res) => {
+  if (!enforceMethods(req, res, ['GET', 'POST', 'PATCH', 'DELETE'])) return
+
   const admin = requireAdminSession(req, res)
   if (!admin) return
 
   try {
-    enforceRateLimit(req, {
+    enforceRateLimit(req, res, {
       keyPrefix: 'admin-table',
       limit: 120,
       windowMs: 60 * 1000,
@@ -40,25 +48,28 @@ const handler: ApiHandler<TableBody> = async (req, res) => {
     return respondWithError(res, error)
   }
 
-  const rawTable = getQueryParam(req, 'table')
-  if (!rawTable || typeof rawTable !== 'string') {
-    return res.status(400).json({ error: 'Missing table parameter' })
-  }
+  const { table: rawTable, limit: rawLimit } = parseQueryWithSchema(
+    req,
+    adminTableQuerySchema
+  )
   const table = getAllowedAdminTable(rawTable)
 
   if (!table) {
-    return res.status(400).json({ error: 'Table not allowed' })
+    return respondWithError(
+      res,
+      new HttpError(400, 'Table not allowed', { code: 'table_not_allowed' })
+    )
   }
   const config = getAdminTableConfigOrNull(table)
 
   try {
     if (req.method === 'GET') {
-      const limit = parseAdminTableLimit(getQueryParam(req, 'limit'))
+      const limit = parseAdminTableLimit(rawLimit)
       const rows = await getAdminRows(table, limit)
       return res.status(200).json({ rows })
     }
 
-    const body = (req as ApiRequest<TableBody>).body || {}
+    const body = parseBodyWithSchema(req, adminTableBodySchema)
 
     if (req.method === 'POST') {
       if (Array.isArray(body.rows) && body.rows.length > 0) {
@@ -77,35 +88,47 @@ const handler: ApiHandler<TableBody> = async (req, res) => {
     if (req.method === 'PATCH') {
       const keys = requireAdminPayload(body.keys, 'Missing keys payload')
       const row = requireAdminPayload(body.row, 'Missing row payload')
-      if (!hasAllPrimaryKeys(config, keys)) {
-        return res.status(400).json({ error: 'Missing primary key fields in keys payload' })
+      if (!config || !hasAllPrimaryKeys(config, keys)) {
+        return respondWithError(
+          res,
+          new HttpError(400, 'Missing primary key fields in keys payload', {
+            code: 'missing_primary_keys',
+          })
+        )
       }
 
       const updatedRow = await editAdminRow(table, keys, row)
       return res.status(200).json({ row: updatedRow })
     }
 
-    if (req.method === 'DELETE') {
-      const keys = requireAdminPayload(body.keys, 'Missing keys payload')
-      if (!hasAllPrimaryKeys(config, keys)) {
-        return res.status(400).json({ error: 'Missing primary key fields in keys payload' })
-      }
-
-      const result = await removeAdminRow(table, keys)
-      return res.status(200).json(result)
+    const keys = requireAdminPayload(body.keys, 'Missing keys payload')
+    if (!config || !hasAllPrimaryKeys(config, keys)) {
+      return respondWithError(
+        res,
+        new HttpError(400, 'Missing primary key fields in keys payload', {
+          code: 'missing_primary_keys',
+        })
+      )
     }
 
-    return res.status(405).json({ error: 'Method not allowed' })
+    const result = await removeAdminRow(table, keys)
+    return res.status(200).json(result)
   } catch (error) {
     if (error instanceof HttpError) {
       return respondWithError(res, error)
     }
     if (error instanceof Error && error.message === 'Database error') {
       logApiError('admin.table', error, { table, method: req.method, url: req.url })
-      return respondWithError(res, new HttpError(500, 'Database error'))
+      return respondWithError(
+        res,
+        new HttpError(500, 'Database error', { code: 'database_error' })
+      )
     }
     if (error instanceof Error && error.message) {
-      return respondWithError(res, new HttpError(500, error.message))
+      return respondWithError(
+        res,
+        new HttpError(500, error.message, { code: 'internal_error' })
+      )
     }
     logApiError('admin.table', error, { table, method: req.method, url: req.url })
     return respondWithError(res, error)

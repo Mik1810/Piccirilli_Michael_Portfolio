@@ -6,28 +6,39 @@ import { MemoryCache } from '../lib/cache/memoryCache.js'
 import type { ProfileResponse } from '../lib/db/repositories/profileRepository.js'
 import {
   enforceMethod,
-  getQueryParam,
+  parseQueryWithSchema,
   respondWithError,
 } from '../lib/http/apiUtils.js'
+import { localeQuerySchema } from '../lib/http/requestSchemas.js'
+import { enforceRateLimit } from '../lib/http/rateLimit.js'
 import { logApiError } from '../lib/logger.js'
 import type { ApiHandler } from '../lib/types/http.js'
 
 const CACHE_TTL_MS = 60 * 1000
-
 const cache = new MemoryCache<ProfileResponse>()
+const RATE_LIMIT = {
+  keyPrefix: 'public-profile',
+  limit: 180,
+  windowMs: 60 * 1000,
+}
 
 const handler: ApiHandler = async (req, res) => {
   if (!enforceMethod(req, res, 'GET')) return
 
-  const lang = normalizeRepositoryLocale(getQueryParam(req, 'lang'))
-  const cacheKey = `profile:${lang}`
-  const cached = cache.get(cacheKey)
-  if (cached) {
-    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')
-    return res.status(200).json(cached)
-  }
+  let lang = normalizeRepositoryLocale(undefined)
 
   try {
+    enforceRateLimit(req, res, RATE_LIMIT)
+
+    const { lang: rawLang } = parseQueryWithSchema(req, localeQuerySchema)
+    lang = normalizeRepositoryLocale(rawLang)
+    const cacheKey = `profile:${lang}`
+    const cached = cache.get(cacheKey)
+    if (cached) {
+      res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')
+      return res.status(200).json(cached)
+    }
+
     const payload = await getProfileContent(lang)
     cache.set(cacheKey, payload, CACHE_TTL_MS)
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')

@@ -1,5 +1,5 @@
 import { HttpError } from './apiUtils.js'
-import type { ApiRequest } from '../types/http.js'
+import type { ApiResponse, ApiRequest } from '../types/http.js'
 
 interface RateLimitBucket {
   count: number
@@ -10,6 +10,19 @@ interface RateLimitOptions {
   keyPrefix: string
   limit: number
   windowMs: number
+}
+
+class RateLimitError extends HttpError {
+  resetAt: number
+  retryAfterSeconds: number
+  limit: number
+
+  constructor(limit: number, resetAt: number, retryAfterSeconds: number) {
+    super(429, 'Too many requests', { code: 'rate_limited' })
+    this.limit = limit
+    this.resetAt = resetAt
+    this.retryAfterSeconds = retryAfterSeconds
+  }
 }
 
 const buckets = new Map<string, RateLimitBucket>()
@@ -38,8 +51,20 @@ const cleanupExpiredBuckets = (now: number) => {
   }
 }
 
+const setRateLimitHeaders = (
+  res: ApiResponse,
+  options: RateLimitOptions,
+  bucket: RateLimitBucket
+) => {
+  const remaining = Math.max(options.limit - bucket.count, 0)
+  res.setHeader('X-RateLimit-Limit', String(options.limit))
+  res.setHeader('X-RateLimit-Remaining', String(remaining))
+  res.setHeader('X-RateLimit-Reset', String(Math.ceil(bucket.resetAt / 1000)))
+}
+
 export const enforceRateLimit = (
   req: ApiRequest,
+  res: ApiResponse,
   options: RateLimitOptions
 ) => {
   const now = Date.now()
@@ -49,16 +74,26 @@ export const enforceRateLimit = (
   const current = buckets.get(clientKey)
 
   if (!current || current.resetAt <= now) {
-    buckets.set(clientKey, {
+    const bucket = {
       count: 1,
       resetAt: now + options.windowMs,
-    })
+    }
+    buckets.set(clientKey, bucket)
+    setRateLimitHeaders(res, options, bucket)
     return
   }
 
   if (current.count >= options.limit) {
-    throw new HttpError(429, 'Too many requests')
+    const retryAfterSeconds = Math.max(
+      1,
+      Math.ceil((current.resetAt - now) / 1000)
+    )
+    setRateLimitHeaders(res, options, current)
+    res.setHeader('Retry-After', String(retryAfterSeconds))
+    throw new RateLimitError(options.limit, current.resetAt, retryAfterSeconds)
   }
 
   current.count += 1
+  setRateLimitHeaders(res, options, current)
 }
+

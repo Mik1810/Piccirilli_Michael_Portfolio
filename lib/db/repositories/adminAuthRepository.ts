@@ -1,8 +1,6 @@
-import { config as loadEnv } from 'dotenv'
 import type { SessionUser } from '../../types/auth.js'
 
-loadEnv({ path: '.env.local', quiet: true })
-loadEnv({ quiet: true })
+import { getSupabaseAuthConfig } from '../../config/env.js'
 
 interface SupabaseAuthResponse {
   user?: {
@@ -20,19 +18,7 @@ export const signInAdmin = async (
   email: string,
   password: string
 ): Promise<SessionUser> => {
-  const supabaseUrl = process.env.SUPABASE_URL
-  const supabaseSecretKey =
-    process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!supabaseUrl) {
-    throw new Error('Missing SUPABASE_URL')
-  }
-
-  if (!supabaseSecretKey) {
-    throw new Error(
-      'Missing SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY)'
-    )
-  }
+  const { supabaseUrl, supabaseSecretKey } = getSupabaseAuthConfig()
 
   const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
     method: 'POST',

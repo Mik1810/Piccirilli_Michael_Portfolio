@@ -3177,3 +3177,136 @@ Conclusione:
 
 
 
+
+## 2026-03-16 21:33 CET - Began backend hardening with shared env validation and Zod request parsing
+
+- Added a centralized runtime env module in [env.ts](./lib/config/env.ts) to load .env.local once and validate:
+  - database DSN expectations
+  - Supabase auth configuration
+  - session secret behavior
+  - optional API port parsing
+- Added shared request schemas in [requestSchemas.ts](./lib/http/requestSchemas.ts) using zod for:
+  - public locale queries
+  - admin login body
+  - admin table query/body payloads
+- Extended [apiUtils.ts](./lib/http/apiUtils.ts) with:
+  - nforceMethods(...)
+  - parseQueryWithSchema(...)
+  - parseBodyWithSchema(...)
+- Reworked env consumers to use the centralized config instead of ad hoc process.env / dotenv calls:
+  - [drizzle.config.ts](./drizzle.config.ts)
+  - [client.ts](./lib/db/client.ts)
+  - [adminAuthRepository.ts](./lib/db/repositories/adminAuthRepository.ts)
+  - [authSession.ts](./lib/authSession.ts)
+  - [devApiServer.ts](./lib/devApiServer.ts)
+- Hardened public read handlers so invalid lang values now fail at the HTTP boundary instead of being silently normalized:
+  - [profile.ts](./api/profile.ts)
+  - [about.ts](./api/about.ts)
+  - [projects.ts](./api/projects.ts)
+  - [skills.ts](./api/skills.ts)
+  - [experiences.ts](./api/experiences.ts)
+- Hardened admin handlers with schema-backed request parsing:
+  - [login.ts](./api/admin/login.ts)
+  - [table.ts](./api/admin/table.ts)
+- Verification:
+  - 
+pm run lint passed
+  - 
+pm run typecheck passed
+  - 
+pm run build passed
+- Expected result:
+  - runtime configuration now fails faster and more explicitly
+  - malformed public/admin input is rejected earlier and more consistently
+  - the backend hardening track now has a reusable validation foundation instead of endpoint-local checks
+
+## 2026-03-16 22:01 CET - Extended backend hardening with explicit rate limiting on public and admin paths
+
+- Reworked [rateLimit.ts](./lib/http/rateLimit.ts) so rate limiting now:
+  - sets X-RateLimit-Limit
+  - sets X-RateLimit-Remaining
+  - sets X-RateLimit-Reset
+  - sets Retry-After on 429
+- Updated admin handlers to pass the response object into the limiter:
+  - [login.ts](./api/admin/login.ts)
+  - [table.ts](./api/admin/table.ts)
+- Added conservative public read-path limits to:
+  - [profile.ts](./api/profile.ts)
+  - [about.ts](./api/about.ts)
+  - [projects.ts](./api/projects.ts)
+  - [skills.ts](./api/skills.ts)
+  - [experiences.ts](./api/experiences.ts)
+  - [health.ts](./api/health.ts)
+- Chosen thresholds are intentionally permissive for normal browsing, with the goal of hardening the HTTP boundary rather than throttling ordinary use.
+- Verification:
+  - 
+pm run lint passed
+  - 
+pm run typecheck passed
+  - 
+pm run build passed
+- Expected result:
+  - both public and admin endpoints now expose clearer limit semantics at the HTTP layer
+  - abusive bursts should fail more predictably and observably with proper response headers
+
+## 2026-03-16 22:09 CET - Added explicit status markers to TODO.md
+
+- Updated [TODO.md](./TODO.md) so the roadmap now carries explicit progress markers:
+  - ✔ Fatto
+  - ◐ Partial
+  - ✘ Non fatto
+- Marked the backend hardening track as partially completed after:
+  - shared env validation
+  - Zod request parsing
+  - initial public/admin rate limiting
+- Left the remaining sections as not started where work has not yet begun.
+- Expected result:
+  - the roadmap should now be easier to scan as a live status board rather than as a flat list of open items.
+
+## 2026-03-16 22:15 CET - Closed the backend hardening block and normalized error payload semantics
+
+- Updated the shared HTTP error layer in [apiUtils.ts](./lib/http/apiUtils.ts) so structured failures now expose a stable code alongside rror for the hardened paths.
+- Updated [requireAdminSession.ts](./lib/requireAdminSession.ts) to use the shared unauthorized response path instead of a hand-written 401 payload.
+- Refined hardened admin handlers to use semantic error codes for common failures such as:
+  - unauthorized access
+  - invalid query/body
+  - table not allowed
+  - missing primary keys
+  - database error
+  - auth failure
+- Marked the Hardening backend section in [TODO.md](./TODO.md) as completed after closing:
+  - env validation
+  - shared Zod parsing
+  - initial public/admin rate limiting
+  - primary HTTP error normalization
+- Verification:
+  - 
+pm run lint passed
+  - 
+pm run typecheck passed
+  - 
+pm run build passed
+- Expected result:
+  - the backend hardening track is now considered closed at the current project scope
+  - future work can move to schema/database hardening or automated tests without leaving the HTTP boundary half-finished
+
+## 2026-03-16 20:47 CET - Added first DB-backed endpoint test suite
+
+- Added a minimal Node test runner setup with `npm run test:db`.
+- Added handler-level integration tests for public DB-backed endpoints:
+  - `/api/profile`
+  - `/api/about`
+  - `/api/projects`
+  - `/api/skills`
+  - `/api/experiences`
+- Covered both success payload shape and invalid locale rejection with structured `invalid_query` errors.
+- Marked the DB-backed endpoint test suite in [TODO.md](./TODO.md) as `🟡 Partial`.
+
+## 2026-03-16 20:56 CET - Migrated DB-backed endpoint tests to Vitest
+
+- Replaced the initial `node:test` setup with Vitest for the DB-backed endpoint suite.
+- Added [vitest.config.ts](./vitest.config.ts) with a minimal Node-focused configuration.
+- Updated scripts in [package.json](./package.json):
+  - `npm run test:db`
+  - `npm run test:db:watch`
+- Kept the same handler-level coverage for public DB-backed endpoints while switching assertions and spies to Vitest.

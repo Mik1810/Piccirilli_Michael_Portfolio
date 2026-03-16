@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 
+import { getAuthSessionSecret, appEnv } from './config/env.js'
 import type { ApiRequest } from './types/http.js'
 import type { SessionPayload, SessionUser } from './types/auth.js'
 
@@ -19,18 +20,9 @@ const base64urlDecode = (input: string) => {
   return Buffer.from(padded, 'base64').toString('utf8')
 }
 
-function getSessionSecret() {
-  const secret = process.env.AUTH_SESSION_SECRET
-  if (secret) return secret
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('Missing AUTH_SESSION_SECRET')
-  }
-  return 'dev-only-insecure-secret-change-me'
-}
-
 function sign(data: string) {
   return crypto
-    .createHmac('sha256', getSessionSecret())
+    .createHmac('sha256', getAuthSessionSecret())
     .update(data)
     .digest('base64url')
 }
@@ -91,28 +83,26 @@ export function verifySessionToken(token: string | undefined | null) {
 }
 
 export function createSessionCookie(token: string) {
-  const isProd = process.env.NODE_ENV === 'production'
   return [
     `${SESSION_COOKIE_NAME}=${token}`,
     'Path=/',
     `Max-Age=${SESSION_TTL_SECONDS}`,
     'HttpOnly',
     'SameSite=Lax',
-    isProd ? 'Secure' : '',
+    appEnv.isProduction ? 'Secure' : '',
   ]
     .filter(Boolean)
     .join('; ')
 }
 
 export function clearSessionCookie() {
-  const isProd = process.env.NODE_ENV === 'production'
   return [
     `${SESSION_COOKIE_NAME}=`,
     'Path=/',
     'Max-Age=0',
     'HttpOnly',
     'SameSite=Lax',
-    isProd ? 'Secure' : '',
+    appEnv.isProduction ? 'Secure' : '',
   ]
     .filter(Boolean)
     .join('; ')
