@@ -119,9 +119,10 @@ Rendere la sezione contatti più completa e più resistente, senza complicarla i
 
 ### Interventi residui
 
-- `❌ Non fatto` migliorare stati di successo/errore lato UX
-- `❌ Non fatto` valutare invio reale o gestione più strutturata del form, se desiderato
-- `❌ Non fatto` aggiungere protezione minima anti-spam se il form diventa operativo
+- `✅ Fatto` migliorare stati di successo/errore lato UX
+- `✅ Fatto` introdurre un flusso di invio strutturato lato server con Resend, con endpoint dedicato, validazione, test API e fallback UI coerente
+- `✅ Fatto` aggiungere protezione minima anti-spam tramite rate limit e honeypot
+- `🟡 Partial` sostituire il sender di test `onboarding@resend.dev` con un sender verificato su dominio proprio, se in futuro si vorrà passare a una configurazione pienamente production-grade
 
 ### Priorità
 
@@ -253,4 +254,5 @@ Medio-Alto
 ## Nota pratica
 
 Se il progetto resta volutamente single-page e già soddisfa il livello desiderato, le sezioni dalla `2` in poi possono anche essere trattate come rifiniture opzionali e non come blocchi obbligatori prima della chiusura.
+
 

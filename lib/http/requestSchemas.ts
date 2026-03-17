@@ -36,3 +36,22 @@ export const adminTableBodySchema = z
     keys: nonEmptyRecordSchema.optional(),
   })
   .strict()
+
+export const contactBodySchema = z
+  .object({
+    name: z.string().trim().min(2, 'Name is required').max(120, 'Name is too long'),
+    email: z
+      .string()
+      .trim()
+      .min(1, 'Email is required')
+      .max(320, 'Email is too long')
+      .email('Email is invalid'),
+    message: z
+      .string()
+      .trim()
+      .min(10, 'Message is too short')
+      .max(4000, 'Message is too long'),
+    locale: z.enum(['it', 'en']).default('it'),
+    website: z.string().trim().max(0, 'Invalid request payload').default(''),
+  })
+  .strict()

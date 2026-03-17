@@ -9,6 +9,15 @@ The release discipline is intentionally lightweight:
 
 ## [Unreleased]
 
+### Added
+- server-side contact delivery through `/api/contact` with Zod validation, rate limiting, and Resend integration
+- dedicated API coverage for the contact flow, now included in the broader `test:api` suite
+
+### Changed
+- the contact form now submits through the backend instead of relying on `mailto:`
+- contact notifications now include a styled HTML email body in addition to the plain-text fallback
+- contact UX now surfaces clearer success and error states, including validation and service-availability feedback
+
 ### Planned
 - coordinated major upgrades of tooling stacks such as ESLint and Vite after compatibility review
 

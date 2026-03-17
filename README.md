@@ -211,7 +211,8 @@ This fragment is representative of the broader modeling philosophy:
 | `/api/projects` | portfolio projects, GitHub projects, tags, gallery images |
 | `/api/skills` | tech stack, skill categories, localized skill items |
 | `/api/experiences` | professional experience and education |
-| `/api/health` | operational sanity check |
+| /api/health | operational sanity check |
+| /api/contact | validated contact submission with rate limiting and Resend-backed delivery | 
 
 ### 5.2 Handler protocol
 
@@ -306,9 +307,14 @@ The runtime expects a local `.env.local` containing at least:
 | --- | --- |
 | `SUPABASE_URL` | Supabase HTTP base URL used for auth REST calls |
 | `SUPABASE_SECRET_KEY` | secret/service credential used for admin auth requests |
-| `DATABASE_URL` | PostgreSQL DSN used by Drizzle, `postgres`, and DB tooling |
+| DATABASE_URL | PostgreSQL DSN used by Drizzle, postgres, and DB tooling |
+| RESEND_API_KEY | Resend API key used by the contact endpoint |
+| CONTACT_FROM_EMAIL | sender address for contact submissions (onboarding@resend.dev for test mode) |
+| CONTACT_TO_EMAIL | destination inbox for contact submissions | 
 
 For Vercel production, the DSN should target the Supabase IPv4 transaction pooler.
+
+When no owned domain is available yet, the initial contact-flow setup can use Resend test mode with onboarding@resend.dev as sender and the account mailbox as destination.
 
 ### 7.2 Developer commands
 
@@ -385,4 +391,5 @@ The active roadmap is maintained in [todo.md](./todo.md) and intentionally lists
 - public repository composition: [lib/db/repositories/projectsRepository.ts](./lib/db/repositories/projectsRepository.ts)
 - admin registry: [lib/admin/registry.ts](./lib/admin/registry.ts)
 - CI workflow: [.github/workflows/ci.yml](./.github/workflows/ci.yml)
+
 

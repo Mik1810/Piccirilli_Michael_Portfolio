@@ -3,25 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "dev:web": "vite",
-    "dev:api": "tsx watch lib/devApiServer.ts",
-    "dev:api:vercel": "vercel dev --yes -p 3000",
-    "dev:fast": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
-    "dev:vercel": "vercel dev",
-    "build": "vite build",
-    "start": "vite build && vite preview",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "format": "prettier --write .",
-    "preview": "vite preview",
-    "test:db": "vitest run tests/api/publicEndpoints.test.ts",
-    "test:db:watch": "vitest tests/api/publicEndpoints.test.ts"
-  },
   "dependencies": {
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
@@ -30,6 +11,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1",
+    "resend": "^6.9.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -54,5 +36,26 @@
   },
   "overrides": {
     "flatted": "^3.4.1"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:web": "vite",
+    "dev:api": "tsx watch lib/devApiServer.ts",
+    "dev:api:vercel": "vercel dev --yes -p 3000",
+    "dev:fast": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
+    "dev:vercel": "vercel dev",
+    "build": "vite build",
+    "start": "vite build && vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "format": "prettier --write .",
+    "preview": "vite preview",
+    "test:db": "vitest run tests/api/publicEndpoints.test.ts",
+    "test:db:watch": "vitest tests/api/publicEndpoints.test.ts",
+    "test:api": "vitest run",
+    "test:api:watch": "vitest"
   }
 }

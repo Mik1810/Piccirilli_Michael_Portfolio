@@ -176,7 +176,10 @@ export interface ContactFormData {
   name: string
   email: string
   message: string
+  website: string
 }
+
+export type ContactFormStatus = 'idle' | 'sending' | 'success' | 'error'
 
 export interface AdminTableDefinition {
   name: string

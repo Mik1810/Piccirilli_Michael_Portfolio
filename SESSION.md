@@ -3420,3 +3420,25 @@ pm run build passed
 - Updated [README.md](./README.md) to document the lightweight release convention based on semantic version alignment and `vX.Y.Z` Git tags.
 - Marked the release-discipline item in [todo.md](./todo.md) as ✅ Fatto.
 
+
+## 2026-03-17 00:30 CET - Added a first server-side contact flow with Resend test sender
+
+- Added [contact.ts](./api/contact.ts) with Zod validation, rate limiting, and JSON success/error responses.
+- Added [contactService.ts](./lib/services/contactService.ts) backed by Resend, including eplyTo and a safe contact_unavailable fallback when email config is missing.
+- Extended [env.ts](./lib/config/env.ts) with RESEND_API_KEY, CONTACT_FROM_EMAIL, and CONTACT_TO_EMAIL getters.
+- Upgraded [Contact.tsx](./src/components/jsx/Contact.tsx) from mailto: navigation to a real POST flow with sending, success, and rror UI states plus a honeypot field.
+- Added [contact.test.ts](./tests/api/contact.test.ts) and widened the API test runner/CI path to 
+pm run test:api.
+- Updated [README.md](./README.md) and [todo.md](./todo.md) to reflect the initial Resend test-mode setup and the partially completed contact-flow roadmap item.
+
+## 2026-03-17 01:10 CET - Polished the contact flow UX and inbox rendering
+
+- Refined [Contact.tsx](./src/components/jsx/Contact.tsx) so API error codes now map to clearer user-facing messages and status feedback uses `aria-live` / `aria-busy`.
+- Upgraded [contactService.ts](./lib/services/contactService.ts) to send a styled HTML email alongside the plain-text fallback, making inbox rendering much easier to scan.
+- Extended [staticI18n.json](./src/data/staticI18n.json) with validation and service-unavailable contact messages, and corrected the Italian timeout copy.
+- Tweaked [Contact.css](./src/components/css/Contact.css) so status feedback remains more readable under the submit button.
+
+## 2026-03-17 01:18 CET - Realigned roadmap and changelog to the current contact-flow state
+
+- Updated [todo.md](./todo.md) so the contact-flow block now marks the server-side Resend path as completed and leaves only the production sender/domain upgrade as `🟡 Partial`.
+- Updated [CHANGELOG.md](./CHANGELOG.md) to record the new contact endpoint, Resend integration, API coverage, and contact-form UX changes under `Unreleased`.

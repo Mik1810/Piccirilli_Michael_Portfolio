@@ -53,7 +53,14 @@
       "messagePlaceholder": "Scrivi il tuo messaggio...",
       "sendBtn": "Invia messaggio",
       "mailSubject": "Contatto da",
-      "mailFrom": "Da"
+      "mailFrom": "Da",
+      "sendBtnSending": "Invio in corso...",
+      "successMessage": "Messaggio inviato correttamente. Ti contatterò al più presto.",
+      "validationErrorMessage": "Controlla i campi del form e riprova.",
+      "unavailableMessage": "Il servizio contatti non è disponibile in questo momento.",
+      "errorMessage": "Non riesco a inviare il messaggio in questo momento.",
+      "directEmailLinkLabel": "Scrivimi direttamente via email",
+      "timeoutMessage": "L'invio sta impiegando troppo tempo. Riprova tra poco oppure scrivimi via email."
     },
     "footer": {
       "rights": "Tutti i diritti riservati."
@@ -113,7 +120,14 @@
       "messagePlaceholder": "Write your message...",
       "sendBtn": "Send message",
       "mailSubject": "Contact from",
-      "mailFrom": "From"
+      "mailFrom": "From",
+      "sendBtnSending": "Sending...",
+      "successMessage": "Message sent successfully. I will get back to you soon.",
+      "validationErrorMessage": "Please check the form fields and try again.",
+      "unavailableMessage": "The contact service is unavailable right now.",
+      "errorMessage": "I am unable to send your message right now.",
+      "directEmailLinkLabel": "Email me directly",
+      "timeoutMessage": "Sending is taking too long. Please try again shortly or email me directly."
     },
     "footer": {
       "rights": "All rights reserved."

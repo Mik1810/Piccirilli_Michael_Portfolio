@@ -2,36 +2,91 @@ import { useState, type ChangeEvent, type FormEvent } from 'react'
 
 import { useLanguage } from '../../context/useLanguage'
 import { useProfile } from '../../context/useProfile'
-import type { ContactFormData } from '../../types/app.js'
+import type { ContactFormData, ContactFormStatus } from '../../types/app.js'
 import '../css/Contact.css'
 
 const EMPTY_FORM: ContactFormData = {
   name: '',
   email: '',
   message: '',
+  website: '',
+}
+
+const getContactErrorMessage = (
+  code: string | undefined,
+  fallbackMessage: string | undefined,
+  t: (key: string) => string
+) => {
+  switch (code) {
+    case 'invalid_body':
+      return t('contact.validationErrorMessage')
+    case 'contact_timeout':
+      return t('contact.timeoutMessage')
+    case 'contact_unavailable':
+      return t('contact.unavailableMessage')
+    default:
+      return fallbackMessage || t('contact.errorMessage')
+  }
 }
 
 function Contact() {
-  const { t } = useLanguage()
+  const { lang, t } = useLanguage()
   const { profile } = useProfile()
   const email = String(profile?.email || '').trim()
   const location = String(profile?.location || '').trim()
   const showContactSkeleton = email.length === 0 || location.length === 0
 
   const [formData, setFormData] = useState<ContactFormData>(EMPTY_FORM)
+  const [status, setStatus] = useState<ContactFormStatus>('idle')
+  const [statusMessage, setStatusMessage] = useState('')
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = event.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+    if (status !== 'idle') {
+      setStatus('idle')
+      setStatusMessage('')
+    }
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const { name, email: userEmail, message } = formData
-    const mailtoLink = `mailto:${email}?subject=${t('contact.mailSubject')} ${encodeURIComponent(name)}&body=${encodeURIComponent(`${t('contact.mailFrom')}: ${name}\nEmail: ${userEmail}\n\n${message}`)}`
-    window.location.href = mailtoLink
+    setStatus('sending')
+    setStatusMessage('')
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          website: formData.website,
+          locale: lang,
+        }),
+      })
+
+      const data = (await response.json()) as { error?: string; code?: string }
+      if (!response.ok) {
+        throw new Error(getContactErrorMessage(data?.code, data?.error, t))
+      }
+
+      setStatus('success')
+      setStatusMessage(t('contact.successMessage'))
+      setFormData(EMPTY_FORM)
+    } catch (error) {
+      setStatus('error')
+      setStatusMessage(
+        error instanceof Error && error.message
+          ? error.message
+          : t('contact.errorMessage')
+      )
+    }
   }
 
   return (
@@ -112,7 +167,21 @@ function Contact() {
                 <span>{location}</span>
               </div>
             </div>
-            <form className="contact-form" onSubmit={handleSubmit}>
+            <form
+              className="contact-form"
+              onSubmit={handleSubmit}
+              aria-busy={status === 'sending'}
+            >
+              <input
+                type="text"
+                name="website"
+                value={formData.website}
+                onChange={handleChange}
+                autoComplete="off"
+                tabIndex={-1}
+                aria-hidden="true"
+                className="contact-honeypot"
+              />
               <div className="form-group">
                 <label htmlFor="name">{t('contact.nameLabel')}</label>
                 <input
@@ -123,6 +192,7 @@ function Contact() {
                   onChange={handleChange}
                   required
                   placeholder={t('contact.namePlaceholder')}
+                  disabled={status === 'sending'}
                 />
               </div>
               <div className="form-group">
@@ -135,6 +205,7 @@ function Contact() {
                   onChange={handleChange}
                   required
                   placeholder={t('contact.emailPlaceholder')}
+                  disabled={status === 'sending'}
                 />
               </div>
               <div className="form-group">
@@ -147,11 +218,35 @@ function Contact() {
                   required
                   rows={5}
                   placeholder={t('contact.messagePlaceholder')}
+                  disabled={status === 'sending'}
                 />
               </div>
-              <button type="submit" className="btn btn-primary">
-                {t('contact.sendBtn')}
-              </button>
+              <div className="contact-submit-row">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={status === 'sending'}
+                >
+                  {status === 'sending'
+                    ? t('contact.sendBtnSending')
+                    : t('contact.sendBtn')}
+                </button>
+                {status !== 'idle' ? (
+                  <p
+                    className={`contact-status contact-status-${status}`}
+                    aria-live="polite"
+                    role={status === 'error' ? 'alert' : 'status'}
+                  >
+                    {statusMessage}
+                    {status === 'error' ? (
+                      <>
+                        {' '}
+                        <a href={`mailto:${email}`}>{t('contact.directEmailLinkLabel')}</a>
+                      </>
+                    ) : null}
+                  </p>
+                ) : null}
+              </div>
             </form>
           </div>
         )}

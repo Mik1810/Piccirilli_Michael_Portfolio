@@ -4,6 +4,8 @@ import { z } from 'zod'
 loadEnv({ path: '.env.local', quiet: true })
 loadEnv({ quiet: true })
 
+const emailStringSchema = z.string().trim().email()
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).optional(),
   API_PORT: z.coerce.number().int().positive().max(65535).optional(),
@@ -13,6 +15,9 @@ const envSchema = z.object({
   SUPABASE_URL: z.string().trim().url().optional(),
   SUPABASE_SECRET_KEY: z.string().trim().min(1).optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().trim().min(1).optional(),
+  RESEND_API_KEY: z.string().trim().min(1).optional(),
+  CONTACT_FROM_EMAIL: z.string().trim().min(1).optional(),
+  CONTACT_TO_EMAIL: z.string().trim().min(1).optional(),
 })
 
 const env = envSchema.parse(process.env)
@@ -71,4 +76,34 @@ export const getAuthSessionSecret = () => {
   }
 
   return 'dev-only-insecure-secret-change-me'
+}
+
+export const getContactEmailConfig = () => {
+  if (!env.RESEND_API_KEY) {
+    throw new Error('Missing RESEND_API_KEY')
+  }
+
+  if (!env.CONTACT_FROM_EMAIL) {
+    throw new Error('Missing CONTACT_FROM_EMAIL')
+  }
+
+  if (!env.CONTACT_TO_EMAIL) {
+    throw new Error('Missing CONTACT_TO_EMAIL')
+  }
+
+  const fromEmail = emailStringSchema.safeParse(env.CONTACT_FROM_EMAIL)
+  if (!fromEmail.success) {
+    throw new Error('Invalid CONTACT_FROM_EMAIL')
+  }
+
+  const toEmail = emailStringSchema.safeParse(env.CONTACT_TO_EMAIL)
+  if (!toEmail.success) {
+    throw new Error('Invalid CONTACT_TO_EMAIL')
+  }
+
+  return {
+    resendApiKey: env.RESEND_API_KEY,
+    contactFromEmail: fromEmail.data,
+    contactToEmail: toEmail.data,
+  }
 }

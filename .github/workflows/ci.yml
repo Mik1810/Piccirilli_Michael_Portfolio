@@ -72,27 +72,30 @@ jobs:
           set -o pipefail
           npm run typecheck 2>&1 | tee -a logs/ci.log
 
-      # Verify the DB-backed public API handlers against the configured CI database.
-      - name: DB-backed API tests
+      # Verify the API handlers (DB-backed public reads plus contact flow) against the configured CI setup.
+      - name: API tests
         shell: bash
         env:
           NODE_ENV: test
           AUTH_SESSION_SECRET: ci-test-secret
-          DATABASE_URL: ${{ secrets.DATABASE_URL || secrets.SUPABASE_DB_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          CONTACT_FROM_EMAIL: ${{ secrets.CONTACT_FROM_EMAIL }}
+          CONTACT_TO_EMAIL: ${{ secrets.CONTACT_TO_EMAIL }}
         run: |
           {
             echo
-            echo "===== DB-backed API tests ====="
+            echo "===== API tests ====="
             echo
           } | tee -a logs/ci.log
 
           if [ -z "$DATABASE_URL" ]; then
-            echo "Missing DATABASE_URL or SUPABASE_DB_URL GitHub secret for npm run test:db" | tee -a logs/ci.log
+            echo "Missing DATABASE_URL GitHub secret for npm run test:api" | tee -a logs/ci.log
             exit 1
           fi
 
           set -o pipefail
-          npm run test:db 2>&1 | tee -a logs/ci.log
+          npm run test:api 2>&1 | tee -a logs/ci.log
 
       # Ensure the production bundle can actually be generated.
       - name: Build
@@ -123,12 +126,12 @@ jobs:
             echo "- \`npm ci --no-fund --no-audit\`"
             echo "- \`npm run lint\`"
             echo "- \`npm run typecheck\`"
-            echo "- \`npm run test:db\`"
+            echo "- \`npm run test:api\`"
             echo "- \`npm run build\`"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
 
-          for section in "Install dependencies" "Lint" "Typecheck" "DB-backed API tests" "Build"; do
+          for section in "Install dependencies" "Lint" "Typecheck" "API tests" "Build"; do
             {
               echo "### ${section}"
               echo '```text'
@@ -155,3 +158,6 @@ jobs:
           name: ci-logs
           path: logs
           if-no-files-found: error
+
+
+
