@@ -238,6 +238,41 @@ export interface AdminTablesResponse {
   error?: string
 }
 
+export interface AdminHealthResponse {
+  ok: boolean
+  service: 'api'
+  timestamp: string
+  environment: string
+  app: {
+    name: string
+    version: string
+    uptimeSeconds: number
+    startedAt: string
+  }
+  deployment: {
+    commitSha: string | null
+    branch: string | null
+  }
+  environmentVariables: AdminEnvironmentVariable[]
+  checks: {
+    database: {
+      ok: boolean
+      latencyMs: number | null
+    }
+  }
+}
+
+export interface AdminEnvironmentVariable {
+  key: string
+  value: string | null
+  isSecret: boolean
+}
+
+export interface AdminEnvironmentResponse {
+  environmentVariables: AdminEnvironmentVariable[]
+  error?: string
+}
+
 export interface AdminRowsResponse {
   rows: Record<string, unknown>[]
   error?: string
