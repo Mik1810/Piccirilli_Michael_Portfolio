@@ -55,7 +55,9 @@
     "preview": "vite preview",
     "test:db": "vitest run tests/api/publicEndpoints.test.ts",
     "test:db:watch": "vitest tests/api/publicEndpoints.test.ts",
-    "test:api": "vitest run",
+    "test:api:handlers": "vitest run tests/api",
+    "test:repositories": "vitest run tests/repositories",
+    "test:api": "npm run test:api:handlers && npm run test:repositories",
     "test:api:watch": "vitest"
   }
 }

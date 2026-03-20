@@ -3625,3 +3625,23 @@ pm run test:api.
 - Verification for this closing pass:
   - `npx vitest run tests/repositories/aboutRepository.test.ts tests/repositories/experiencesRepository.test.ts`
   - `npx vitest run tests/repositories/adminAuthRepository.test.ts`
+
+## 2026-03-20 01:24 CET - Split backend tests out of the main CI workflow
+
+- Updated [package.json](./package.json) so `npm run test:api` now runs:
+  - `tests/api`
+  - then `tests/repositories`
+- Restored default Vitest file parallelism in [vitest.config.ts](./vitest.config.ts) and moved cross-folder ordering to the npm script layer.
+- Updated [tests/TEST.md](./tests/TEST.md) to document the new execution order and the new dedicated test commands.
+- Simplified [ci.yml](./.github/workflows/ci.yml) so the main CI workflow now runs only:
+  - `npm ci`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run build`
+- Added [backend-tests.yml](./.github/workflows/backend-tests.yml) as a dedicated workflow for:
+  - `npm ci`
+  - `npm run test:api`
+  - markdown summary publication
+  - backend test log artifact upload
+- Verification:
+  - `npm run test:api`

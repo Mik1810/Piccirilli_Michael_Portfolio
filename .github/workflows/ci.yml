@@ -1,4 +1,4 @@
-name: CI test
+name: CI
 
 on:
   # Validate the main branch after each push.
@@ -10,7 +10,7 @@ on:
 
 jobs:
   verify:
-    # A single lightweight verification job is enough for this repo today.
+    # Keep the baseline verification fast and independent from DB-backed tests.
     runs-on: ubuntu-latest
     env:
       # Keep CI logs plain-text so they stay readable in summaries and artifacts.
@@ -72,31 +72,6 @@ jobs:
           set -o pipefail
           npm run typecheck 2>&1 | tee -a logs/ci.log
 
-      # Verify the API handlers (DB-backed public reads plus contact flow) against the configured CI setup.
-      - name: API tests
-        shell: bash
-        env:
-          NODE_ENV: test
-          AUTH_SESSION_SECRET: ci-test-secret
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          CONTACT_FROM_EMAIL: ${{ secrets.CONTACT_FROM_EMAIL }}
-          CONTACT_TO_EMAIL: ${{ secrets.CONTACT_TO_EMAIL }}
-        run: |
-          {
-            echo
-            echo "===== API tests ====="
-            echo
-          } | tee -a logs/ci.log
-
-          if [ -z "$DATABASE_URL" ]; then
-            echo "Missing DATABASE_URL GitHub secret for npm run test:api" | tee -a logs/ci.log
-            exit 1
-          fi
-
-          set -o pipefail
-          npm run test:api 2>&1 | tee -a logs/ci.log
-
       # Ensure the production bundle can actually be generated.
       - name: Build
         shell: bash
@@ -126,12 +101,11 @@ jobs:
             echo "- \`npm ci --no-fund --no-audit\`"
             echo "- \`npm run lint\`"
             echo "- \`npm run typecheck\`"
-            echo "- \`npm run test:api\`"
             echo "- \`npm run build\`"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
 
-          for section in "Install dependencies" "Lint" "Typecheck" "API tests" "Build"; do
+          for section in "Install dependencies" "Lint" "Typecheck" "Build"; do
             {
               echo "### ${section}"
               echo '```text'

@@ -1,0 +1,108 @@
+name: Backend Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: '0'
+      NO_COLOR: '1'
+      npm_config_color: 'false'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Prepare backend test logs directory
+        shell: bash
+        run: |
+          mkdir -p logs
+          : > logs/backend-tests.log
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          {
+            echo "===== Install dependencies ====="
+            echo
+          } | tee -a logs/backend-tests.log
+          set -o pipefail
+          npm ci --no-fund --no-audit 2>&1 | tee -a logs/backend-tests.log
+
+      - name: Run backend test suite
+        shell: bash
+        env:
+          NODE_ENV: test
+          AUTH_SESSION_SECRET: ci-test-secret
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          CONTACT_FROM_EMAIL: ${{ secrets.CONTACT_FROM_EMAIL }}
+          CONTACT_TO_EMAIL: ${{ secrets.CONTACT_TO_EMAIL }}
+        run: |
+          {
+            echo
+            echo "===== Backend tests ====="
+            echo
+          } | tee -a logs/backend-tests.log
+
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Missing DATABASE_URL GitHub secret for npm run test:api" | tee -a logs/backend-tests.log
+            exit 1
+          fi
+
+          set -o pipefail
+          npm run test:api 2>&1 | tee -a logs/backend-tests.log
+
+      - name: Publish backend test summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Backend test summary"
+            echo
+            echo "- Full command output remains visible in each workflow step."
+            echo "- The downloadable artifact is still kept as a backup."
+            echo
+            echo "### Checks"
+            echo "- \`npm ci --no-fund --no-audit\`"
+            echo "- \`npm run test:api\`"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for section in "Install dependencies" "Backend tests"; do
+            {
+              echo "### ${section}"
+              echo '```text'
+              awk -v target="$section" '
+                $0 == "===== " target " =====" {
+                  capture = 1
+                  next
+                }
+                /^===== .* =====$/ {
+                  if (capture) exit
+                }
+                capture { print }
+              ' logs/backend-tests.log
+              echo '```'
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - name: Upload backend test logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-test-logs
+          path: logs/backend-tests.log
+          if-no-files-found: error

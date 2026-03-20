@@ -16,6 +16,7 @@ The release discipline is intentionally lightweight:
 - a DB-backed admin CRUD integration suite for `/api/admin/table`, covering all current admin tables that support artificial records plus safe update/restore checks for the singleton `profile` and `profile_i18n` tables
 - targeted failure-path coverage for admin endpoints, `/api/health`, and auth-session utilities
 - repository-level coverage across all current repositories, including `adminAuthRepository`, `adminTableRepository`, `aboutRepository`, `experiencesRepository`, `profileRepository`, `projectsRepository`, and `skillsRepository`
+- a dedicated GitHub Actions workflow for backend tests, with its own markdown summary and downloadable logs
 
 ### Changed
 - the contact form now submits through the backend instead of relying on `mailto:`
@@ -24,6 +25,7 @@ The release discipline is intentionally lightweight:
 - the contact email HTML now comes from a dedicated template module with explicit placeholder replacement and escaping for dynamic fields
 - contact-flow coverage now also checks the extracted email template rendering and escaping behavior
 - the public HTML entry now points to `/src/main.tsx`, matching the real frontend entry file
+- the main CI workflow now focuses on `lint`, `typecheck`, and `build`, while backend tests run in a separate workflow
 
 ### Planned
 - coordinated major upgrades of tooling stacks such as ESLint and Vite after compatibility review
