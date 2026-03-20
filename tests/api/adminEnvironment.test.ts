@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import adminEnvironmentHandler from '../../api/admin/environment.ts'
+import adminHandler from '../../api/admin/[route].ts'
 import {
   createSessionCookie,
   createSessionToken,
@@ -17,7 +17,7 @@ const createAdminCookieHeader = () =>
 
 describe('Admin environment endpoint', () => {
   it('rejects unauthenticated requests', async () => {
-    const response = await invokeApiHandler(adminEnvironmentHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/environment',
       ip: '127.0.7.10',
     })
@@ -30,7 +30,7 @@ describe('Admin environment endpoint', () => {
   })
 
   it('returns tracked environment variables for authenticated requests', async () => {
-    const response = await invokeApiHandler(adminEnvironmentHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/environment',
       ip: '127.0.7.11',
       headers: {

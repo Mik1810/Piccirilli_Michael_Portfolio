@@ -13,12 +13,7 @@ vi.mock('../../lib/services/adminAuthService.ts', async () => {
   }
 })
 
-import adminLoginHandler from '../../api/admin/login.ts'
-import adminLogoutHandler from '../../api/admin/logout.ts'
-import adminHealthHandler from '../../api/admin/health.ts'
-import adminSessionHandler from '../../api/admin/session.ts'
-import adminTableHandler from '../../api/admin/table.ts'
-import adminTablesHandler from '../../api/admin/tables.ts'
+import adminHandler from '../../api/admin/[route].ts'
 import {
   createSessionCookie,
   createSessionToken,
@@ -39,7 +34,7 @@ afterEach(() => {
 
 describe('Admin failure paths', () => {
   it('reports unauthenticated admin session when the cookie is invalid', async () => {
-    const response = await invokeApiHandler(adminSessionHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/session',
       ip: '127.0.5.10',
       headers: {
@@ -59,7 +54,7 @@ describe('Admin failure paths', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     mockLoginAdmin.mockRejectedValueOnce(new Error('Invalid credentials'))
 
-    const response = await invokeApiHandler(adminLoginHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       method: 'POST',
       url: '/api/admin/login',
       ip: '127.0.5.11',
@@ -78,7 +73,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects logout without an authenticated session', async () => {
-    const response = await invokeApiHandler(adminLogoutHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       method: 'POST',
       url: '/api/admin/logout',
       ip: '127.0.5.12',
@@ -92,7 +87,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects tables listing without an authenticated session', async () => {
-    const response = await invokeApiHandler(adminTablesHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/tables',
       ip: '127.0.5.13',
     })
@@ -105,7 +100,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects generic admin table access without an authenticated session', async () => {
-    const response = await invokeApiHandler(adminTableHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/table?table=projects',
       ip: '127.0.5.14',
     })
@@ -118,7 +113,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects admin health access without an authenticated session', async () => {
-    const response = await invokeApiHandler(adminHealthHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/health',
       ip: '127.0.5.145',
     })
@@ -131,7 +126,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects admin table requests for disallowed tables', async () => {
-    const response = await invokeApiHandler(adminTableHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/table?table=definitely_not_allowed',
       ip: '127.0.5.15',
       headers: {
@@ -148,7 +143,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects invalid limit values before reaching the DB layer', async () => {
-    const response = await invokeApiHandler(adminTableHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/table?table=projects&limit=not-a-number',
       ip: '127.0.5.16',
       headers: {
@@ -165,7 +160,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects patch requests with missing primary key fields', async () => {
-    const response = await invokeApiHandler(adminTableHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       method: 'PATCH',
       url: '/api/admin/table?table=social_links',
       ip: '127.0.5.17',
@@ -191,7 +186,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects patch requests that contain no mutable fields', async () => {
-    const response = await invokeApiHandler(adminTableHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       method: 'PATCH',
       url: '/api/admin/table?table=social_links',
       ip: '127.0.5.18',
@@ -219,7 +214,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects row payloads with unknown columns', async () => {
-    const response = await invokeApiHandler(adminTableHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       method: 'POST',
       url: '/api/admin/table?table=social_links',
       ip: '127.0.5.19',
@@ -247,7 +242,7 @@ describe('Admin failure paths', () => {
   })
 
   it('rejects empty body payloads for create requests', async () => {
-    const response = await invokeApiHandler(adminTableHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       method: 'POST',
       url: '/api/admin/table?table=social_links',
       ip: '127.0.5.20',

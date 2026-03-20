@@ -113,7 +113,7 @@ The browser only consumes HTTP contracts and generated admin metadata. Persisten
 | Area | Primary files | Role |
 | --- | --- | --- |
 | Public API | [api/](./api) | HTTP entry points for public JSON contracts |
-| Admin API | [api/admin/](./api/admin) | authenticated admin endpoints |
+| Admin API | [api/admin/[route].ts](./api/admin/[route].ts) + [lib/services/admin-routes/](./lib/services/admin-routes) | authenticated admin endpoints behind a single serverless entrypoint |
 | Service layer | [lib/services/](./lib/services) | orchestration between HTTP concerns and repositories |
 | Database access | [lib/db/](./lib/db) | Drizzle client, schema, repositories |
 | Admin registry | [lib/admin/](./lib/admin) | table metadata, validators, grouping, editor semantics |
@@ -124,6 +124,8 @@ The browser only consumes HTTP contracts and generated admin metadata. Persisten
 ### 3.3 Routing model
 
 The deployment routing strategy is intentionally simple. [vercel.json](./vercel.json) serves filesystem assets first and then falls back to `index.html`, allowing the public site to remain a single-page application while still exposing serverless API endpoints.
+
+On the admin side, multiple logical routes are intentionally consolidated behind [api/admin/[route].ts](./api/admin/[route].ts), with modular handlers in [lib/services/admin-routes/](./lib/services/admin-routes), to stay within Vercel Hobby function-count limits while keeping route-level separation in code.
 
 ## 4. Persistence Model and Invariants
 
@@ -254,7 +256,7 @@ The public UI was tuned toward **monotonic rendering**: each section transitions
 
 The admin uses Supabase Auth as authentication authority, but the browser never talks to Supabase directly. Instead:
 
-1. credentials are posted to [api/admin/login.ts](./api/admin/login.ts);
+1. credentials are posted to [api/admin/[route].ts](./api/admin/[route].ts) using the `/api/admin/login` route;
 2. the server forwards them to Supabase Auth REST;
 3. the server issues and verifies its own signed session cookie;
 4. the React admin consumes only the server-owned session endpoints.

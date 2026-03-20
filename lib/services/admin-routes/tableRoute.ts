@@ -1,4 +1,3 @@
-import { requireAdminSession } from '../../lib/requireAdminSession.js'
 import {
   createAdminRow,
   createAdminRows,
@@ -10,21 +9,22 @@ import {
   parseAdminTableLimit,
   requireAdminPayload,
   removeAdminRow,
-} from '../../lib/services/adminTableService.js'
+} from '../adminTableService.js'
 import {
   enforceMethods,
   HttpError,
   parseBodyWithSchema,
   parseQueryWithSchema,
   respondWithError,
-} from '../../lib/http/apiUtils.js'
+} from '../../http/apiUtils.js'
 import {
   adminTableBodySchema,
   adminTableQuerySchema,
-} from '../../lib/http/requestSchemas.js'
-import { enforceRateLimit } from '../../lib/http/rateLimit.js'
-import { logApiError } from '../../lib/logger.js'
-import type { ApiHandler } from '../../lib/types/http.js'
+} from '../../http/requestSchemas.js'
+import { enforceRateLimit } from '../../http/rateLimit.js'
+import { logApiError } from '../../logger.js'
+import { requireAdminSession } from '../../requireAdminSession.js'
+import type { ApiHandler } from '../../types/http.js'
 
 interface TableBody {
   row?: Record<string, unknown>
@@ -32,7 +32,7 @@ interface TableBody {
   keys?: Record<string, unknown>
 }
 
-const handler: ApiHandler<TableBody> = async (req, res) => {
+export const  handleAdminTableRoute: ApiHandler<TableBody> = async (req, res) => {
   if (!enforceMethods(req, res, ['GET', 'POST', 'PATCH', 'DELETE'])) return
 
   const admin = requireAdminSession(req, res)
@@ -134,5 +134,3 @@ const handler: ApiHandler<TableBody> = async (req, res) => {
     return respondWithError(res, error)
   }
 }
-
-export default handler

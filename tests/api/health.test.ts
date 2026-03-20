@@ -14,7 +14,7 @@ vi.mock('../../lib/db/client.ts', async () => {
 })
 
 import healthHandler from '../../api/health.ts'
-import adminHealthHandler from '../../api/admin/health.ts'
+import adminHandler from '../../api/admin/[route].ts'
 import {
   createSessionCookie,
   createSessionToken,
@@ -90,7 +90,7 @@ describe('Health endpoint', () => {
   it('returns a richer admin-only health payload for authenticated requests', async () => {
     mockSqlClient.mockResolvedValueOnce([{ ok: 1 }])
 
-    const response = await invokeApiHandler(adminHealthHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/health',
       ip: '127.0.6.12',
       headers: {
@@ -136,7 +136,7 @@ describe('Health endpoint', () => {
   })
 
   it('rejects unauthenticated access to the admin health payload', async () => {
-    const response = await invokeApiHandler(adminHealthHandler, {
+    const response = await invokeApiHandler(adminHandler, {
       url: '/api/admin/health',
       ip: '127.0.6.13',
     })

@@ -1,21 +1,21 @@
-import { loginAdmin } from '../../lib/services/adminAuthService.js'
 import {
   HttpError,
   enforceMethod,
   parseBodyWithSchema,
   respondWithError,
-} from '../../lib/http/apiUtils.js'
-import { adminLoginBodySchema } from '../../lib/http/requestSchemas.js'
-import { enforceRateLimit } from '../../lib/http/rateLimit.js'
-import { logApiError } from '../../lib/logger.js'
-import type { ApiHandler } from '../../lib/types/http.js'
+} from '../../http/apiUtils.js'
+import { adminLoginBodySchema } from '../../http/requestSchemas.js'
+import { enforceRateLimit } from '../../http/rateLimit.js'
+import { logApiError } from '../../logger.js'
+import { loginAdmin } from '../adminAuthService.js'
+import type { ApiHandler } from '../../types/http.js'
 
 interface LoginBody {
   email?: string
   password?: string
 }
 
-const handler: ApiHandler<LoginBody> = async (req, res) => {
+export const handleAdminLoginRoute: ApiHandler<LoginBody> = async (req, res) => {
   if (!enforceMethod(req, res, 'POST')) return
 
   try {
@@ -26,13 +26,9 @@ const handler: ApiHandler<LoginBody> = async (req, res) => {
     })
 
     const { email, password } = parseBodyWithSchema(req, adminLoginBodySchema)
-
     const { user, cookie } = await loginAdmin(email, password)
     res.setHeader('Set-Cookie', cookie)
-
-    return res.status(200).json({
-      user,
-    })
+    return res.status(200).json({ user })
   } catch (error) {
     if (error instanceof Error && error.message === 'Invalid user session') {
       return respondWithError(
@@ -54,5 +50,3 @@ const handler: ApiHandler<LoginBody> = async (req, res) => {
     return respondWithError(res, error)
   }
 }
-
-export default handler

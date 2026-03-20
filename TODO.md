@@ -1,4 +1,4 @@
-# todo.md
+# TODO.md
 
 ## Scopo
 
@@ -71,9 +71,11 @@ Ridurre il lavoro manuale di manutenzione e aumentare la visibilità operativa d
   - versione app
   - informazioni minime di integrità pubblica
   - environment, uptime e metadati minimi di deploy lato admin
+- `✅ Fatto` consolidare le route admin in un entrypoint serverless unico (`/api/admin/[route]`) con handler modulari in `lib/services/admin-routes`, per rientrare nel limite Vercel Hobby sulle function
 - `✅ Fatto` introdurre una disciplina di release leggera, tramite `CHANGELOG.md` e convenzione di tag semver, per esempio:
   - changelog minimo
   - tag coerenti con le versioni
+- `❌ Non fatto` valutare se applicare lo stesso pattern di router unico anche agli endpoint pubblici (es. raggruppamento sotto `/api/home/[route]`) per ridurre il numero totale di Serverless Functions su Vercel Hobby
 - `❌ Non fatto` pianificare upgrade coordinati dei principali stack di tooling (per esempio ESLint e Vite), verificando la compatibilità tra dipendenze prima del merge
 
 ### Priorità
@@ -243,6 +245,8 @@ Chiudere gli ultimi punti deboli dell’admin e della gestione asset senza riapr
   - badge `PUBLIC`/`SECRET` allineati a sinistra e con larghezza a contenuto
   - variabili pubbliche mostrate in chiaro senza reveal
   - campo valore con larghezza uniforme, ellissi visiva e navigazione completa da tastiera
+- `❌ Non fatto` verificare perche` la pagina di login admin impiega troppo a caricarsi in alcuni casi
+- `❌ Non fatto` valutare/aggiungere uno skeleton (o stato di loading esplicito) anche nella pagina login admin per migliorare il feedback percepito
 - `❌ Non fatto` riprendere con calma il tema upload file in produzione, con percorso ideale:
   - endpoint admin protetto per upload
   - storage persistente

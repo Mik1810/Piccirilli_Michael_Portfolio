@@ -3690,3 +3690,25 @@ pm run test:api.
   - `npm run typecheck`
   - `npm run lint`
   - `npm run build`
+
+## 2026-03-20 04:30 CET - Consolidated admin serverless routing and aligned docs
+
+- Solved Vercel Hobby deploy blocking issue (`No more than 12 Serverless Functions`) by consolidating admin API files into a single entrypoint:
+  - [api/admin/[route].ts](./api/admin/[route].ts)
+- Kept route behavior unchanged at HTTP level (`/api/admin/session`, `/api/admin/login`, `/api/admin/logout`, `/api/admin/tables`, `/api/admin/table`, `/api/admin/health`, `/api/admin/environment`), while moving logic to dedicated modules:
+  - [lib/services/admin-routes/sessionRoute.ts](./lib/services/admin-routes/sessionRoute.ts)
+  - [lib/services/admin-routes/loginRoute.ts](./lib/services/admin-routes/loginRoute.ts)
+  - [lib/services/admin-routes/logoutRoute.ts](./lib/services/admin-routes/logoutRoute.ts)
+  - [lib/services/admin-routes/tablesRoute.ts](./lib/services/admin-routes/tablesRoute.ts)
+  - [lib/services/admin-routes/tableRoute.ts](./lib/services/admin-routes/tableRoute.ts)
+  - [lib/services/admin-routes/healthRoute.ts](./lib/services/admin-routes/healthRoute.ts)
+  - [lib/services/admin-routes/environmentRoute.ts](./lib/services/admin-routes/environmentRoute.ts)
+- Updated local API resolver in [devApiServer.ts](./lib/devApiServer.ts) to resolve dynamic route files (`[route]`/`[...route]`) in addition to direct file matches.
+- Updated API test suites to import the unified admin entrypoint while preserving existing request paths and assertions.
+- Documentation alignment completed:
+  - [README.md](./README.md): clarified single-entrypoint admin API architecture
+  - [TEST.md](./tests/TEST.md): clarified admin routing model and payload naming
+  - [TODO.md](./TODO.md): normalized filename casing and added completed item about admin route consolidation
+- Verification:
+  - `npm run typecheck` passed
+  - `npm run test:api:handlers` passed

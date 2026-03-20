@@ -55,13 +55,7 @@ import healthHandler from '../../api/health.ts'
 import profileHandler from '../../api/profile.ts'
 import projectsHandler from '../../api/projects.ts'
 import skillsHandler from '../../api/skills.ts'
-import adminHealthHandler from '../../api/admin/health.ts'
-import adminEnvironmentHandler from '../../api/admin/environment.ts'
-import adminLoginHandler from '../../api/admin/login.ts'
-import adminLogoutHandler from '../../api/admin/logout.ts'
-import adminSessionHandler from '../../api/admin/session.ts'
-import adminTableHandler from '../../api/admin/table.ts'
-import adminTablesHandler from '../../api/admin/tables.ts'
+import adminHandler from '../../api/admin/[route].ts'
 import {
   createSessionCookie,
   createSessionToken,
@@ -170,7 +164,7 @@ describe('Smoke checks', () => {
   })
 
   it('smoke-checks every admin endpoint', async () => {
-    const anonymousSessionResponse = await invokeApiHandler(adminSessionHandler, {
+    const anonymousSessionResponse = await invokeApiHandler(adminHandler, {
       url: '/api/admin/session',
       ip: '127.0.3.21',
     })
@@ -184,7 +178,7 @@ describe('Smoke checks', () => {
     const adminCookie = createAdminCookieHeader()
 
     const authenticatedSessionResponse = await invokeApiHandler(
-      adminSessionHandler,
+      adminHandler,
       {
         url: '/api/admin/session',
         ip: '127.0.3.22',
@@ -204,7 +198,7 @@ describe('Smoke checks', () => {
       },
     })
 
-    const loginResponse = await invokeApiHandler(adminLoginHandler, {
+    const loginResponse = await invokeApiHandler(adminHandler, {
       method: 'POST',
       url: '/api/admin/login',
       ip: '127.0.3.23',
@@ -223,7 +217,7 @@ describe('Smoke checks', () => {
       },
     })
 
-    const logoutResponse = await invokeApiHandler(adminLogoutHandler, {
+    const logoutResponse = await invokeApiHandler(adminHandler, {
       method: 'POST',
       url: '/api/admin/logout',
       ip: '127.0.3.24',
@@ -237,7 +231,7 @@ describe('Smoke checks', () => {
     expect(logoutResponse.body).toEqual({ ok: true })
     expect(String(logoutResponse.getHeader('set-cookie'))).toContain('Max-Age=0')
 
-    const tablesResponse = await invokeApiHandler(adminTablesHandler, {
+    const tablesResponse = await invokeApiHandler(adminHandler, {
       url: '/api/admin/tables',
       ip: '127.0.3.25',
       headers: {
@@ -253,7 +247,7 @@ describe('Smoke checks', () => {
       })
     )
 
-    const adminHealthResponse = await invokeApiHandler(adminHealthHandler, {
+    const adminHealthResponse = await invokeApiHandler(adminHandler, {
       url: '/api/admin/health',
       ip: '127.0.3.255',
       headers: {
@@ -275,7 +269,7 @@ describe('Smoke checks', () => {
     )
 
     const adminEnvironmentResponse = await invokeApiHandler(
-      adminEnvironmentHandler,
+      adminHandler,
       {
         url: '/api/admin/environment',
         ip: '127.0.3.256',
@@ -293,7 +287,7 @@ describe('Smoke checks', () => {
       })
     )
 
-    const tableResponse = await invokeApiHandler(adminTableHandler, {
+    const tableResponse = await invokeApiHandler(adminHandler, {
       url: '/api/admin/table?table=profile&limit=5',
       ip: '127.0.3.26',
       headers: {

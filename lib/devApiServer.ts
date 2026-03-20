@@ -27,7 +27,19 @@ const resolveHandlerPath = (pathname: string) => {
   const safeBasePath = path
     .normalize(baseCandidate)
     .replace(/^(\.\.(\/|\\|$))+/, '')
-  const candidates = [`${safeBasePath}.ts`, `${safeBasePath}.js`]
+  const baseCandidates = [`${safeBasePath}.ts`, `${safeBasePath}.js`]
+
+  const parts = safeBasePath.split(/[\\/]/).filter(Boolean)
+  const dynamicCandidates =
+    parts.length > 1
+      ? [
+          `${parts.slice(0, -1).join('/')}/[route].ts`,
+          `${parts.slice(0, -1).join('/')}/[route].js`,
+          `${parts.slice(0, -1).join('/')}/[...route].ts`,
+          `${parts.slice(0, -1).join('/')}/[...route].js`,
+        ]
+      : []
+  const candidates = [...baseCandidates, ...dynamicCandidates]
 
   const match = candidates.find((candidate) =>
     existsSync(path.join(apiDir, candidate))

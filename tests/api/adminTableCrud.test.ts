@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { and, eq } from 'drizzle-orm'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import adminTableHandler from '../../api/admin/table.ts'
+import adminHandler from '../../api/admin/[route].ts'
 import { getAdminTableConfig } from '../../lib/adminTables.ts'
 import {
   createSessionCookie,
@@ -126,7 +126,7 @@ const directDeleteByKeys = async (table: string, keys: AdminRow) => {
 }
 
 const listAdminRows = async (table: string, limit = 1000, ip = '127.0.4.1') => {
-  const response = await invokeApiHandler(adminTableHandler, {
+  const response = await invokeApiHandler(adminHandler, {
     method: 'GET',
     url: `/api/admin/table?table=${table}&limit=${limit}`,
     ip,
@@ -152,7 +152,7 @@ const findRowByKeys = (table: string, rows: AdminRow[], row: AdminRow) => {
 }
 
 const createAdminRow = async (table: string, row: AdminRow, ip = '127.0.4.2') => {
-  const response = await invokeApiHandler(adminTableHandler, {
+  const response = await invokeApiHandler(adminHandler, {
     method: 'POST',
     url: `/api/admin/table?table=${table}`,
     ip,
@@ -176,7 +176,7 @@ const updateAdminRow = async (
   row: AdminRow,
   ip = '127.0.4.3'
 ) => {
-  const response = await invokeApiHandler(adminTableHandler, {
+  const response = await invokeApiHandler(adminHandler, {
     method: 'PATCH',
     url: `/api/admin/table?table=${table}`,
     ip,
@@ -195,7 +195,7 @@ const updateAdminRow = async (
 }
 
 const deleteAdminRow = async (table: string, keys: AdminRow, ip = '127.0.4.4') => {
-  const response = await invokeApiHandler(adminTableHandler, {
+  const response = await invokeApiHandler(adminHandler, {
     method: 'DELETE',
     url: `/api/admin/table?table=${table}`,
     ip,

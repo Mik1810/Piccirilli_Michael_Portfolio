@@ -12,6 +12,11 @@ Ad oggi la copertura automatica è focalizzata sul backend:
 - CRUD admin DB-backed
 - layer repository
 
+Nota architetturale aggiornata:
+
+- gli endpoint admin restano esposti come path distinti (`/api/admin/login`, `/api/admin/table`, ecc.)
+- internamente, lato serverless, sono instradati da un entrypoint unico `api/admin/[route].ts` con handler modulari sotto `lib/services/admin-routes`
+
 Non sono invece ancora presenti:
 
 - test frontend/component-level
@@ -197,7 +202,7 @@ Scopo:
 Cosa testa:
 
 - `200` con sessione admin valida
-- shape minima stabile del payload (`variables`, contatori e metadati derivati)
+- shape minima stabile del payload (`environmentVariables`)
 - `401` senza sessione admin
 - fallback coerente in caso di errore interno del servizio
 
