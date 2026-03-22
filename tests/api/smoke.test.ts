@@ -48,13 +48,7 @@ vi.mock('../../lib/services/adminTableService.ts', async () => {
   }
 })
 
-import aboutHandler from '../../api/about.ts'
-import contactHandler from '../../api/contact.ts'
-import experiencesHandler from '../../api/experiences.ts'
-import healthHandler from '../../api/health.ts'
-import profileHandler from '../../api/profile.ts'
-import projectsHandler from '../../api/projects.ts'
-import skillsHandler from '../../api/skills.ts'
+import publicHandler from '../../api/home.ts'
 import adminHandler from '../../api/admin.ts'
 import {
   createSessionCookie,
@@ -125,20 +119,20 @@ describe('Smoke checks', () => {
 
   it('smoke-checks every public endpoint', async () => {
     const publicCases = [
-      [aboutHandler, '/api/about?lang=it', '127.0.3.11'],
-      [profileHandler, '/api/profile?lang=it', '127.0.3.12'],
-      [projectsHandler, '/api/projects?lang=it', '127.0.3.13'],
-      [skillsHandler, '/api/skills?lang=it', '127.0.3.14'],
-      [experiencesHandler, '/api/experiences?lang=it', '127.0.3.15'],
+      ['/api/about?lang=it', '127.0.3.11'],
+      ['/api/profile?lang=it', '127.0.3.12'],
+      ['/api/projects?lang=it', '127.0.3.13'],
+      ['/api/skills?lang=it', '127.0.3.14'],
+      ['/api/experiences?lang=it', '127.0.3.15'],
     ] as const
 
-    for (const [handler, url, ip] of publicCases) {
-      const response = await invokeApiHandler(handler, { url, ip })
+    for (const [url, ip] of publicCases) {
+      const response = await invokeApiHandler(publicHandler, { url, ip })
       expect(response.statusCode).toBe(200)
       expect(response.body).toBeTruthy()
     }
 
-    const healthResponse = await invokeApiHandler(healthHandler, {
+    const healthResponse = await invokeApiHandler(publicHandler, {
       url: '/api/health',
       ip: '127.0.3.16',
     })
@@ -146,7 +140,7 @@ describe('Smoke checks', () => {
     expect(healthResponse.statusCode).toBe(200)
     expect(healthResponse.body).toBeTruthy()
 
-    const contactResponse = await invokeApiHandler(contactHandler, {
+    const contactResponse = await invokeApiHandler(publicHandler, {
       method: 'POST',
       url: '/api/contact',
       ip: '127.0.3.17',

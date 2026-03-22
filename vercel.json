@@ -2,8 +2,23 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "routes": [
     {
+      "src": "^/$",
+      "status": 308,
+      "headers": {
+        "Location": "/home"
+      }
+    },
+    {
       "src": "/api/admin/(.*)",
       "dest": "/api/admin?route=$1"
+    },
+    {
+      "src": "/api/(about|profile|projects|skills|experiences|health|contact)",
+      "dest": "/api/home?route=$1"
+    },
+    {
+      "src": "/api/home/(.*)",
+      "dest": "/api/home?route=$1"
     },
     {
       "handle": "filesystem"

@@ -1,18 +1,18 @@
-import {
-  getSkillsContent,
-  normalizeRepositoryLocale,
-} from '../lib/services/publicContentService.js'
-import { MemoryCache } from '../lib/cache/memoryCache.js'
-import type { SkillsResponse } from '../lib/db/repositories/skillsRepository.js'
+import { MemoryCache } from '../../cache/memoryCache.js'
+import type { SkillsResponse } from '../../db/repositories/skillsRepository.js'
 import {
   enforceMethod,
   parseQueryWithSchema,
   respondWithError,
-} from '../lib/http/apiUtils.js'
-import { localeQuerySchema } from '../lib/http/requestSchemas.js'
-import { enforceRateLimit } from '../lib/http/rateLimit.js'
-import { logApiError } from '../lib/logger.js'
-import type { ApiHandler } from '../lib/types/http.js'
+} from '../../http/apiUtils.js'
+import { localeQuerySchema } from '../../http/requestSchemas.js'
+import { enforceRateLimit } from '../../http/rateLimit.js'
+import { logApiError } from '../../logger.js'
+import {
+  getSkillsContent,
+  normalizeRepositoryLocale,
+} from '../publicContentService.js'
+import type { ApiHandler } from '../../types/http.js'
 
 const CACHE_TTL_MS = 60 * 1000
 const cache = new MemoryCache<SkillsResponse>()
@@ -22,7 +22,7 @@ const RATE_LIMIT = {
   windowMs: 60 * 1000,
 }
 
-const handler: ApiHandler = async (req, res) => {
+export const handlePublicSkillsRoute: ApiHandler = async (req, res) => {
   if (!enforceMethod(req, res, 'GET')) return
 
   let lang = normalizeRepositoryLocale(undefined)
@@ -51,5 +51,3 @@ const handler: ApiHandler = async (req, res) => {
     return respondWithError(res, error)
   }
 }
-
-export default handler

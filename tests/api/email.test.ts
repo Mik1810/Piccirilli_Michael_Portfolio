@@ -4,7 +4,7 @@ import { HttpError } from '../../lib/http/apiUtils.ts'
 import { renderContactEmailTemplate } from '../../lib/templates/contactEmailTemplate.ts'
 import { invokeApiHandler } from './testUtils.ts'
 import { sendContactMessage } from '../../lib/services/contactService.ts'
-import contactHandler from '../../api/contact.ts'
+import publicHandler from '../../api/home.ts'
 
 vi.mock('../../lib/services/contactService.ts', () => ({
   sendContactMessage: vi.fn(),
@@ -14,7 +14,7 @@ describe('Contact API', () => {
   it('POST /api/contact accepts a valid payload and returns rate-limit headers', async () => {
     vi.mocked(sendContactMessage).mockResolvedValueOnce({ id: 'email_123' })
 
-    const response = await invokeApiHandler(contactHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       method: 'POST',
       url: '/api/contact',
       ip: '127.0.2.10',
@@ -42,7 +42,7 @@ describe('Contact API', () => {
   })
 
   it('rejects invalid contact payloads', async () => {
-    const response = await invokeApiHandler(contactHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       method: 'POST',
       url: '/api/contact',
       ip: '127.0.2.11',
@@ -65,7 +65,7 @@ describe('Contact API', () => {
   })
 
   it('rejects honeypot submissions', async () => {
-    const response = await invokeApiHandler(contactHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       method: 'POST',
       url: '/api/contact',
       ip: '127.0.2.12',
@@ -93,7 +93,7 @@ describe('Contact API', () => {
       })
     )
 
-    const response = await invokeApiHandler(contactHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       method: 'POST',
       url: '/api/contact',
       ip: '127.0.2.13',

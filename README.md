@@ -112,7 +112,7 @@ The browser only consumes HTTP contracts and generated admin metadata. Persisten
 
 | Area | Primary files | Role |
 | --- | --- | --- |
-| Public API | [api/](./api) | HTTP entry points for public JSON contracts |
+| Public API | [api/home.ts](./api/home.ts) + [lib/services/public-routes/](./lib/services/public-routes) | public endpoint dispatch behind a single serverless entrypoint |
 | Admin API | [api/admin.ts](./api/admin.ts) + [lib/services/admin-routes/](./lib/services/admin-routes) | authenticated admin endpoints behind a single serverless entrypoint |
 | Service layer | [lib/services/](./lib/services) | orchestration between HTTP concerns and repositories |
 | Database access | [lib/db/](./lib/db) | Drizzle client, schema, repositories |
@@ -125,7 +125,9 @@ The browser only consumes HTTP contracts and generated admin metadata. Persisten
 
 The deployment routing strategy is intentionally simple. [vercel.json](./vercel.json) serves filesystem assets first and then falls back to `index.html`, allowing the public site to remain a single-page application while still exposing serverless API endpoints.
 
-On the admin side, multiple logical routes are intentionally consolidated behind [api/admin.ts](./api/admin.ts), with modular handlers in [lib/services/admin-routes/](./lib/services/admin-routes), to stay within Vercel Hobby function-count limits while keeping route-level separation in code.
+Both public and admin APIs are intentionally consolidated to stay within Vercel Hobby function-count limits while preserving route-level separation in code:
+- public routes are dispatched by [api/home.ts](./api/home.ts), with modular handlers in [lib/services/public-routes/](./lib/services/public-routes);
+- admin routes are dispatched by [api/admin.ts](./api/admin.ts), with modular handlers in [lib/services/admin-routes/](./lib/services/admin-routes).
 
 ## 4. Persistence Model and Invariants
 

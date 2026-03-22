@@ -1,9 +1,9 @@
-import { appEnv } from '../lib/config/env.js'
-import { enforceMethod, parseBodyWithSchema, respondWithError } from '../lib/http/apiUtils.js'
-import { contactBodySchema } from '../lib/http/requestSchemas.js'
-import { enforceRateLimit } from '../lib/http/rateLimit.js'
-import { sendContactMessage } from '../lib/services/contactService.js'
-import type { ApiHandler } from '../lib/types/http.js'
+import { appEnv } from '../../config/env.js'
+import { enforceMethod, parseBodyWithSchema, respondWithError } from '../../http/apiUtils.js'
+import { contactBodySchema } from '../../http/requestSchemas.js'
+import { enforceRateLimit } from '../../http/rateLimit.js'
+import { sendContactMessage } from '../contactService.js'
+import type { ApiHandler } from '../../types/http.js'
 
 const RATE_LIMIT = {
   keyPrefix: 'public-contact',
@@ -11,7 +11,7 @@ const RATE_LIMIT = {
   windowMs: 10 * 60 * 1000,
 }
 
-const handler: ApiHandler = async (req, res) => {
+export const handlePublicContactRoute: ApiHandler = async (req, res) => {
   if (!enforceMethod(req, res, 'POST')) return
 
   try {
@@ -34,5 +34,3 @@ const handler: ApiHandler = async (req, res) => {
     return respondWithError(res, error)
   }
 }
-
-export default handler

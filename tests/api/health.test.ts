@@ -13,7 +13,7 @@ vi.mock('../../lib/db/client.ts', async () => {
   }
 })
 
-import healthHandler from '../../api/health.ts'
+import publicHandler from '../../api/home.ts'
 import adminHandler from '../../api/admin.ts'
 import {
   createSessionCookie,
@@ -30,7 +30,7 @@ describe('Health endpoint', () => {
   it('returns 200 with a healthy database check', async () => {
     mockSqlClient.mockResolvedValueOnce([{ ok: 1 }])
 
-    const response = await invokeApiHandler(healthHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       url: '/api/health',
       ip: '127.0.6.10',
     })
@@ -63,7 +63,7 @@ describe('Health endpoint', () => {
   it('returns 503 when the database check fails', async () => {
     mockSqlClient.mockRejectedValueOnce(new Error('DB down'))
 
-    const response = await invokeApiHandler(healthHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       url: '/api/health',
       ip: '127.0.6.11',
     })

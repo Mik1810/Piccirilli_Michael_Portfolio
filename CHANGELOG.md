@@ -23,6 +23,12 @@ The release discipline is intentionally lightweight:
 - dedicated tests for `/api/admin/environment` (including auth/failure paths) and smoke coverage for the endpoint
 
 ### Changed
+- public and admin routing were further stabilized for local and Vercel parity:
+  - public endpoints are now dispatched through `/api/home` with rewrites preserving existing public paths (`/api/profile`, `/api/about`, etc.)
+  - local dev API resolution now prioritizes explicit `admin.ts` and `home.ts` handlers without dynamic `[route]` fallbacks
+- the public SPA route now canonicalizes to `/home`, with redirect from `/` and updated canonical/OG metadata
+- admin unknown subroutes (`/admin/*`) now render an admin-specific fallback page instead of redirecting to the public home
+- the admin login experience now includes an explicit loading skeleton and a stable fallback shell to prevent footer/layout jumps during lazy mount
 - the contact form now submits through the backend instead of relying on `mailto:`
 - contact notifications now include a styled HTML email body in addition to the plain-text fallback
 - contact UX now surfaces clearer success and error states, including validation and service-availability feedback

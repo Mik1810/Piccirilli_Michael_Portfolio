@@ -72,11 +72,11 @@ Ridurre il lavoro manuale di manutenzione e aumentare la visibilità operativa d
   - informazioni minime di integrità pubblica
   - environment, uptime e metadati minimi di deploy lato admin
 - `✅ Fatto` consolidare le route admin in un entrypoint serverless unico (`/api/admin` con rewrite da `/api/admin/*`) con handler modulari in `lib/services/admin-routes`, per rientrare nel limite Vercel Hobby sulle function
-- `❌ Non fatto [CRITICO - prossimo step]` rivedere la logica di routing API in ottica limite Vercel Hobby (max 12 Serverless Functions), definendo una strategia stabile di consolidamento/dispatch per evitare nuovi blocchi deploy
+- `✅ Fatto` rivedere la logica di routing API in ottica limite Vercel Hobby (max 12 Serverless Functions), definendo una strategia stabile di consolidamento/dispatch con dispatcher unificati (`/api/admin` e `api/home`) per evitare nuovi blocchi deploy
 - `✅ Fatto` introdurre una disciplina di release leggera, tramite `CHANGELOG.md` e convenzione di tag semver, per esempio:
   - changelog minimo
   - tag coerenti con le versioni
-- `❌ Non fatto` valutare se applicare lo stesso pattern di router unico anche agli endpoint pubblici (es. raggruppamento sotto `/api/home/[route]`) per ridurre il numero totale di Serverless Functions su Vercel Hobby
+- `✅ Fatto` applicato lo stesso pattern di router unico anche agli endpoint pubblici tramite `api/home`, mantenendo invariati i path HTTP esistenti (`/api/profile`, `/api/about`, ecc.)
 - `❌ Non fatto` pianificare upgrade coordinati dei principali stack di tooling (per esempio ESLint e Vite), verificando la compatibilità tra dipendenze prima del merge
 
 ### Priorità
@@ -247,7 +247,7 @@ Chiudere gli ultimi punti deboli dell’admin e della gestione asset senza riapr
   - variabili pubbliche mostrate in chiaro senza reveal
   - campo valore con larghezza uniforme, ellissi visiva e navigazione completa da tastiera
 - `❌ Non fatto` verificare perche` la pagina di login admin impiega troppo a caricarsi in alcuni casi
-- `❌ Non fatto` valutare/aggiungere uno skeleton (o stato di loading esplicito) anche nella pagina login admin per migliorare il feedback percepito
+- `✅ Fatto` aggiungere uno skeleton/stato di loading esplicito nella pagina login admin, stabilizzando il layout iniziale ed evitando il salto visivo del footer durante il mount lazy
 - `❌ Non fatto` riprendere con calma il tema upload file in produzione, con percorso ideale:
   - endpoint admin protetto per upload
   - storage persistente
@@ -295,6 +295,7 @@ Rendere l’esperienza utente più curata e accessibile, con attenzione a dettag
 - `🟡 Partial` migliorare lo stile dei tag (project-tag, about-interest-tag) per maggiore visibilità e coerenza visiva
 - `❌ Non fatto` rendere il badge "site-live" verde se il sito è online
 - `❌ Non fatto` sistemare il lightbox dei progetti GitHub su mobile: i bottoni di navigazione e chiusura si spostano/ridimensionano in modo non ottimale
+- `❌ Non fatto [Priorità bassissima]` aggiungere un effetto CSS nella homepage del portfolio, per esempio una chiazza azzurro chiaro che sfuma/degrada allontanandosi dal centro del cursore
 
 ### Priorità
 
@@ -425,8 +426,8 @@ Ridurre i casi in cui la homepage resta in skeleton per troppo tempo e richiede 
 ### Contesto emerso
 
 - su produzione (`https://michaelpiccirilli.vercel.app/`) il caricamento iniziale puo` restare in skeleton per molti secondi
-- il problema principale sembra la strategia di fetch, non il componente skeleton in se`
-- oggi il flusso client e` soggetto a effetto waterfall:
+- il problema principale sembra la strategia di fetch, non il componente skeleton in sè
+- oggi il flusso client è soggetto a effetto waterfall:
   - `ContentProvider` parte dopo `profileLoading`
   - `about/projects/experiences/skills` vengono caricati in sequenza
   - con timeout a 8s per chiamata il worst case percepito puo` arrivare a ~40s
@@ -448,7 +449,6 @@ Ridurre i casi in cui la homepage resta in skeleton per troppo tempo e richiede 
 Alta
 
 ### Effort
-
 Medio
 
 

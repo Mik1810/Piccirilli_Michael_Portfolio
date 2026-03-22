@@ -444,6 +444,35 @@
   max-width: 460px;
 }
 
+.admin-login-card-skeleton {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-login-skeleton-title {
+  width: 12rem;
+  height: 1.7rem;
+  border-radius: 12px;
+}
+
+.admin-login-skeleton-label {
+  width: 5.5rem;
+  height: 0.9rem;
+  border-radius: 999px;
+}
+
+.admin-login-skeleton-input {
+  width: 100%;
+  height: 2.85rem;
+  border-radius: 10px;
+}
+
+.admin-login-skeleton-button {
+  width: 100%;
+  height: 2.85rem;
+  border-radius: 10px;
+}
+
 .admin-home-inline-note {
   display: inline-flex;
   align-items: center;

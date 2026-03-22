@@ -1,10 +1,10 @@
-import { enforceMethod, respondWithError } from '../lib/http/apiUtils.js'
-import { enforceRateLimit } from '../lib/http/rateLimit.js'
+import { enforceMethod, respondWithError } from '../../http/apiUtils.js'
+import { enforceRateLimit } from '../../http/rateLimit.js'
 import {
   createPublicHealthPayload,
   runDatabaseHealthCheck,
-} from '../lib/services/healthService.js'
-import type { ApiHandler } from '../lib/types/http.js'
+} from '../healthService.js'
+import type { ApiHandler } from '../../types/http.js'
 
 const RATE_LIMIT = {
   keyPrefix: 'public-health',
@@ -12,7 +12,7 @@ const RATE_LIMIT = {
   windowMs: 60 * 1000,
 }
 
-const handler: ApiHandler = async (req, res) => {
+export const handlePublicHealthRoute: ApiHandler = async (req, res) => {
   if (!enforceMethod(req, res, 'GET')) return
 
   try {
@@ -27,5 +27,3 @@ const handler: ApiHandler = async (req, res) => {
     return respondWithError(res, error)
   }
 }
-
-export default handler

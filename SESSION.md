@@ -3713,3 +3713,43 @@ pm run test:api.
 - Verification:
   - `npm run typecheck` passed
   - `npm run test:api:handlers` passed
+
+## 2026-03-22 21:50 CET - Stabilized `/home` public routing, unified public API dispatch, and admin login loading UX
+
+- Consolidated public API routing behind a dedicated entrypoint:
+  - added [home.ts](./api/home.ts)
+  - moved public endpoint logic under [lib/services/public-routes/](./lib/services/public-routes)
+  - removed legacy per-endpoint API files in `api/` for public paths
+- Kept external HTTP contracts unchanged (`/api/profile`, `/api/about`, `/api/projects`, `/api/skills`, `/api/experiences`, `/api/health`, `/api/contact`) via rewrites in [vercel.json](./vercel.json).
+- Hardened admin/public route separation:
+  - admin remains dispatched via [admin.ts](./api/admin.ts)
+  - removed stale dynamic `[route]`/`[...route]` fallback candidates from [devApiServer.ts](./lib/devApiServer.ts)
+  - local resolver now prioritizes explicit `admin.ts` and `home.ts` to avoid cross-dispatch collisions.
+- Updated SPA routing to canonical public path `/home`:
+  - redirect `/` -> `/home`
+  - wildcard fallback to `/home`
+  - updated SEO metadata (`canonical`, `og:url`, JSON-LD web page URL) in [index.html](./index.html)
+- Added an admin-specific not-found route fallback for `/admin/*` in [App.tsx](./src/App.tsx), so admin typos no longer fall back to public home.
+- Added explicit admin login loading skeleton and stabilized fallback shell:
+  - [AdminLogin.tsx](./src/components/jsx/AdminLogin.tsx)
+  - [AdminAuth.css](./src/components/css/AdminAuth.css)
+  - [SectionSkeletons.css](./src/components/css/SectionSkeletons.css)
+
+### Manual validation notes (local browser)
+
+- Route and auth flows validated manually:
+  - `/` redirects to `/home`
+  - `/home` renders correctly
+  - unknown paths return to `/home`
+  - `/login` -> `/admin` login flow works
+  - `/admin/tables` works
+  - logout returns to `/home`
+- HAR analysis:
+  - `localhost.har` captured the pre-fix period with intermittent `404 API route not found` and slow waterfall requests
+  - `localhost2.har` confirmed post-fix stability for routing (`ALL_200` on relevant API calls), with only occasional cold-start latency spikes still visible on some public endpoints.
+
+### Verification executed during this tranche
+
+- `npm run typecheck` passed
+- `npm run lint` passed
+- `npx vitest run tests/api/publicEndpoints.test.ts tests/api/health.test.ts tests/api/email.test.ts tests/api/smoke.test.ts` passed

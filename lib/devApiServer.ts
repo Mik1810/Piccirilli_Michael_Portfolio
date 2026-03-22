@@ -27,21 +27,27 @@ const resolveHandlerPath = (pathname: string) => {
   const safeBasePath = path
     .normalize(baseCandidate)
     .replace(/^(\.\.(\/|\\|$))+/, '')
-  const baseCandidates = [`${safeBasePath}.ts`, `${safeBasePath}.js`]
-
   const parts = safeBasePath.split(/[\\/]/).filter(Boolean)
-  const dynamicCandidates =
-    parts.length > 1
-      ? [
-          `${parts[0]}.ts`,
-          `${parts[0]}.js`,
-          `${parts.slice(0, -1).join('/')}/[route].ts`,
-          `${parts.slice(0, -1).join('/')}/[route].js`,
-          `${parts.slice(0, -1).join('/')}/[...route].ts`,
-          `${parts.slice(0, -1).join('/')}/[...route].js`,
-        ]
-      : []
-  const candidates = [...baseCandidates, ...dynamicCandidates]
+
+  const publicRouteSet = new Set([
+    'about',
+    'profile',
+    'projects',
+    'skills',
+    'experiences',
+    'health',
+    'contact',
+  ])
+
+  const resolverCandidates: string[] = []
+  if (parts[0] === 'admin') resolverCandidates.push('admin.ts', 'admin.js')
+  if (parts[0] === 'home') resolverCandidates.push('home.ts', 'home.js')
+  if (parts.length > 0 && publicRouteSet.has(parts[0])) {
+    resolverCandidates.push('home.ts', 'home.js')
+  }
+
+  const baseCandidates = [`${safeBasePath}.ts`, `${safeBasePath}.js`]
+  const candidates = [...resolverCandidates, ...baseCandidates]
 
   const match = candidates.find((candidate) =>
     existsSync(path.join(apiDir, candidate))

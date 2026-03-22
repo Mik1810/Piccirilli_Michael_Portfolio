@@ -1,10 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import aboutHandler from '../../api/about.ts'
-import experiencesHandler from '../../api/experiences.ts'
-import profileHandler from '../../api/profile.ts'
-import projectsHandler from '../../api/projects.ts'
-import skillsHandler from '../../api/skills.ts'
+import publicHandler from '../../api/home.ts'
 import { invokeApiHandler } from './testUtils.ts'
 
 const assertRateLimitHeaders = (headers: { getHeader: (name: string) => unknown }) => {
@@ -21,7 +17,7 @@ afterEach(() => {
 
 describe('DB-backed public endpoints', () => {
   it('GET /api/profile returns a stable payload and rate-limit headers', async () => {
-    const response = await invokeApiHandler(profileHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       url: '/api/profile?lang=it',
       ip: '127.0.0.11',
     })
@@ -40,7 +36,7 @@ describe('DB-backed public endpoints', () => {
   })
 
   it('GET /api/about returns a stable payload and rate-limit headers', async () => {
-    const response = await invokeApiHandler(aboutHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       url: '/api/about?lang=en',
       ip: '127.0.0.12',
     })
@@ -53,7 +49,7 @@ describe('DB-backed public endpoints', () => {
   })
 
   it('GET /api/projects returns a stable payload and rate-limit headers', async () => {
-    const response = await invokeApiHandler(projectsHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       url: '/api/projects?lang=it',
       ip: '127.0.0.13',
     })
@@ -69,7 +65,7 @@ describe('DB-backed public endpoints', () => {
   })
 
   it('GET /api/skills returns a stable payload and rate-limit headers', async () => {
-    const response = await invokeApiHandler(skillsHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       url: '/api/skills?lang=it',
       ip: '127.0.0.14',
     })
@@ -85,7 +81,7 @@ describe('DB-backed public endpoints', () => {
   })
 
   it('GET /api/experiences returns a stable payload and rate-limit headers', async () => {
-    const response = await invokeApiHandler(experiencesHandler, {
+    const response = await invokeApiHandler(publicHandler, {
       url: '/api/experiences?lang=it',
       ip: '127.0.0.15',
     })
@@ -102,17 +98,17 @@ describe('DB-backed public endpoints', () => {
 
   it('rejects invalid locale instead of silently normalizing it', async () => {
     const endpoints = [
-      ['profile', profileHandler, '127.0.1.11'],
-      ['about', aboutHandler, '127.0.1.12'],
-      ['projects', projectsHandler, '127.0.1.13'],
-      ['skills', skillsHandler, '127.0.1.14'],
-      ['experiences', experiencesHandler, '127.0.1.15'],
+      ['profile', '127.0.1.11'],
+      ['about', '127.0.1.12'],
+      ['projects', '127.0.1.13'],
+      ['skills', '127.0.1.14'],
+      ['experiences', '127.0.1.15'],
     ] as const
 
     const consoleErrorSpy = silenceConsoleError()
 
-    for (const [name, handler, ip] of endpoints) {
-      const response = await invokeApiHandler(handler, {
+    for (const [name, ip] of endpoints) {
+      const response = await invokeApiHandler(publicHandler, {
         url: '/api/' + name + '?lang=fr',
         ip,
       })

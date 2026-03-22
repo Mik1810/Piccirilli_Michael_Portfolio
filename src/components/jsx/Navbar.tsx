@@ -23,7 +23,7 @@ function Navbar() {
     ? adminIdentity || ' '
     : profile?.name || 'Portfolio'
   const cv = profile?.cv || '#'
-  const showHomeLinks = pathname === '/'
+  const showHomeLinks = pathname === '/home'
   const loginLabel = lang === 'it' ? 'Login admin' : 'Admin login'
   const logoutLabel = lang === 'it' ? 'Logout' : 'Logout'
 
@@ -38,7 +38,7 @@ function Navbar() {
 
   const handleClick = () => setMenuOpen(false)
   const handleLogout = async () => {
-    navigate('/', { replace: true })
+    navigate('/home', { replace: true })
     await logout()
   }
 
@@ -54,7 +54,7 @@ function Navbar() {
             )}
           </Link>
         ) : (
-          <a href={showHomeLinks ? '#hero' : '/'} className="navbar-logo">
+          <a href={showHomeLinks ? '#hero' : '/home'} className="navbar-logo">
             {isAdminIdentityLoading ? (
               <span className="navbar-logo-skeleton" aria-hidden="true" />
             ) : (

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import About from './components/jsx/About'
 import Contact from './components/jsx/Contact'
@@ -32,7 +32,7 @@ function App() {
 
   useEffect(() => {
     const previousPath = previousPathnameRef.current
-    if (pathname === '/' && previousPath !== '/') {
+    if (pathname === '/home' && previousPath !== '/home') {
       refreshProfile()
       refreshContent()
     }
@@ -40,7 +40,7 @@ function App() {
   }, [pathname, refreshProfile, refreshContent])
 
   useEffect(() => {
-    if (pathname !== '/') return undefined
+    if (pathname !== '/home') return undefined
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -95,8 +95,9 @@ function App() {
             </Suspense>
           }
         />
+        <Route path="/admin/*" element={<AdminRouteNotFound />} />
         <Route
-          path="/"
+          path="/home"
           element={
             <main>
               <HeroTyping />
@@ -108,6 +109,8 @@ function App() {
             </main>
           }
         />
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
       <Footer className={isAdminRoute ? 'footer-admin' : ''} />
       <ScrollToTop />
@@ -125,6 +128,20 @@ function AdminRouteFallback() {
       <div className="section-loading-content">
         <span className="section-loading-line section-loading-line-title" />
         <span className="section-loading-line section-loading-line-copy" />
+      </div>
+    </main>
+  )
+}
+
+function AdminRouteNotFound() {
+  return (
+    <main className="section-loading-wrapper" aria-live="polite">
+      <div className="section-loading-content">
+        <h2>Admin route not found</h2>
+        <p>The requested admin page does not exist.</p>
+        <a href="/admin" className="navbar-login-btn" style={{ width: 'fit-content' }}>
+          Back to admin home
+        </a>
       </div>
     </main>
   )

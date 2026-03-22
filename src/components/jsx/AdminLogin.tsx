@@ -37,6 +37,27 @@ function AdminLogin() {
     setLoading(false)
   }
 
+  if (authLoading) {
+    return (
+      <main className="admin-page admin-page-login" aria-busy="true" aria-live="polite">
+        <section className="admin-card admin-login-card admin-login-card-skeleton">
+          <span className="admin-skeleton admin-login-skeleton-title" aria-hidden="true" />
+          <div className="admin-form">
+            <label className="admin-label" aria-hidden="true">
+              <span className="admin-skeleton admin-login-skeleton-label" />
+              <span className="admin-skeleton admin-login-skeleton-input" />
+            </label>
+            <label className="admin-label" aria-hidden="true">
+              <span className="admin-skeleton admin-login-skeleton-label" />
+              <span className="admin-skeleton admin-login-skeleton-input" />
+            </label>
+            <span className="admin-skeleton admin-login-skeleton-button" aria-hidden="true" />
+          </div>
+        </section>
+      </main>
+    )
+  }
+
   return (
     <main className="admin-page admin-page-login">
       <section className="admin-card admin-login-card">
