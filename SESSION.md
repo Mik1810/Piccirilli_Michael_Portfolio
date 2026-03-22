@@ -3753,3 +3753,33 @@ pm run test:api.
 - `npm run typecheck` passed
 - `npm run lint` passed
 - `npx vitest run tests/api/publicEndpoints.test.ts tests/api/health.test.ts tests/api/email.test.ts tests/api/smoke.test.ts` passed
+
+## 2026-03-23 - Stabilizzazione caricamento homepage (punto 15)
+
+### Contesto operativo
+
+- durante i test locali la homepage pubblica mostrava intermittentemente richieste `canceled` e sezioni bloccate in skeleton
+- analisi HAR e tracing hanno mostrato pattern misti: abort client a 15s e richieste "zombie" con connessione chiusa lato client ma lavoro backend ancora in esecuzione
+
+### Interventi applicati
+
+- introdotta telemetria tempi su route pubbliche e repository DB (`logTiming`) per distinguere latenza handler vs latenza query
+- aggiunto tracing dettagliato nel dev API server (`request.start`, `handler.end`, `response.finish/close`, `requestId`)
+- identificato collo di bottiglia principale nel dynamic import per-request di `api/home.ts` al cold start locale
+- rimosso il dynamic import per-request nel dev server, passando a dispatch statico `admin/home`
+- aggiunta cancellazione cooperativa su abort request (`AbortSignal` in `ApiRequest` + helper `lib/http/abort.ts` + guard nelle route pubbliche)
+- aggiunto warmup automatico dev degli endpoint pubblici all'avvio, con timeout per endpoint e messaggio finale esplicito `dev-api.warmup.ready`
+- evitata chiamata `/api/admin/session` sulla superficie pubblica (`/home`), mantenendola su `/login` e `/admin*`
+- ridotte doppie fetch iniziali su `/home` (refresh esplicito solo quando si rientra dall'area admin)
+- aggiunto retry breve lato client per abort rapidi/transitori in `ContentContext` e `ProfileContext`
+- aggiunta redirect immediata in `index.html` da `/` a `/home` per eliminare il bianco iniziale pre-mount React
+
+### Evidenze test
+
+- ultimi HAR locali: nessun `canceled` sulle API pubbliche principali (`about/projects/profile/experiences/skills`), tutte `200`
+- tempi API stabilizzati nell'ordine ~0.8s-3s nei run osservati post-fix
+- lentezza residua prevalentemente su asset immagine (atteso per il volume media dei progetti)
+
+### Stato
+
+- punto 15: sostanzialmente stabilizzato lato locale; restano rifiniture opzionali su endpoint bootstrap unico e uniformazione error-state UI

@@ -24,3 +24,14 @@ export const logApiError = (
     ...(metadata || {}),
   })
 }
+
+const isTimingLoggingEnabled =
+  (process.env.NODE_ENV || 'development') !== 'production'
+
+export const logTiming = (
+  context: string,
+  metadata?: Record<string, unknown>
+) => {
+  if (!isTimingLoggingEnabled) return
+  console.info(`[timing] ${context}`, metadata || {})
+}

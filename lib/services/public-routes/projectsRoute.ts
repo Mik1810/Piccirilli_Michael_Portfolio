@@ -5,9 +5,14 @@ import {
   parseQueryWithSchema,
   respondWithError,
 } from '../../http/apiUtils.js'
+import {
+  RequestAbortedError,
+  throwIfAborted,
+  withAbortSignal,
+} from '../../http/abort.js'
 import { localeQuerySchema } from '../../http/requestSchemas.js'
 import { enforceRateLimit } from '../../http/rateLimit.js'
-import { logApiError } from '../../logger.js'
+import { logApiError, logTiming } from '../../logger.js'
 import {
   getProjectsContent,
   normalizeRepositoryLocale,
@@ -26,8 +31,11 @@ export const handlePublicProjectsRoute: ApiHandler = async (req, res) => {
   if (!enforceMethod(req, res, 'GET')) return
 
   let lang = normalizeRepositoryLocale(undefined)
+  const startedAt = Date.now()
+  logTiming('api.projects.start', { url: req.url })
 
   try {
+    throwIfAborted(req.signal)
     enforceRateLimit(req, res, RATE_LIMIT)
 
     const { lang: rawLang } = parseQueryWithSchema(req, localeQuerySchema)
@@ -35,11 +43,18 @@ export const handlePublicProjectsRoute: ApiHandler = async (req, res) => {
     const cacheKey = `projects:${lang}`
     const cached = cache.get(cacheKey)
     if (cached) {
+      throwIfAborted(req.signal)
+      logTiming('api.projects.cache_hit', {
+        lang,
+        durationMs: Date.now() - startedAt,
+      })
       res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')
       return res.status(200).json(cached)
     }
 
-    const payload = await getProjectsContent(lang)
+    const payloadPromise = getProjectsContent(lang)
+    const payload = await withAbortSignal(payloadPromise, req.signal)
+    throwIfAborted(req.signal)
     const { projects, githubProjects } = payload
 
     if (
@@ -50,8 +65,11 @@ export const handlePublicProjectsRoute: ApiHandler = async (req, res) => {
     }
 
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')
+    logTiming('api.projects.end', { lang, durationMs: Date.now() - startedAt })
     return res.status(200).json(payload)
   } catch (error) {
+    if (error instanceof RequestAbortedError) return
+    logTiming('api.projects.error', { lang, durationMs: Date.now() - startedAt })
     logApiError('projects', error, { lang, url: req.url })
     return respondWithError(res, error)
   }

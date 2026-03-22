@@ -58,10 +58,12 @@ function TimelineSkeletonItem({ index }: { index: number }) {
 
 function Experience() {
   const { t } = useLanguage()
-  const { experiences, education } = useContent()
+  const { experiences, education, sectionsLoading } = useContent()
   const sectionRef = useRef<HTMLElement | null>(null)
-  const showExperienceSkeletons = experiences.length === 0
-  const showEducationSkeletons = education.length === 0
+  const showExperienceSkeletons =
+    sectionsLoading.experiences && experiences.length === 0
+  const showEducationSkeletons =
+    sectionsLoading.experiences && education.length === 0
 
   useEffect(() => {
     if (!sectionRef.current) return
@@ -192,6 +194,13 @@ function Experience() {
                   </div>
                 </div>
               ))}
+          {!sectionsLoading.experiences &&
+            experiences.length === 0 &&
+            education.length === 0 && (
+              <p className="section-soft-fallback reveal reveal-delay-2">
+                {t('common.sectionUnavailable')}
+              </p>
+            )}
         </div>
       </div>
     </section>

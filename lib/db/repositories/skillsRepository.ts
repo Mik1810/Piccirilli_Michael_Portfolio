@@ -1,6 +1,7 @@
 import { asc, eq } from 'drizzle-orm'
 
 import { db } from '../client.js'
+import { logTiming } from '../../logger.js'
 import {
   skillCategories,
   skillCategoriesI18n,
@@ -30,6 +31,7 @@ export interface SkillsResponse {
 export const fetchSkills = async (
   locale: RepositoryLocale
 ): Promise<SkillsResponse> => {
+  const startedAt = Date.now()
   const techCategoryRows = await db
     .select({
       id: techCategories.id,
@@ -137,6 +139,13 @@ export const fetchSkills = async (
     category: skillCategoryNameById.get(row.id) || `Category ${row.id}`,
     skills: skillItemsByCategoryId.get(row.id) || [],
   }))
+
+  logTiming('repo.skills.end', {
+    locale,
+    durationMs: Date.now() - startedAt,
+    techCategories: techStack.length,
+    skillCategories: categories.length,
+  })
 
   return { techStack, categories }
 }

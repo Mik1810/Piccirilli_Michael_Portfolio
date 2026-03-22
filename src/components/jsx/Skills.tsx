@@ -17,13 +17,14 @@ function getTechCategoryLabel(label: string, t: (key: string) => string) {
 
 function Skills() {
   const { t } = useLanguage()
-  const { techStack, skillCategories } = useContent()
+  const { techStack, skillCategories, sectionsLoading } = useContent()
   const safeTechStack = Array.isArray(techStack) ? techStack : []
   const safeSkillCategories = Array.isArray(skillCategories)
     ? skillCategories
     : []
-  const showTechSkeletons = safeTechStack.length === 0
-  const showSkillSkeletons = safeSkillCategories.length === 0
+  const showTechSkeletons = sectionsLoading.skills && safeTechStack.length === 0
+  const showSkillSkeletons =
+    sectionsLoading.skills && safeSkillCategories.length === 0
 
   return (
     <section id="skills" className="skills">
@@ -129,6 +130,13 @@ function Skills() {
                 </div>
               ))}
         </div>
+        {!sectionsLoading.skills &&
+          safeTechStack.length === 0 &&
+          safeSkillCategories.length === 0 && (
+            <p className="section-soft-fallback reveal reveal-delay-2">
+              {t('common.sectionUnavailable')}
+            </p>
+          )}
       </div>
     </section>
   )

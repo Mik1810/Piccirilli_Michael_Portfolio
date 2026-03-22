@@ -18,6 +18,7 @@ export interface ApiRequest<TBody = unknown> {
   body?: TBody
   url?: string
   ip?: string
+  signal?: AbortSignal
 }
 
 export interface ApiResponse {

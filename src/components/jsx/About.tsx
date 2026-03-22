@@ -5,12 +5,12 @@ import '../css/About.css'
 
 function About() {
   const { t } = useLanguage()
-  const { about } = useContent()
-  const { profile } = useProfile()
+  const { about, sectionsLoading } = useContent()
+  const { profile, loading: profileLoading } = useProfile()
   const interests = about?.interests || []
   const bio = String(profile?.bio || '').trim()
-  const showBioSkeleton = bio.length === 0
-  const showInterestsSkeleton = interests.length === 0
+  const showBioSkeleton = profileLoading && bio.length === 0
+  const showInterestsSkeleton = sectionsLoading.about && interests.length === 0
 
   return (
     <section id="about" className="about">
@@ -40,9 +40,9 @@ function About() {
                   style={{ width: '72%', height: '16px' }}
                 />
               </div>
-            ) : (
+            ) : bio.length > 0 ? (
               <p>{bio}</p>
-            )}
+            ) : null}
             <div className="about-interests">
               {showInterestsSkeleton
                 ? Array.from({ length: 6 }, (_, index) => (
@@ -52,11 +52,15 @@ function About() {
                       aria-hidden="true"
                     />
                   ))
-                : interests.map((interest) => (
+                : interests.length > 0
+                  ? interests.map((interest) => (
                     <span key={interest} className="about-interest-tag">
                       {interest}
                     </span>
-                  ))}
+                    ))
+                  : (
+                    <p className="section-soft-fallback">{t('common.sectionUnavailable')}</p>
+                  )}
             </div>
           </div>
         </div>

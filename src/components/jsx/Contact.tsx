@@ -31,10 +31,14 @@ const getContactErrorMessage = (
 
 function Contact() {
   const { lang, t } = useLanguage()
-  const { profile } = useProfile()
+  const { profile, loading: profileLoading } = useProfile()
   const email = String(profile?.email || '').trim()
   const location = String(profile?.location || '').trim()
-  const showContactSkeleton = email.length === 0 || location.length === 0
+  const showContactSkeleton =
+    profileLoading && (email.length === 0 || location.length === 0)
+  const contactEmailText = email.length > 0 ? email : t('common.contactInfoUnavailable')
+  const contactLocationText =
+    location.length > 0 ? location : t('common.contactInfoUnavailable')
 
   const [formData, setFormData] = useState<ContactFormData>(EMPTY_FORM)
   const [status, setStatus] = useState<ContactFormStatus>('idle')
@@ -96,48 +100,49 @@ function Contact() {
         <p className="section-subtitle reveal reveal-delay-1">
           {t('contact.subtitle')}
         </p>
-        {showContactSkeleton ? (
-          <div className="contact-wrapper reveal reveal-delay-2 contact-wrapper-skeleton">
-            <div className="contact-info" aria-hidden="true">
-              {Array.from({ length: 2 }, (_, index) => (
-                <div key={`contact-info-skeleton-${index}`} className="contact-item">
-                  <span
-                    className="ui-skeleton ui-skeleton-circle"
-                    style={{ width: '20px', height: '20px' }}
-                  />
-                  <span
-                    className="ui-skeleton ui-skeleton-line"
-                    style={{ width: index === 0 ? '210px' : '160px', height: '14px' }}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="contact-form contact-form-skeleton" aria-hidden="true">
-              {Array.from({ length: 3 }, (_, index) => (
-                <div key={`contact-form-skeleton-${index}`} className="form-group">
-                  <span
-                    className="ui-skeleton ui-skeleton-line"
-                    style={{ width: '96px', height: '12px' }}
-                  />
-                  <span
-                    className="ui-skeleton ui-skeleton-block"
-                    style={{
-                      width: '100%',
-                      height: index === 2 ? '132px' : '48px',
-                      borderRadius: '8px',
-                    }}
-                  />
-                </div>
-              ))}
-              <span
-                className="ui-skeleton ui-skeleton-button"
-                style={{ width: '150px' }}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="contact-wrapper reveal reveal-delay-2">
-            <div className="contact-info">
+        <div className="contact-wrapper reveal reveal-delay-2">
+          {showContactSkeleton ? (
+            <>
+              <div className="contact-info" aria-hidden="true">
+                {Array.from({ length: 2 }, (_, index) => (
+                  <div key={`contact-info-skeleton-${index}`} className="contact-item">
+                    <span
+                      className="ui-skeleton ui-skeleton-circle"
+                      style={{ width: '20px', height: '20px' }}
+                    />
+                    <span
+                      className="ui-skeleton ui-skeleton-line"
+                      style={{ width: index === 0 ? '210px' : '160px', height: '14px' }}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="contact-form contact-form-skeleton" aria-hidden="true">
+                {Array.from({ length: 3 }, (_, index) => (
+                  <div key={`contact-form-skeleton-${index}`} className="form-group">
+                    <span
+                      className="ui-skeleton ui-skeleton-line"
+                      style={{ width: '96px', height: '12px' }}
+                    />
+                    <span
+                      className="ui-skeleton ui-skeleton-block"
+                      style={{
+                        width: '100%',
+                        height: index === 2 ? '132px' : '48px',
+                        borderRadius: '8px',
+                      }}
+                    />
+                  </div>
+                ))}
+                <span
+                  className="ui-skeleton ui-skeleton-button"
+                  style={{ width: '150px' }}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="contact-info">
               <div className="contact-item">
                 <svg
                   viewBox="0 0 24 24"
@@ -150,7 +155,11 @@ function Contact() {
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <polyline points="22,6 12,13 2,6" />
                 </svg>
-                <a href={`mailto:${email}`}>{email}</a>
+                {email.length > 0 ? (
+                  <a href={`mailto:${email}`}>{email}</a>
+                ) : (
+                  <span>{contactEmailText}</span>
+                )}
               </div>
               <div className="contact-item">
                 <svg
@@ -164,14 +173,14 @@ function Contact() {
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
                   <circle cx="12" cy="10" r="3" />
                 </svg>
-                <span>{location}</span>
+                <span>{contactLocationText}</span>
               </div>
             </div>
-            <form
-              className="contact-form"
-              onSubmit={handleSubmit}
-              aria-busy={status === 'sending'}
-            >
+              <form
+                className="contact-form"
+                onSubmit={handleSubmit}
+                aria-busy={status === 'sending'}
+              >
               <input
                 type="text"
                 name="website"
@@ -238,7 +247,7 @@ function Contact() {
                     role={status === 'error' ? 'alert' : 'status'}
                   >
                     {statusMessage}
-                    {status === 'error' ? (
+                    {status === 'error' && email.length > 0 ? (
                       <>
                         {' '}
                         <a href={`mailto:${email}`}>{t('contact.directEmailLinkLabel')}</a>
@@ -247,9 +256,10 @@ function Contact() {
                   </p>
                 ) : null}
               </div>
-            </form>
-          </div>
-        )}
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </section>
   )

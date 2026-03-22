@@ -64,6 +64,10 @@
     },
     "footer": {
       "rights": "Tutti i diritti riservati."
+    },
+    "common": {
+      "sectionUnavailable": "Contenuto temporaneamente non disponibile.",
+      "contactInfoUnavailable": "Dato non disponibile al momento."
     }
   },
   "en": {
@@ -131,6 +135,10 @@
     },
     "footer": {
       "rights": "All rights reserved."
+    },
+    "common": {
+      "sectionUnavailable": "Content temporarily unavailable.",
+      "contactInfoUnavailable": "Information currently unavailable."
     }
   }
 }

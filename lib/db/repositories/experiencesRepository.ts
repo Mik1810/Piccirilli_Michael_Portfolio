@@ -1,6 +1,7 @@
 import { asc, eq } from 'drizzle-orm'
 
 import { db } from '../client.js'
+import { logTiming } from '../../logger.js'
 import {
   education,
   educationI18n,
@@ -38,6 +39,7 @@ export interface ExperiencesResponse {
 export const fetchExperiences = async (
   locale: RepositoryLocale
 ): Promise<ExperiencesResponse> => {
+  const startedAt = Date.now()
   const experienceRows = await db
     .select({
       id: experiences.id,
@@ -118,6 +120,13 @@ export const fetchExperiences = async (
       }
     })
     .filter(Boolean) as EducationSummary[]
+
+  logTiming('repo.experiences.end', {
+    locale,
+    durationMs: Date.now() - startedAt,
+    experiences: experienceList.length,
+    education: educationList.length,
+  })
 
   return { experiences: experienceList, education: educationList }
 }

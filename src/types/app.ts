@@ -141,6 +141,12 @@ export interface GithubProjectMediaCarouselProps {
 
 export interface ContentContextValue {
   loading: boolean
+  sectionsLoading: {
+    about: boolean
+    projects: boolean
+    experiences: boolean
+    skills: boolean
+  }
   about: AboutData
   projects: ProjectItem[]
   githubProjects: GithubProjectItem[]

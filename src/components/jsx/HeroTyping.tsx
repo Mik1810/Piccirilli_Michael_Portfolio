@@ -179,8 +179,8 @@ function HeroTypingAnimationText({
 
 function HeroTyping() {
   const { t, lang } = useLanguage()
-  const { profile } = useProfile()
-  const nameText = profile?.name || ''
+  const { profile, loading: profileLoading } = useProfile()
+  const nameText = profile?.name || DEFAULT_HERO_NAME
   const photo = profile?.photo || DEFAULT_HERO_PHOTO
   const university = profile?.university || { logo: '', name: '' }
   const socials = Array.isArray(profile?.socials) ? profile.socials : []
@@ -188,7 +188,7 @@ function HeroTyping() {
   const greeting = profile?.greeting || t('hero.greeting')
   const uniName = university.name || ''
   const animationKey = `${lang}:${nameText}:${roles.join('|')}`
-  const isReady = nameText.trim().length > 0
+  const isReady = !profileLoading
   const portraitAlt = nameText || DEFAULT_HERO_NAME
 
   return (

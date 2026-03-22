@@ -18,6 +18,8 @@ const optionalUrlString = () =>
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).optional(),
   API_PORT: z.coerce.number().int().positive().max(65535).optional(),
+  DB_POOL_MAX: z.coerce.number().int().positive().max(30).optional(),
+  DB_STATEMENT_TIMEOUT_MS: z.coerce.number().int().positive().max(120000).optional(),
   AUTH_SESSION_SECRET: optionalTrimmedString(),
   DATABASE_URL: optionalTrimmedString(),
   SUPABASE_URL: optionalUrlString(),
@@ -39,6 +41,8 @@ export const appEnv = Object.freeze({
   nodeEnv: env.NODE_ENV ?? 'development',
   isProduction: (env.NODE_ENV ?? 'development') === 'production',
   apiPort: env.API_PORT ?? 3000,
+  dbPoolMax: env.DB_POOL_MAX ?? 4,
+  dbStatementTimeoutMs: env.DB_STATEMENT_TIMEOUT_MS ?? 20000,
 })
 
 const serializeEnvValue = (value: string | number | undefined) => {
@@ -59,6 +63,16 @@ export const getAdminEnvironmentSnapshot =
     {
       key: 'API_PORT',
       value: serializeEnvValue(appEnv.apiPort),
+      isSecret: false,
+    },
+    {
+      key: 'DB_POOL_MAX',
+      value: serializeEnvValue(appEnv.dbPoolMax),
+      isSecret: false,
+    },
+    {
+      key: 'DB_STATEMENT_TIMEOUT_MS',
+      value: serializeEnvValue(appEnv.dbStatementTimeoutMs),
       isSecret: false,
     },
     {

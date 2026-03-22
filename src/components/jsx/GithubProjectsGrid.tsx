@@ -57,18 +57,20 @@ function GithubProjectSkeleton({ index }: { index: number }) {
 
 function GithubProjectsGrid({
   projects,
+  loading,
   previewCtaLabel,
   expandHintLabel,
   emptyMediaLabel,
   repoLabel,
 }: {
   projects: GithubProjectItem[]
+  loading: boolean
   previewCtaLabel: string
   expandHintLabel: string
   emptyMediaLabel: string
   repoLabel: string
 }) {
-  const showGithubSkeletons = projects.length === 0
+  const showGithubSkeletons = loading && projects.length === 0
 
   return (
     <div className="github-projects-grid">

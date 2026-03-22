@@ -32,7 +32,10 @@ function App() {
 
   useEffect(() => {
     const previousPath = previousPathnameRef.current
-    if (pathname === '/home' && previousPath !== '/home') {
+    const returningFromAdmin =
+      previousPath === '/login' || previousPath.startsWith('/admin')
+
+    if (pathname === '/home' && previousPath !== '/home' && returningFromAdmin) {
       refreshProfile()
       refreshContent()
     }

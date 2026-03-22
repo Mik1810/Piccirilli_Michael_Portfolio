@@ -436,13 +436,13 @@ Ridurre i casi in cui la homepage resta in skeleton per troppo tempo e richiede 
 
 ### Interventi residui
 
-- `❌ Non fatto` avviare fetch contenuti in parallelo (`Promise.all`) in `ContentContext`, eliminando la cascata sequenziale
-- `❌ Non fatto` separare stati `loading`, `error` e `empty` nei componenti pubblici (About/Projects/Skills/Experience), evitando `empty => skeleton`
-- `❌ Non fatto` disaccoppiare avvio `ContentProvider` da `profileLoading` per non bloccare il resto della homepage
-- `❌ Non fatto` introdurre error state esplicito lato UI quando una fetch fallisce o va in timeout
-- `❌ Non fatto` ritarare timeout client (o timeout differenziati per endpoint) per ridurre il tempo morto percepito
+- `✅ Fatto` avviare fetch contenuti in parallelo in `ContentContext`, eliminando la cascata sequenziale (con concorrenza controllata)
+- `🟡 Partial` separare stati `loading`, `error` e `empty` nei componenti pubblici (About/Projects/Skills/Experience), evitando `empty => skeleton` (loading/empty stabilizzati; error state UI ancora migliorabile)
+- `✅ Fatto` disaccoppiare la homepage pubblica dal bootstrap admin/sessione, evitando blocchi iniziali non necessari su `/home`
+- `🟡 Partial` introdurre error state esplicito lato UI quando una fetch fallisce o va in timeout (presente fallback sezionale, manca una surface error uniforme cross-sezione)
+- `✅ Fatto` ritarare timeout client con gestione abort più robusta (retry breve su abort rapidi senza aumentare il timeout hard da 15s)
 - `❌ Non fatto` valutare endpoint bootstrap unico per homepage (`/api/bootstrap`) per ridurre round-trip iniziali
-- `❌ Non fatto` valutare ottimizzazioni query lato server sui path piu` lenti (accorpamento letture, minor serializzazione)
+- `🟡 Partial` valutare ottimizzazioni query lato server sui path piu` lenti (telemetria tempi introdotta, warmup dev e cancellazione cooperativa su abort; resta da decidere eventuale accorpamento endpoint)
 
 ### Priorità
 

@@ -4,6 +4,10 @@ import type { ProfileData, ProviderProps } from '../types/app.js'
 import { ProfileContext } from './profileContextValue'
 import { useLanguage } from './useLanguage'
 
+const PROFILE_REQUEST_TIMEOUT_MS = 15000
+const PROFILE_RETRY_DELAY_MS = 250
+const PROFILE_QUICK_ABORT_THRESHOLD_MS = 1200
+
 export function ProfileProvider({ children }: ProviderProps) {
   const { lang } = useLanguage()
   const [profile, setProfile] = useState<ProfileData | null>(null)
@@ -34,24 +38,67 @@ export function ProfileProvider({ children }: ProviderProps) {
 
     const loadProfile = async () => {
       setLoading(true)
-      const timeout = withTimeoutSignal(8000)
       try {
-        const response = await fetch(`/api/profile?lang=${lang}`, {
-          signal: timeout.signal,
-          cache: 'no-store',
-        })
-        const data = (await response.json()) as ProfileData
-        if (response.ok) {
-          setProfile(data)
-        } else {
-          setProfile(null)
+        const runOnce = async () => {
+          const startedAt = performance.now()
+          const timeout = withTimeoutSignal(PROFILE_REQUEST_TIMEOUT_MS)
+          try {
+            const response = await fetch(`/api/profile?lang=${lang}`, {
+              signal: timeout.signal,
+              cache: 'no-store',
+            })
+            const data = (await response.json()) as ProfileData
+            return {
+              ok: response.ok,
+              data: response.ok ? data : null,
+              aborted: false,
+              elapsedMs: performance.now() - startedAt,
+            }
+          } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') {
+              if (controller.signal.aborted) throw error
+              return {
+                ok: false,
+                data: null,
+                aborted: true,
+                elapsedMs: performance.now() - startedAt,
+              }
+            }
+            return {
+              ok: false,
+              data: null,
+              aborted: false,
+              elapsedMs: performance.now() - startedAt,
+            }
+          } finally {
+            timeout.cleanup()
+          }
+        }
+
+        let attempt = await runOnce()
+        const shouldRetryQuickAbort =
+          attempt.aborted &&
+          (attempt.elapsedMs ?? PROFILE_REQUEST_TIMEOUT_MS) <
+            PROFILE_QUICK_ABORT_THRESHOLD_MS
+
+        if (
+          !attempt.ok &&
+          (!attempt.aborted || shouldRetryQuickAbort) &&
+          !controller.signal.aborted
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, PROFILE_RETRY_DELAY_MS))
+          if (!controller.signal.aborted) {
+            attempt = await runOnce()
+          }
+        }
+
+        if (!controller.signal.aborted && attempt.ok && attempt.data) {
+          setProfile(attempt.data)
         }
       } catch (error) {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {
-          setProfile(null)
+          // Keep previous profile snapshot on transient failures.
         }
-      } finally {
-        timeout.cleanup()
       }
       setLoading(false)
     }

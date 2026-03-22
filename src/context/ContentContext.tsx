@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { ContentContext } from './contentContextValue'
-import { useProfile } from './useProfile'
 import { useLanguage } from './useLanguage'
 import type {
   AboutData,
@@ -18,6 +17,8 @@ import type {
 interface FetchJsonResult<T> {
   ok: boolean
   data: T | null
+  aborted?: boolean
+  elapsedMs?: number
 }
 
 interface SkillsApiResponse {
@@ -41,12 +42,22 @@ type ProjectsApiResponse =
     }
 
 const EMPTY_ABOUT: AboutData = { interests: [] }
+const REQUEST_TIMEOUT_MS = 15000
+const RETRY_DELAY_MS = 250
+const QUICK_ABORT_THRESHOLD_MS = 1200
+const FETCH_CONCURRENCY = 2
+type ContentSectionKey = 'about' | 'projects' | 'experiences' | 'skills'
 
 export function ContentProvider({ children }: ProviderProps) {
   const { lang } = useLanguage()
-  const { loading: profileLoading } = useProfile()
   const [reloadKey, setReloadKey] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [sectionsLoading, setSectionsLoading] = useState({
+    about: true,
+    projects: true,
+    experiences: true,
+    skills: true,
+  })
   const [about, setAbout] = useState<AboutData>(EMPTY_ABOUT)
   const [projects, setProjects] = useState<ProjectItem[]>([])
   const [githubProjects, setGithubProjects] = useState<GithubProjectItem[]>([])
@@ -60,39 +71,66 @@ export function ContentProvider({ children }: ProviderProps) {
   }, [])
 
   useEffect(() => {
-    if (profileLoading) return undefined
-
     const controller = new AbortController()
 
     const fetchJson = async <T,>(url: string): Promise<FetchJsonResult<T>> => {
-      const requestController = new AbortController()
-      const timeoutId = setTimeout(() => requestController.abort(), 8000)
-      const abortFromParent = () => requestController.abort()
-      controller.signal.addEventListener('abort', abortFromParent)
+      const runOnce = async (): Promise<FetchJsonResult<T>> => {
+        const startedAt = performance.now()
+        const requestController = new AbortController()
+        const timeoutId = setTimeout(() => requestController.abort(), REQUEST_TIMEOUT_MS)
+        const abortFromParent = () => requestController.abort()
+        controller.signal.addEventListener('abort', abortFromParent)
 
-      try {
-        const res = await fetch(url, {
-          signal: requestController.signal,
-          cache: 'no-store',
-        })
-        let data: T | null = null
         try {
-          data = (await res.json()) as T
-        } catch {
-          data = null
-        }
-        return { ok: res.ok, data }
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          if (controller.signal.aborted) {
-            throw error
+          const res = await fetch(url, {
+            signal: requestController.signal,
+            cache: 'no-store',
+          })
+          let data: T | null = null
+          try {
+            data = (await res.json()) as T
+          } catch {
+            data = null
           }
+          return { ok: res.ok, data, aborted: false }
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            if (controller.signal.aborted) {
+              throw error
+            }
+            return {
+              ok: false,
+              data: null,
+              aborted: true,
+              elapsedMs: performance.now() - startedAt,
+            }
+          }
+          return {
+            ok: false,
+            data: null,
+            aborted: false,
+            elapsedMs: performance.now() - startedAt,
+          }
+        } finally {
+          clearTimeout(timeoutId)
+          controller.signal.removeEventListener('abort', abortFromParent)
         }
-        return { ok: false, data: null }
-      } finally {
-        clearTimeout(timeoutId)
-        controller.signal.removeEventListener('abort', abortFromParent)
       }
+
+      const firstTry = await runOnce()
+      if (firstTry.ok || controller.signal.aborted) return firstTry
+
+      const shouldRetryQuickAbort =
+        firstTry.aborted &&
+        (firstTry.elapsedMs ?? REQUEST_TIMEOUT_MS) < QUICK_ABORT_THRESHOLD_MS
+
+      if (firstTry.aborted && !shouldRetryQuickAbort) {
+        return firstTry
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS))
+      if (controller.signal.aborted) return firstTry
+      return runOnce()
     }
 
     const normalizeProjects = (data: ProjectsApiResponse | null) => {
@@ -128,61 +166,96 @@ export function ContentProvider({ children }: ProviderProps) {
       return { techStack: nextTechStack, categories }
     }
 
+    const setSectionDone = (section: ContentSectionKey) => {
+      setSectionsLoading((prev) => ({ ...prev, [section]: false }))
+    }
+
     const loadContent = async () => {
       setLoading(true)
-      try {
-        const aboutResult = await fetchJson<AboutData>(`/api/about?lang=${lang}`)
-        if (controller.signal.aborted) return
-        setAbout(aboutResult.ok && aboutResult.data ? aboutResult.data : EMPTY_ABOUT)
+      setSectionsLoading({
+        about: true,
+        projects: true,
+        experiences: true,
+        skills: true,
+      })
 
-        const projectsResult = await fetchJson<ProjectsApiResponse>(
-          `/api/projects?lang=${lang}`
-        )
-        if (controller.signal.aborted) return
-        const projectsData = normalizeProjects(projectsResult.data)
-        setProjects(projectsData.projects)
-        setGithubProjects(projectsData.githubProjects)
+      const tasks: Array<() => Promise<void>> = [
+        async () => {
+          try {
+            const result = await fetchJson<AboutData>(`/api/about?lang=${lang}`)
+            if (controller.signal.aborted) return
+            if (result.ok && result.data) setAbout(result.data)
+          } finally {
+            if (!controller.signal.aborted) setSectionDone('about')
+          }
+        },
+        async () => {
+          try {
+            const result = await fetchJson<ProjectsApiResponse>(`/api/projects?lang=${lang}`)
+            if (controller.signal.aborted) return
+            if (result.ok) {
+              const data = normalizeProjects(result.data)
+              setProjects(data.projects)
+              setGithubProjects(data.githubProjects)
+            }
+          } finally {
+            if (!controller.signal.aborted) setSectionDone('projects')
+          }
+        },
+        async () => {
+          try {
+            const result = await fetchJson<ExperiencesApiResponse>(`/api/experiences?lang=${lang}`)
+            if (controller.signal.aborted) return
+            if (result.ok) {
+              const expData = result.data
+              setExperiences(Array.isArray(expData?.experiences) ? expData.experiences : [])
+              setEducation(Array.isArray(expData?.education) ? expData.education : [])
+            }
+          } finally {
+            if (!controller.signal.aborted) setSectionDone('experiences')
+          }
+        },
+        async () => {
+          try {
+            const result = await fetchJson<SkillsApiResponse>(`/api/skills?lang=${lang}`)
+            if (controller.signal.aborted) return
+            if (result.ok) {
+              const data = normalizeSkills(result.data)
+              setTechStack(Array.isArray(data.techStack) ? data.techStack : [])
+              setSkillCategories(Array.isArray(data.categories) ? data.categories : [])
+            }
+          } finally {
+            if (!controller.signal.aborted) setSectionDone('skills')
+          }
+        },
+      ]
 
-        const experiencesResult = await fetchJson<ExperiencesApiResponse>(
-          `/api/experiences?lang=${lang}`
-        )
-        if (controller.signal.aborted) return
-        const expData = experiencesResult.ok ? experiencesResult.data : null
-        setExperiences(
-          Array.isArray(expData?.experiences) ? expData.experiences : []
-        )
-        setEducation(Array.isArray(expData?.education) ? expData.education : [])
-
-        const skillsResult = await fetchJson<SkillsApiResponse>(
-          `/api/skills?lang=${lang}`
-        )
-        if (controller.signal.aborted) return
-        const skillsData = normalizeSkills(skillsResult.data)
-        setTechStack(Array.isArray(skillsData.techStack) ? skillsData.techStack : [])
-        setSkillCategories(
-          Array.isArray(skillsData.categories) ? skillsData.categories : []
-        )
-      } catch (error) {
-        if (!(error instanceof DOMException && error.name === 'AbortError')) {
-          setAbout(EMPTY_ABOUT)
-          setProjects([])
-          setGithubProjects([])
-          setExperiences([])
-          setEducation([])
-          setTechStack([])
-          setSkillCategories([])
+      const queue = [...tasks]
+      const workers = Array.from({ length: FETCH_CONCURRENCY }, async () => {
+        while (queue.length > 0 && !controller.signal.aborted) {
+          const task = queue.shift()
+          if (!task) break
+          try {
+            await task()
+          } catch (error) {
+            if (error instanceof DOMException && error.name === 'AbortError') break
+          }
         }
-      }
+      })
 
+      await Promise.all(workers)
+
+      if (controller.signal.aborted) return
       setLoading(false)
     }
 
     void loadContent()
     return () => controller.abort()
-  }, [lang, reloadKey, profileLoading])
+  }, [lang, reloadKey])
 
   const value: ContentContextValue = {
     loading,
+    sectionsLoading,
     about,
     projects,
     githubProjects,

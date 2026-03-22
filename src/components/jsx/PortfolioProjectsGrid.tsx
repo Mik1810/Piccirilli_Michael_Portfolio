@@ -127,15 +127,17 @@ function ProjectCardSkeleton({ index }: { index: number }) {
 
 function PortfolioProjectsGrid({
   projects,
+  loading,
   codeLabel,
   siteLabel,
 }: {
   projects: ProjectItem[]
+  loading: boolean
   codeLabel: string
   siteLabel: string
 }) {
   const reducedMotion = usePrefersReducedMotion()
-  const showProjectSkeletons = projects.length === 0
+  const showProjectSkeletons = loading && projects.length === 0
 
   return (
     <div className="projects-grid">

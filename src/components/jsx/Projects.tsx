@@ -7,7 +7,7 @@ import PortfolioProjectsGrid from './PortfolioProjectsGrid'
 
 function Projects() {
   const { t } = useLanguage()
-  const { projects, githubProjects } = useContent()
+  const { projects, githubProjects, sectionsLoading } = useContent()
   const safeProjects: ProjectItem[] = Array.isArray(projects) ? projects : []
   const featuredGithubProjects: GithubProjectItem[] = Array.isArray(githubProjects)
     ? githubProjects
@@ -23,9 +23,17 @@ function Projects() {
 
         <PortfolioProjectsGrid
           projects={safeProjects}
+          loading={sectionsLoading.projects}
           codeLabel={t('projects.codeLabel')}
           siteLabel={t('projects.siteLabel')}
         />
+        {!sectionsLoading.projects &&
+          safeProjects.length === 0 &&
+          featuredGithubProjects.length === 0 && (
+            <p className="section-soft-fallback reveal reveal-delay-2">
+              {t('common.sectionUnavailable')}
+            </p>
+          )}
 
         <div className="projects-subsection">
           <div className="projects-subsection-header reveal">
@@ -37,6 +45,7 @@ function Projects() {
 
           <GithubProjectsGrid
             projects={featuredGithubProjects}
+            loading={sectionsLoading.projects}
             previewCtaLabel={t('projects.previewLabel')}
             expandHintLabel={t('projects.expandHint')}
             emptyMediaLabel={t('projects.mediaUnavailable')}

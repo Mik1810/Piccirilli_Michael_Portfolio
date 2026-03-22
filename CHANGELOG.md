@@ -23,6 +23,17 @@ The release discipline is intentionally lightweight:
 - dedicated tests for `/api/admin/environment` (including auth/failure paths) and smoke coverage for the endpoint
 
 ### Changed
+- homepage/public-load stability was reworked around TODO point 15:
+  - public content bootstrap now uses controlled parallel fetches with section-level loading tracking
+  - initial `/api/admin/session` bootstrap is skipped on public surfaces (`/home`) and kept for `/login` + `/admin*`
+  - duplicate refresh triggers on `/home` were reduced (refresh on return from admin area only)
+  - client fetch handling now retries only quick/transient aborts while preserving the 15s hard timeout
+- local dev API runtime was hardened for cold-start diagnostics and stability:
+  - added request/response timing traces (`request.start`, `handler.end`, `response.finish/close`) with request ids
+  - replaced per-request dynamic handler import with static admin/home dispatch in `devApiServer`
+  - added cooperative abort propagation (`AbortSignal`) from dev server to public route handlers
+  - added startup warmup for public API endpoints with explicit `dev-api.warmup.ready` signal
+- local root-path UX improved: `/` now redirects immediately to `/home` from `index.html` to avoid pre-mount blank screen
 - public and admin routing were further stabilized for local and Vercel parity:
   - public endpoints are now dispatched through `/api/home` with rewrites preserving existing public paths (`/api/profile`, `/api/about`, etc.)
   - local dev API resolution now prioritizes explicit `admin.ts` and `home.ts` handlers without dynamic `[route]` fallbacks

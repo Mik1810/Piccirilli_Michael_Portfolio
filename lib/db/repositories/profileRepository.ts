@@ -1,6 +1,7 @@
 import { and, asc, eq } from 'drizzle-orm'
 
 import { db } from '../client.js'
+import { logTiming } from '../../logger.js'
 import {
   heroRoles,
   heroRolesI18n,
@@ -38,6 +39,7 @@ export { normalizeRepositoryLocale }
 export const fetchProfile = async (
   locale: RepositoryLocale
 ): Promise<ProfileResponse> => {
+  const startedAt = Date.now()
   const profileRows = await db
     .select({
       id: profile.id,
@@ -99,6 +101,13 @@ export const fetchProfile = async (
   const roles = roleBaseRows
     .map((row) => roleById.get(row.id))
     .filter(Boolean) as string[]
+
+  logTiming('repo.profile.end', {
+    locale,
+    durationMs: Date.now() - startedAt,
+    roles: roles.length,
+    socials: socialRows.length,
+  })
 
   return {
     name: profileRow?.fullName || '',

@@ -31,6 +31,19 @@ export function AuthProvider({ children }: ProviderProps) {
   }, [])
 
   useEffect(() => {
+    const pathname = window.location.pathname
+    const isAdminSurface =
+      pathname === '/login' ||
+      pathname === '/admin' ||
+      pathname.startsWith('/admin/')
+
+    if (!isAdminSurface) {
+      setAuthLoading(false)
+      setAuthenticated(false)
+      setUser(null)
+      return
+    }
+
     const bootstrap = async () => {
       setAuthLoading(true)
       await refreshSession()

@@ -104,6 +104,14 @@
       }
     </script>
     <script>
+      // Immediate client-side redirect in dev/static fallback to avoid blank root page.
+      (function() {
+        if (window.location.pathname === '/') {
+          window.location.replace('/home' + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+    <script>
       // Prevent flash of wrong theme on load
       (function() {
         const saved = localStorage.getItem('theme');

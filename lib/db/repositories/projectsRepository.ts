@@ -1,6 +1,7 @@
 import { asc, eq } from 'drizzle-orm'
 
 import { db } from '../client.js'
+import { logTiming } from '../../logger.js'
 import {
   githubProjectImages,
   githubProjectTags,
@@ -45,6 +46,7 @@ export const normalizeRepositoryLocale = (value: string | undefined): Repository
 export const fetchProjects = async (
   locale: RepositoryLocale
 ): Promise<ProjectsResponse> => {
+  const startedAt = Date.now()
   const projectRows = await db
     .select({
       id: projects.id,
@@ -169,6 +171,13 @@ export const fetchProjects = async (
       liveUrl: row.liveUrl || null,
       images: githubImagesByProjectId.get(row.id) || [],
     }
+  })
+
+  logTiming('repo.projects.end', {
+    locale,
+    durationMs: Date.now() - startedAt,
+    projects: projectList.length,
+    githubProjects: githubProjectList.length,
   })
 
   return { projects: projectList, githubProjects: githubProjectList }
