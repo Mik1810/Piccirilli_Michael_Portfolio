@@ -11,6 +11,16 @@ The release discipline is intentionally lightweight:
 
 _No entries yet._
 
+## [1.2.2] - 2026-03-23
+
+### Added
+- new `dev:web` launcher (`scripts/devWebLauncher.ts`) that waits for API readiness before starting Vite, preventing frontend/backend startup races in local development
+
+### Changed
+- `npm run dev:web` now starts through the readiness launcher
+- added `npm run dev:web:raw` to keep the direct Vite startup path available when needed
+- `npm run dev:fast` now uses `--kill-others-on-fail` for safer coordinated local startup
+
 ## [1.2.1] - 2026-03-23
 
 ### Changed

@@ -1,5 +1,18 @@
 # SESSION
 
+## Aggiornamento release 1.2.2 (2026-03-23)
+
+- Introdotto un launcher dedicato per `dev:web` in [scripts/devWebLauncher.ts](./scripts/devWebLauncher.ts):
+  - polling readiness API prima dell'avvio Vite
+  - endpoint default `http://localhost:${API_PORT}/api/admin/session`
+  - timeout/intervallo configurabili via env (`DEV_WEB_WAIT_TIMEOUT_MS`, `DEV_WEB_WAIT_INTERVAL_MS`, `DEV_API_READY_URL`)
+- Aggiornati gli script npm in [package.json](./package.json):
+  - `dev:web` ora usa il launcher di readiness
+  - aggiunto `dev:web:raw` per avvio Vite diretto
+  - `dev:fast` ora usa `concurrently --kill-others-on-fail`
+- Validazione tecnica eseguita:
+  - `npm run typecheck` ✅
+
 ## Aggiornamento release 1.2.1 (2026-03-23)
 
 - Rifiniti i log startup del profilo `dev:api:log`:

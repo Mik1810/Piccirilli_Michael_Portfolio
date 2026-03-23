@@ -1,7 +1,7 @@
 {
   "name": "piccirilli_michael_portfolio",
   "private": true,
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "dependencies": {
     "dotenv": "^17.3.1",
@@ -40,11 +40,12 @@
   },
   "scripts": {
     "dev": "vite",
-    "dev:web": "vite",
+    "dev:web": "tsx scripts/devWebLauncher.ts",
+    "dev:web:raw": "vite",
     "dev:api": "tsx watch lib/devApiServer.ts",
     "dev:api:log": "tsx scripts/devApiLauncher.ts",
     "dev:api:vercel": "vercel dev --yes -p 3000",
-    "dev:fast": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
+    "dev:fast": "concurrently --kill-others-on-fail \"npm run dev:api\" \"npm run dev:web\"",
     "dev:vercel": "vercel dev",
     "build": "vite build",
     "start": "vite build && vite preview",
