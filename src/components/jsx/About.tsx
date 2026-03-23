@@ -2,10 +2,11 @@ import { useContent } from '../../context/useContent'
 import { useLanguage } from '../../context/useLanguage'
 import { useProfile } from '../../context/useProfile'
 import '../css/About.css'
+import SectionStateMessage from './SectionStateMessage'
 
 function About() {
   const { t } = useLanguage()
-  const { about, sectionsLoading } = useContent()
+  const { about, sectionsLoading, sectionsStatus, refreshContent } = useContent()
   const { profile, loading: profileLoading } = useProfile()
   const interests = about?.interests || []
   const bio = String(profile?.bio || '').trim()
@@ -59,7 +60,10 @@ function About() {
                     </span>
                     ))
                   : (
-                    <p className="section-soft-fallback">{t('common.sectionUnavailable')}</p>
+                    <SectionStateMessage
+                      state={sectionsStatus.about === 'error' ? 'error' : 'empty'}
+                      onRetry={refreshContent}
+                    />
                   )}
             </div>
           </div>

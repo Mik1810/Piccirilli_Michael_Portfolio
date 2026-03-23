@@ -47,6 +47,7 @@ const RETRY_DELAY_MS = 250
 const QUICK_ABORT_THRESHOLD_MS = 1200
 const FETCH_CONCURRENCY = 2
 type ContentSectionKey = 'about' | 'projects' | 'experiences' | 'skills'
+type ContentSectionStatus = 'loading' | 'ready' | 'empty' | 'error'
 
 export function ContentProvider({ children }: ProviderProps) {
   const { lang } = useLanguage()
@@ -57,6 +58,17 @@ export function ContentProvider({ children }: ProviderProps) {
     projects: true,
     experiences: true,
     skills: true,
+  })
+  const [sectionsStatus, setSectionsStatus] = useState<{
+    about: ContentSectionStatus
+    projects: ContentSectionStatus
+    experiences: ContentSectionStatus
+    skills: ContentSectionStatus
+  }>({
+    about: 'loading',
+    projects: 'loading',
+    experiences: 'loading',
+    skills: 'loading',
   })
   const [about, setAbout] = useState<AboutData>(EMPTY_ABOUT)
   const [projects, setProjects] = useState<ProjectItem[]>([])
@@ -169,6 +181,12 @@ export function ContentProvider({ children }: ProviderProps) {
     const setSectionDone = (section: ContentSectionKey) => {
       setSectionsLoading((prev) => ({ ...prev, [section]: false }))
     }
+    const setSectionStatus = (
+      section: ContentSectionKey,
+      status: ContentSectionStatus
+    ) => {
+      setSectionsStatus((prev) => ({ ...prev, [section]: status }))
+    }
 
     const loadContent = async () => {
       setLoading(true)
@@ -178,18 +196,32 @@ export function ContentProvider({ children }: ProviderProps) {
         experiences: true,
         skills: true,
       })
+      setSectionsStatus({
+        about: 'loading',
+        projects: 'loading',
+        experiences: 'loading',
+        skills: 'loading',
+      })
 
       const tasks: Array<() => Promise<void>> = [
         async () => {
+          let status: ContentSectionStatus = 'error'
           try {
             const result = await fetchJson<AboutData>(`/api/about?lang=${lang}`)
             if (controller.signal.aborted) return
-            if (result.ok && result.data) setAbout(result.data)
+            if (result.ok && result.data) {
+              setAbout(result.data)
+              status = (result.data.interests || []).length > 0 ? 'ready' : 'empty'
+            }
           } finally {
-            if (!controller.signal.aborted) setSectionDone('about')
+            if (!controller.signal.aborted) {
+              setSectionDone('about')
+              setSectionStatus('about', status)
+            }
           }
         },
         async () => {
+          let status: ContentSectionStatus = 'error'
           try {
             const result = await fetchJson<ProjectsApiResponse>(`/api/projects?lang=${lang}`)
             if (controller.signal.aborted) return
@@ -197,35 +229,66 @@ export function ContentProvider({ children }: ProviderProps) {
               const data = normalizeProjects(result.data)
               setProjects(data.projects)
               setGithubProjects(data.githubProjects)
+              status =
+                data.projects.length > 0 || data.githubProjects.length > 0
+                  ? 'ready'
+                  : 'empty'
             }
           } finally {
-            if (!controller.signal.aborted) setSectionDone('projects')
+            if (!controller.signal.aborted) {
+              setSectionDone('projects')
+              setSectionStatus('projects', status)
+            }
           }
         },
         async () => {
+          let status: ContentSectionStatus = 'error'
           try {
             const result = await fetchJson<ExperiencesApiResponse>(`/api/experiences?lang=${lang}`)
             if (controller.signal.aborted) return
             if (result.ok) {
               const expData = result.data
-              setExperiences(Array.isArray(expData?.experiences) ? expData.experiences : [])
-              setEducation(Array.isArray(expData?.education) ? expData.education : [])
+              const nextExperiences = Array.isArray(expData?.experiences)
+                ? expData.experiences
+                : []
+              const nextEducation = Array.isArray(expData?.education)
+                ? expData.education
+                : []
+              setExperiences(nextExperiences)
+              setEducation(nextEducation)
+              status =
+                nextExperiences.length > 0 || nextEducation.length > 0
+                  ? 'ready'
+                  : 'empty'
             }
           } finally {
-            if (!controller.signal.aborted) setSectionDone('experiences')
+            if (!controller.signal.aborted) {
+              setSectionDone('experiences')
+              setSectionStatus('experiences', status)
+            }
           }
         },
         async () => {
+          let status: ContentSectionStatus = 'error'
           try {
             const result = await fetchJson<SkillsApiResponse>(`/api/skills?lang=${lang}`)
             if (controller.signal.aborted) return
             if (result.ok) {
               const data = normalizeSkills(result.data)
-              setTechStack(Array.isArray(data.techStack) ? data.techStack : [])
-              setSkillCategories(Array.isArray(data.categories) ? data.categories : [])
+              const nextTechStack = Array.isArray(data.techStack) ? data.techStack : []
+              const nextCategories = Array.isArray(data.categories) ? data.categories : []
+              setTechStack(nextTechStack)
+              setSkillCategories(nextCategories)
+              status =
+                nextTechStack.length > 0 || nextCategories.length > 0
+                  ? 'ready'
+                  : 'empty'
             }
           } finally {
-            if (!controller.signal.aborted) setSectionDone('skills')
+            if (!controller.signal.aborted) {
+              setSectionDone('skills')
+              setSectionStatus('skills', status)
+            }
           }
         },
       ]
@@ -256,6 +319,7 @@ export function ContentProvider({ children }: ProviderProps) {
   const value: ContentContextValue = {
     loading,
     sectionsLoading,
+    sectionsStatus,
     about,
     projects,
     githubProjects,

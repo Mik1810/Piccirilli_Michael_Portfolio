@@ -147,6 +147,12 @@ export interface ContentContextValue {
     experiences: boolean
     skills: boolean
   }
+  sectionsStatus: {
+    about: 'loading' | 'ready' | 'empty' | 'error'
+    projects: 'loading' | 'ready' | 'empty' | 'error'
+    experiences: 'loading' | 'ready' | 'empty' | 'error'
+    skills: 'loading' | 'ready' | 'empty' | 'error'
+  }
   about: AboutData
   projects: ProjectItem[]
   githubProjects: GithubProjectItem[]

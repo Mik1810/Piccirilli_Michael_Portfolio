@@ -9,6 +9,10 @@ The release discipline is intentionally lightweight:
 
 ## [Unreleased]
 
+_No entries yet._
+
+## [1.1.0] - 2026-03-23
+
 ### Added
 - server-side contact delivery through `/api/contact` with Zod validation, rate limiting, and Resend integration
 - dedicated API coverage for the contact flow, now included in the broader `test:api` suite

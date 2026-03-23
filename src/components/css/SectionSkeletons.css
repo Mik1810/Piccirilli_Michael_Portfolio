@@ -94,6 +94,27 @@
   height: 1rem;
 }
 
+.section-state-message {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: start;
+}
+
+.section-state-retry {
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  color: var(--color-text-primary);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.section-state-retry:hover {
+  background: color-mix(in srgb, var(--color-primary) 24%, transparent);
+}
+
 @keyframes ui-skeleton-shimmer {
   100% {
     transform: translateX(100%);

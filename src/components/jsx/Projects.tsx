@@ -4,10 +4,12 @@ import type { GithubProjectItem, ProjectItem } from '../../types/app.js'
 import '../css/ProjectsSection.css'
 import GithubProjectsGrid from './GithubProjectsGrid'
 import PortfolioProjectsGrid from './PortfolioProjectsGrid'
+import SectionStateMessage from './SectionStateMessage'
 
 function Projects() {
   const { t } = useLanguage()
-  const { projects, githubProjects, sectionsLoading } = useContent()
+  const { projects, githubProjects, sectionsLoading, sectionsStatus, refreshContent } =
+    useContent()
   const safeProjects: ProjectItem[] = Array.isArray(projects) ? projects : []
   const featuredGithubProjects: GithubProjectItem[] = Array.isArray(githubProjects)
     ? githubProjects
@@ -30,9 +32,11 @@ function Projects() {
         {!sectionsLoading.projects &&
           safeProjects.length === 0 &&
           featuredGithubProjects.length === 0 && (
-            <p className="section-soft-fallback reveal reveal-delay-2">
-              {t('common.sectionUnavailable')}
-            </p>
+            <SectionStateMessage
+              className="reveal reveal-delay-2"
+              state={sectionsStatus.projects === 'error' ? 'error' : 'empty'}
+              onRetry={refreshContent}
+            />
           )}
 
         <div className="projects-subsection">

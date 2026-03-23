@@ -1,6 +1,7 @@
 import { useContent } from '../../context/useContent'
 import { useLanguage } from '../../context/useLanguage'
 import '../css/Skills.css'
+import SectionStateMessage from './SectionStateMessage'
 
 const DEVICON_BASE = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons'
 
@@ -17,7 +18,8 @@ function getTechCategoryLabel(label: string, t: (key: string) => string) {
 
 function Skills() {
   const { t } = useLanguage()
-  const { techStack, skillCategories, sectionsLoading } = useContent()
+  const { techStack, skillCategories, sectionsLoading, sectionsStatus, refreshContent } =
+    useContent()
   const safeTechStack = Array.isArray(techStack) ? techStack : []
   const safeSkillCategories = Array.isArray(skillCategories)
     ? skillCategories
@@ -133,9 +135,11 @@ function Skills() {
         {!sectionsLoading.skills &&
           safeTechStack.length === 0 &&
           safeSkillCategories.length === 0 && (
-            <p className="section-soft-fallback reveal reveal-delay-2">
-              {t('common.sectionUnavailable')}
-            </p>
+            <SectionStateMessage
+              className="reveal reveal-delay-2"
+              state={sectionsStatus.skills === 'error' ? 'error' : 'empty'}
+              onRetry={refreshContent}
+            />
           )}
       </div>
     </section>

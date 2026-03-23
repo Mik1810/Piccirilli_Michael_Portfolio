@@ -67,6 +67,9 @@
     },
     "common": {
       "sectionUnavailable": "Contenuto temporaneamente non disponibile.",
+      "sectionEmpty": "Nessun contenuto disponibile al momento.",
+      "sectionError": "Errore nel caricamento del contenuto.",
+      "retry": "Riprova",
       "contactInfoUnavailable": "Dato non disponibile al momento."
     }
   },
@@ -138,6 +141,9 @@
     },
     "common": {
       "sectionUnavailable": "Content temporarily unavailable.",
+      "sectionEmpty": "No content available at the moment.",
+      "sectionError": "Error loading content.",
+      "retry": "Retry",
       "contactInfoUnavailable": "Information currently unavailable."
     }
   }

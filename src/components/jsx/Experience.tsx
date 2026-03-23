@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { useContent } from '../../context/useContent'
 import { useLanguage } from '../../context/useLanguage'
 import '../css/Experience.css'
+import SectionStateMessage from './SectionStateMessage'
 
 function TimelineSkeletonItem({ index }: { index: number }) {
   return (
@@ -58,7 +59,8 @@ function TimelineSkeletonItem({ index }: { index: number }) {
 
 function Experience() {
   const { t } = useLanguage()
-  const { experiences, education, sectionsLoading } = useContent()
+  const { experiences, education, sectionsLoading, sectionsStatus, refreshContent } =
+    useContent()
   const sectionRef = useRef<HTMLElement | null>(null)
   const showExperienceSkeletons =
     sectionsLoading.experiences && experiences.length === 0
@@ -197,9 +199,11 @@ function Experience() {
           {!sectionsLoading.experiences &&
             experiences.length === 0 &&
             education.length === 0 && (
-              <p className="section-soft-fallback reveal reveal-delay-2">
-                {t('common.sectionUnavailable')}
-              </p>
+              <SectionStateMessage
+                className="reveal reveal-delay-2"
+                state={sectionsStatus.experiences === 'error' ? 'error' : 'empty'}
+                onRetry={refreshContent}
+              />
             )}
         </div>
       </div>
