@@ -264,6 +264,15 @@ function AdminHome({ forceSkeleton = false }: AdminHomeProps) {
     if (forceSkeleton) return undefined
 
     let disposed = false
+    let timerId: number | null = null
+
+    const scheduleNextPoll = () => {
+      if (disposed) return
+      timerId = window.setTimeout(() => {
+        void pollDbLatency()
+      }, DB_LATENCY_POLL_INTERVAL_MS)
+    }
+
     const pollDbLatency = async () => {
       try {
         const response = await fetch('/api/admin/metrics/db-latency', {
@@ -283,17 +292,17 @@ function AdminHome({ forceSkeleton = false }: AdminHomeProps) {
         })
       } catch {
         // Keep silent: admin home has manual refresh and a resilient baseline snapshot.
+      } finally {
+        scheduleNextPoll()
       }
     }
 
-    const timerId = window.setInterval(() => {
-      void pollDbLatency()
-    }, DB_LATENCY_POLL_INTERVAL_MS)
+    scheduleNextPoll()
 
     return () => {
       disposed = true
-      if (timerId) {
-        window.clearInterval(timerId)
+      if (timerId !== null) {
+        window.clearTimeout(timerId)
       }
     }
   }, [appendDbLatencySample, forceSkeleton])
@@ -337,7 +346,11 @@ function AdminHome({ forceSkeleton = false }: AdminHomeProps) {
   }, [dbLatencyTrend, dbLatencyViewMode])
 
   const health = snapshot.health
-  const databaseHealthy = Boolean(health?.checks.database.ok)
+  const latestDbLatencySample =
+    dbLatencyTrend.length > 0 ? dbLatencyTrend[dbLatencyTrend.length - 1] : null
+  const databaseHealthy = latestDbLatencySample
+    ? latestDbLatencySample.ok
+    : Boolean(health?.checks.database.ok)
   const commitSha = health?.deployment.commitSha
   const branch = health?.deployment.branch
   const environmentVariables = snapshot.environmentVariables
@@ -375,11 +388,15 @@ function AdminHome({ forceSkeleton = false }: AdminHomeProps) {
       ? formatUptime(health.app.uptimeSeconds)
       : 'N/A'
 
-  const checkedAtLabel = formatDateTime(health?.timestamp || null)
-  const latencyLabel =
-    health?.checks.database.latencyMs === null
-      ? 'N/A'
-      : `${health?.checks.database.latencyMs} ms`
+  const latestLatencyMs =
+    typeof latestDbLatencySample?.latencyMs === 'number'
+      ? latestDbLatencySample.latencyMs
+      : health?.checks.database.latencyMs ?? null
+
+  const checkedAtLabel = formatDateTime(
+    latestDbLatencySample?.timestamp || health?.timestamp || null
+  )
+  const latencyLabel = latestLatencyMs === null ? 'N/A' : `${latestLatencyMs} ms`
 
   return (
     <main className="admin-page admin-page-home">

@@ -25,8 +25,17 @@ export const logApiError = (
   })
 }
 
-const isTimingLoggingEnabled =
-  (process.env.NODE_ENV || 'development') !== 'production'
+const parseBooleanFlag = (value: string | undefined) =>
+  value === '1' || value === 'true' || value === 'yes'
+
+const isTimingLoggingEnabled = (() => {
+  const rawValue = process.env.DEV_API_DEBUG_LOGS
+  if (typeof rawValue === 'string') {
+    return parseBooleanFlag(rawValue.trim().toLowerCase())
+  }
+
+  return (process.env.NODE_ENV || 'development') !== 'production'
+})()
 
 export const logTiming = (
   context: string,

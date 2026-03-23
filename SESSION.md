@@ -1,5 +1,23 @@
 # SESSION
 
+## Aggiornamento release 1.2.4 (2026-03-24)
+
+- Rifinita la card admin `Latency trend` in [AdminHomeDatabaseCard.tsx](./src/components/jsx/admin-home/AdminHomeDatabaseCard.tsx):
+  - `Latest latency`/`Checked at` ora agganciati all'ultimo sample reale di latenza
+  - introdotta serie smussata (media mobile 3) mantenendo `Latest` grezzo
+  - aggiunta linea `Trend` interpolata (primo->ultimo campione visibile)
+  - aggiunti switch di visibilità (`Threshold`, `Latest`, `Trend`) con indicatori colore coerenti alle linee
+  - migliorato layout controlli e meta (`Samples`, `Over threshold`) con allineamento orizzontale
+- Stabilizzato il polling latenza DB in [AdminHome.tsx](./src/components/jsx/AdminHome.tsx):
+  - passaggio da `setInterval` a polling sequenziale (`setTimeout` after completion) per evitare overlap
+  - mantenuto intervallo a `5s` dopo test UX
+- Ridotta variabilità artificiale da reconnect:
+  - `idle_timeout` Postgres portato a `30s` in [client.ts](./lib/db/client.ts)
+- Allineato il gating dei log debug backend:
+  - `logTiming` ora rispetta `DEV_API_DEBUG_LOGS` in [logger.ts](./lib/logger.ts)
+- Validazione tecnica eseguita:
+  - `npm run typecheck` ✅
+
 ## Aggiornamento release 1.2.3 (2026-03-23)
 
 - Rifinita la convenzione script dev su richiesta operativa:

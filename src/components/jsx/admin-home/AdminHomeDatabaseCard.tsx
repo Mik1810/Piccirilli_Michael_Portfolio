@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { DatabaseIcon } from './AdminHomeIcons'
 import {
   Area,
@@ -29,11 +30,19 @@ interface LatencyTrendPoint {
   label: string
   timestampMs: number
   latencyMs: number | null
+  latencySmoothed: number | null
   timestamp: string
   overThreshold: boolean
 }
 
 interface OverThresholdSegment {
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+}
+
+interface InterpolationTrendSegment {
   x1: number
   y1: number
   x2: number
@@ -71,16 +80,34 @@ function AdminHomeDatabaseCard({
   onTrendViewModeChange,
   latencyTrend,
 }: AdminHomeDatabaseCardProps) {
+  const [showThreshold, setShowThreshold] = useState(true)
+  const [showLatestLine, setShowLatestLine] = useState(true)
+  const [showTrendLine, setShowTrendLine] = useState(true)
+
   const trendData: LatencyTrendPoint[] = latencyTrend.map((sample, index) => {
     const timestampMs = new Date(sample.timestamp).getTime()
     const latencyValue = sample.latencyMs
     const overThreshold =
       typeof latencyValue === 'number' && latencyValue > LATENCY_ALERT_THRESHOLD_MS
 
+    // Moving average on up to the latest 3 samples, skipping null values.
+    const smoothingWindow = latencyTrend
+      .slice(Math.max(0, index - 2), index + 1)
+      .map((item) => item.latencyMs)
+      .filter((value): value is number => typeof value === 'number')
+    const latencySmoothed =
+      smoothingWindow.length > 0
+        ? Math.round(
+            smoothingWindow.reduce((total, value) => total + value, 0) /
+              smoothingWindow.length
+          )
+        : null
+
     return {
       label: formatTrendLabel(sample.timestamp),
       timestampMs: Number.isNaN(timestampMs) ? index : timestampMs,
       latencyMs: latencyValue,
+      latencySmoothed,
       timestamp: sample.timestamp,
       overThreshold,
     }
@@ -140,6 +167,28 @@ function AdminHomeDatabaseCard({
     (total, point) => (point.overThreshold ? total + 1 : total),
     0
   )
+  const interpolationTrendSegment = (() => {
+    const first = trendData.find(
+      (point): point is LatencyTrendPoint & { latencyMs: number } =>
+        typeof point.latencyMs === 'number'
+    )
+    const last = [...trendData]
+      .reverse()
+      .find(
+        (point): point is LatencyTrendPoint & { latencyMs: number } =>
+          typeof point.latencyMs === 'number'
+      )
+
+    if (!first || !last) return null
+    if (first.timestampMs === last.timestampMs) return null
+
+    return {
+      x1: first.timestampMs,
+      y1: first.latencyMs,
+      x2: last.timestampMs,
+      y2: last.latencyMs,
+    } satisfies InterpolationTrendSegment
+  })()
   const validLatencyValues = trendData
     .map((point) => point.latencyMs)
     .filter((value): value is number => typeof value === 'number')
@@ -235,32 +284,100 @@ function AdminHomeDatabaseCard({
       <div className="admin-home-latency-trend-wrap">
         <div className="admin-home-latency-trend-head">
           <p className="admin-home-card-eyebrow">Latency trend</p>
-          <div className="admin-home-latency-meta">
+        </div>
+        <div className="admin-home-latency-controls">
+          <div
+            className="admin-home-segmented-control"
+            role="group"
+            aria-label="Periodo grafico latenza"
+          >
+            <button
+              type="button"
+              className={`admin-home-segmented-control-button ${
+                trendViewMode === 'window' ? 'is-active' : ''
+              }`.trim()}
+              onClick={() => onTrendViewModeChange('window')}
+            >
+              Ultimi 30
+            </button>
+            <button
+              type="button"
+              className={`admin-home-segmented-control-button ${
+                trendViewMode === 'session' ? 'is-active' : ''
+              }`.trim()}
+              onClick={() => onTrendViewModeChange('session')}
+            >
+              Sessione
+            </button>
+          </div>
+          <div className="admin-home-visibility-switches" role="group" aria-label="Visibilita trend latenza">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={showThreshold}
+              className={`admin-home-visibility-switch ${
+                showThreshold ? 'is-on' : ''
+              }`.trim()}
+              onClick={() => setShowThreshold((current) => !current)}
+            >
+              <span className="admin-home-visibility-switch-track" aria-hidden="true">
+                <span className="admin-home-visibility-switch-thumb" />
+              </span>
+              <span className="admin-home-visibility-switch-label">
+                <span
+                  className="admin-home-visibility-switch-color admin-home-visibility-switch-color-threshold"
+                  aria-hidden="true"
+                />
+                Threshold
+              </span>
+            </button>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={showLatestLine}
+              className={`admin-home-visibility-switch ${
+                showLatestLine ? 'is-on' : ''
+              }`.trim()}
+              onClick={() => setShowLatestLine((current) => !current)}
+            >
+              <span className="admin-home-visibility-switch-track" aria-hidden="true">
+                <span className="admin-home-visibility-switch-thumb" />
+              </span>
+              <span className="admin-home-visibility-switch-label">
+                <span
+                  className="admin-home-visibility-switch-color admin-home-visibility-switch-color-latest"
+                  aria-hidden="true"
+                />
+                Latest
+              </span>
+            </button>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={showTrendLine}
+              className={`admin-home-visibility-switch ${
+                showTrendLine ? 'is-on' : ''
+              }`.trim()}
+              onClick={() => setShowTrendLine((current) => !current)}
+            >
+              <span className="admin-home-visibility-switch-track" aria-hidden="true">
+                <span className="admin-home-visibility-switch-thumb" />
+              </span>
+              <span className="admin-home-visibility-switch-label">
+                <span
+                  className="admin-home-visibility-switch-color admin-home-visibility-switch-color-trend"
+                  aria-hidden="true"
+                />
+                Trend
+              </span>
+            </button>
+          </div>
+          <div className="admin-home-latency-meta admin-home-latency-meta-inline">
             <span className="admin-home-latency-count">Samples: {latencyTrend.length}</span>
             <span className="admin-home-latency-alert-count">
               Over threshold: {overThresholdCount}
             </span>
           </div>
-        </div>
-        <div className="admin-home-segmented-control" role="group" aria-label="Periodo grafico latenza">
-          <button
-            type="button"
-            className={`admin-home-segmented-control-button ${
-              trendViewMode === 'window' ? 'is-active' : ''
-            }`.trim()}
-            onClick={() => onTrendViewModeChange('window')}
-          >
-            Ultimi 30
-          </button>
-          <button
-            type="button"
-            className={`admin-home-segmented-control-button ${
-              trendViewMode === 'session' ? 'is-active' : ''
-            }`.trim()}
-            onClick={() => onTrendViewModeChange('session')}
-          >
-            Sessione
-          </button>
         </div>
         {latencyTrend.length === 0 ? (
           <p className="admin-home-inline-note">In attesa dei primi campioni…</p>
@@ -295,18 +412,20 @@ function AdminHomeDatabaseCard({
                   axisLine={{ stroke: 'rgba(148, 163, 184, 0.26)' }}
                   tickLine={{ stroke: 'rgba(148, 163, 184, 0.26)' }}
                 />
-                <ReferenceLine
-                  y={LATENCY_ALERT_THRESHOLD_MS}
-                  stroke="rgba(248, 113, 113, 0.9)"
-                  strokeDasharray="4 4"
-                  ifOverflow="extendDomain"
-                  label={{
-                    value: 'Soglia 1000ms',
-                    position: 'right',
-                    fill: '#fca5a5',
-                    fontSize: 11,
-                  }}
-                />
+                {showThreshold && (
+                  <ReferenceLine
+                    y={LATENCY_ALERT_THRESHOLD_MS}
+                    stroke="rgba(248, 113, 113, 0.9)"
+                    strokeDasharray="4 4"
+                    ifOverflow="extendDomain"
+                    label={{
+                      value: 'Soglia 1000ms',
+                      position: 'right',
+                      fill: '#fca5a5',
+                      fontSize: 11,
+                    }}
+                  />
+                )}
                 <Tooltip
                   content={({ active, payload }) => {
                     if (!active || !payload || payload.length === 0) return null
@@ -316,6 +435,11 @@ function AdminHomeDatabaseCard({
                       item.latencyMs === null || item.latencyMs === undefined
                         ? 'N/A'
                         : `${item.latencyMs} ms`
+                    const smoothedLatencyLabel =
+                      item.latencySmoothed === null ||
+                      item.latencySmoothed === undefined
+                        ? 'N/A'
+                        : `${item.latencySmoothed} ms`
 
                     return (
                       <div
@@ -330,8 +454,25 @@ function AdminHomeDatabaseCard({
                         <p style={{ margin: 0, color: '#cbd5e1' }}>
                           {formatTooltipDateTime(item.timestamp)}
                         </p>
-                        <p style={{ margin: '0.25rem 0 0', color: '#38bdf8', fontWeight: 700 }}>
-                          latencyMs : {latencyLabel}
+                        {showLatestLine && (
+                          <p
+                            style={{
+                              margin: '0.25rem 0 0',
+                              color: '#f59e0b',
+                              fontWeight: 700,
+                            }}
+                          >
+                            Latest: {latencyLabel}
+                          </p>
+                        )}
+                        <p
+                          style={{
+                            margin: '0.2rem 0 0',
+                            color: '#22d3ee',
+                            fontWeight: 700,
+                          }}
+                        >
+                          Smoothed (3): {smoothedLatencyLabel}
                         </p>
                       </div>
                     )
@@ -339,11 +480,25 @@ function AdminHomeDatabaseCard({
                   cursor={{ stroke: 'rgba(56, 189, 248, 0.45)', strokeWidth: 1 }}
                   isAnimationActive={false}
                 />
+                {showLatestLine && (
                 <Area
-                  type="linear"
+                  type="monotone"
                   dataKey="latencyMs"
                   connectNulls={false}
-                  stroke="#38bdf8"
+                  stroke="#f59e0b"
+                    strokeOpacity={0.95}
+                    strokeWidth={1.8}
+                    fill="transparent"
+                    dot={false}
+                    isAnimationActive={false}
+                    activeDot={false}
+                  />
+                )}
+                <Area
+                  type="monotone"
+                  dataKey="latencySmoothed"
+                  connectNulls={false}
+                  stroke="#22d3ee"
                   strokeWidth={2.5}
                   fill="url(#admin-latency-fill)"
                   dot={false}
@@ -363,20 +518,38 @@ function AdminHomeDatabaseCard({
                     )
                   }}
                 />
-                {overThresholdSegments.map((segment, index) => (
+                {showThreshold &&
+                  overThresholdSegments.map((segment, index) => (
+                    <ReferenceLine
+                      key={`over-threshold-segment-${index}`}
+                      segment={[
+                        { x: segment.x1, y: segment.y1 },
+                        { x: segment.x2, y: segment.y2 },
+                      ]}
+                      stroke="#ef4444"
+                      strokeWidth={2.8}
+                    />
+                  ))}
+                {showTrendLine && interpolationTrendSegment && (
                   <ReferenceLine
-                    key={`over-threshold-segment-${index}`}
                     segment={[
-                      { x: segment.x1, y: segment.y1 },
-                      { x: segment.x2, y: segment.y2 },
+                      {
+                        x: interpolationTrendSegment.x1,
+                        y: interpolationTrendSegment.y1,
+                      },
+                      {
+                        x: interpolationTrendSegment.x2,
+                        y: interpolationTrendSegment.y2,
+                      },
                     ]}
-                    stroke="#ef4444"
-                    strokeWidth={2.8}
+                    stroke="rgba(167, 139, 250, 0.9)"
+                    strokeDasharray="6 4"
+                    strokeWidth={1.7}
                   />
-                ))}
-                {overThresholdCount > 0 && (
+                )}
+                {showThreshold && overThresholdCount > 0 && (
                   <Area
-                    type="linear"
+                    type="monotone"
                     dataKey="latencyMs"
                     connectNulls={false}
                     stroke="transparent"

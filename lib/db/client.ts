@@ -14,7 +14,7 @@ const getClient = () => {
       // Vercel functions are short-lived and scale horizontally:
       // keep a small but non-trivial pool for Supavisor-backed traffic.
       max: appEnv.dbPoolMax,
-      idle_timeout: 5,
+      idle_timeout: 30,
       connect_timeout: 15,
       ssl: 'require',
       prepare: false,

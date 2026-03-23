@@ -11,6 +11,19 @@ The release discipline is intentionally lightweight:
 
 _No entries yet._
 
+## [1.2.4] - 2026-03-24
+
+### Changed
+- admin DB latency card refinements:
+  - `Latest latency` and `Checked at` now follow the most recent latency sample (instead of only the initial health snapshot)
+  - chart now supports dual representation (`Latest` line + smoothed line) with dedicated visibility switches (`Threshold`, `Latest`, `Trend`)
+  - added interpolation `Trend` line from first to last visible sample (session/window-aware)
+  - controls and chart meta layout were refined for clearer horizontal alignment and readability
+- DB latency polling is now sequential (next poll scheduled after current request completion) to avoid overlap-induced sampling jitter
+- DB latency polling interval remains at `5s` after testing
+- DB client `idle_timeout` increased from `5` to `30` seconds to reduce reconnect spikes under periodic polling
+- backend timing logs now respect `DEV_API_DEBUG_LOGS` (aligned behavior for `[DEBUG]` timing output)
+
 ## [1.2.3] - 2026-03-23
 
 ### Changed
