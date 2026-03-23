@@ -8,6 +8,50 @@ const PROFILE_REQUEST_TIMEOUT_MS = 15000
 const PROFILE_RETRY_DELAY_MS = 250
 const PROFILE_QUICK_ABORT_THRESHOLD_MS = 1200
 
+const areSocialListsEqual = (
+  current: ProfileData['socials'],
+  next: ProfileData['socials']
+) => {
+  if (current.length !== next.length) return false
+  return current.every((item, index) => {
+    const other = next[index]
+    return (
+      item?.name === other?.name &&
+      item?.url === other?.url &&
+      item?.icon === other?.icon
+    )
+  })
+}
+
+const areProfilesEqual = (current: ProfileData | null, next: ProfileData) => {
+  if (!current) return false
+  if (
+    current.name !== next.name ||
+    current.photo !== next.photo ||
+    current.email !== next.email ||
+    current.cv !== next.cv ||
+    current.greeting !== next.greeting ||
+    current.location !== next.location ||
+    current.bio !== next.bio
+  ) {
+    return false
+  }
+
+  if (
+    current.university.name !== next.university.name ||
+    current.university.logo !== next.university.logo
+  ) {
+    return false
+  }
+
+  if (current.roles.length !== next.roles.length) return false
+  if (!current.roles.every((role, index) => role === next.roles[index])) {
+    return false
+  }
+
+  return areSocialListsEqual(current.socials, next.socials)
+}
+
 export function ProfileProvider({ children }: ProviderProps) {
   const { lang } = useLanguage()
   const [profile, setProfile] = useState<ProfileData | null>(null)
@@ -93,7 +137,11 @@ export function ProfileProvider({ children }: ProviderProps) {
         }
 
         if (!controller.signal.aborted && attempt.ok && attempt.data) {
-          setProfile(attempt.data)
+          setProfile((current) =>
+            areProfilesEqual(current, attempt.data as ProfileData)
+              ? current
+              : (attempt.data as ProfileData)
+          )
         }
       } catch (error) {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {

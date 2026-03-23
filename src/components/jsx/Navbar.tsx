@@ -4,10 +4,16 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
 import { useLanguage } from '../../context/useLanguage'
 import { useProfile } from '../../context/useProfile'
+import heroFallback from '../../data/heroFallback.json'
 import type { NavbarLink } from '../../types/app.js'
 import LanguageSwitcher from './LanguageSwitcher'
 import ThemeToggle from './ThemeToggle'
 import '../css/Navbar.css'
+
+const NAVBAR_FALLBACK_NAME =
+  typeof heroFallback?.name === 'string' && heroFallback.name.trim().length > 0
+    ? heroFallback.name
+    : 'Portfolio'
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -21,7 +27,7 @@ function Navbar() {
   const isAdminIdentityLoading = isAdminRoute && authLoading && adminIdentity.length === 0
   const name = isAdminRoute
     ? adminIdentity || ' '
-    : profile?.name || 'Portfolio'
+    : profile?.name || NAVBAR_FALLBACK_NAME
   const cv = profile?.cv || '#'
   const showHomeLinks = pathname === '/home'
   const loginLabel = lang === 'it' ? 'Login admin' : 'Admin login'

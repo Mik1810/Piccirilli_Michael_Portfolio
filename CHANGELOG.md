@@ -11,6 +11,17 @@ The release discipline is intentionally lightweight:
 
 _No entries yet._
 
+## [1.1.1] - 2026-03-23
+
+### Added
+- a centralized hero fallback dataset in `src/data/heroFallback.json` (name, photo, socials, fallback roles, localized university badge)
+
+### Changed
+- hero fallback behavior on `/home` is now language-aware at switch time, so greeting/typing/university badge update immediately when locale changes
+- typing updates are now stabilized to avoid unnecessary re-typing when incoming DB data is equivalent to current state
+- navbar fallback branding now follows the same hero fallback source, keeping public identity consistent before DB hydration
+- fallback and DB social badges are rendered with a stable canonical order (`LinkedIn`, then `GitHub`) to avoid visual reorder jumps
+
 ## [1.1.0] - 2026-03-23
 
 ### Added

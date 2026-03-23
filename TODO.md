@@ -176,6 +176,7 @@ Fare un ultimo pass mirato sui colli di bottiglia rimasti, senza overengineering
 
 - `❌ Non fatto` ridurre dipendenze esterne chatty dove ha senso
 - `❌ Non fatto` fare un audit Lighthouse/Web Vitals finale
+- `❌ Non fatto [Priorità bassa]` valutare un endpoint bootstrap unico (`/api/bootstrap`) per ridurre ulteriormente i round-trip iniziali della homepage
 
 ### Priorità
 
@@ -437,18 +438,44 @@ Ridurre i casi in cui la homepage resta in skeleton per troppo tempo e richiede 
 ### Interventi residui
 
 - `✅ Fatto` avviare fetch contenuti in parallelo in `ContentContext`, eliminando la cascata sequenziale (con concorrenza controllata)
-- `🟡 Partial` separare stati `loading`, `error` e `empty` nei componenti pubblici (About/Projects/Skills/Experience), evitando `empty => skeleton` (loading/empty stabilizzati; error state UI ancora migliorabile)
+- `✅ Fatto` separare stati `loading`, `error` e `empty` nei componenti pubblici (About/Projects/Skills/Experience), evitando `empty => skeleton`
 - `✅ Fatto` disaccoppiare la homepage pubblica dal bootstrap admin/sessione, evitando blocchi iniziali non necessari su `/home`
-- `🟡 Partial` introdurre error state esplicito lato UI quando una fetch fallisce o va in timeout (presente fallback sezionale, manca una surface error uniforme cross-sezione)
+- `✅ Fatto` introdurre error state esplicito lato UI quando una fetch fallisce o va in timeout (surface uniforme sezionale con azione `Riprova`)
 - `✅ Fatto` ritarare timeout client con gestione abort più robusta (retry breve su abort rapidi senza aumentare il timeout hard da 15s)
-- `❌ Non fatto` valutare endpoint bootstrap unico per homepage (`/api/bootstrap`) per ridurre round-trip iniziali
-- `🟡 Partial` valutare ottimizzazioni query lato server sui path piu` lenti (telemetria tempi introdotta, warmup dev e cancellazione cooperativa su abort; resta da decidere eventuale accorpamento endpoint)
+- `✅ Fatto` consolidare ottimizzazioni lato server/dev sui path lenti (telemetria tempi, warmup opzionale locale, cancellazione cooperativa su abort, dispatch stabile dev)
+
+### Stato
+
+- `✅ Chiuso formalmente` stabilizzazione homepage completata per il perimetro definito; eventuali extra rimangono nel backlog performance come rifiniture opzionali
 
 ### Priorità
 
 Alta
 
 ### Effort
+Medio
+
+---
+
+## 16. Ottimizzazione caricamento immagini
+
+### Obiettivo
+
+Ridurre la latenza percepita legata agli asset media dei progetti senza cambiare l'architettura SPA.
+
+### Interventi residui
+
+- `❌ Non fatto [Priorità bassa]` rendere più aggressivo il lazy loading delle immagini fuori viewport
+- `❌ Non fatto [Priorità bassa]` ridurre il burst iniziale delle fetch immagini (batch più piccoli o preload più graduale)
+- `❌ Non fatto [Priorità bassa]` fare una passata di ricompressione mirata sui file media più pesanti
+- `❌ Non fatto [Priorità bassa]` valutare `srcset/sizes` per limitare download sovradimensionati su viewport piccoli
+
+### Priorità
+
+Bassa
+
+### Effort
+
 Medio
 
 

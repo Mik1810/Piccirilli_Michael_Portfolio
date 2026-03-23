@@ -1,5 +1,15 @@
 # SESSION
 
+## Aggiornamento release 1.1.1 (2026-03-23)
+
+- Consolidato fallback hero in `src/data/heroFallback.json` per evitare costanti sparse nei componenti.
+- Stabilizzato il comportamento di fallback/idratazione su `/home`:
+  - switch lingua immediato su greeting, typing e badge universita`.
+  - riduzione dei refresh non necessari quando i dati DB sono semanticamente uguali.
+  - ordine social coerente tra fallback e DB (`LinkedIn` -> `GitHub`).
+- Allineato fallback branding navbar al profilo hero pre-hydration.
+- Preparato bump versione da `1.1.0` a `1.1.1` con aggiornamento changelog.
+
 ## Sessione
 
 - Data inizio: `2026-03-14`

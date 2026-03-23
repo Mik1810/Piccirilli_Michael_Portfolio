@@ -1,14 +1,50 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLanguage } from '../../context/useLanguage'
 import { useProfile } from '../../context/useProfile'
+import heroFallback from '../../data/heroFallback.json'
 import icons from '../../data/icons'
 import type { HeroTypingAnimationProps } from '../../types/app.js'
 import '../css/HeroTyping.css'
 
 const EMPTY_ROLES: string[] = []
-const DEFAULT_HERO_PHOTO = '/imgs/michael.jpg'
-const DEFAULT_HERO_NAME = 'Michael Piccirilli'
+
+interface HeroFallbackData {
+  name: string
+  photo: string
+  roles: {
+    it: string
+    en: string
+  }
+  university: {
+    logo: string
+    name: {
+      it: string
+      en: string
+    }
+  }
+  socials: Array<{
+    name: string
+    url: string
+    icon: string
+  }>
+}
+
+const FALLBACK_HERO = heroFallback as HeroFallbackData
+const HERO_SOCIAL_PRIORITY: Record<string, number> = {
+  linkedin: 0,
+  github: 1,
+}
+
+const orderHeroSocials = (
+  socials: Array<{ name: string; url: string; icon: string }>
+) =>
+  [...socials].sort((a, b) => {
+    const pa = HERO_SOCIAL_PRIORITY[a.icon] ?? 99
+    const pb = HERO_SOCIAL_PRIORITY[b.icon] ?? 99
+    if (pa !== pb) return pa - pb
+    return a.name.localeCompare(b.name)
+  })
 
 function HeroPortrait({
   photo,
@@ -56,23 +92,15 @@ function HeroPortrait({
   )
 }
 
-function HeroTypingSkeletonText() {
-  return (
-    <div className="hero-typing-text hero-skeleton-text" aria-hidden="true">
-      <div className="hero-skeleton-line hero-skeleton-line-sm" />
-      <div className="hero-skeleton-line hero-skeleton-line-xl" />
-      <div className="hero-skeleton-line hero-skeleton-line-md" />
-      <div className="hero-skeleton-badge" />
-      <div className="hero-typing-actions">
-        <span className="hero-skeleton-btn" />
-        <span className="hero-skeleton-btn hero-skeleton-btn-outline" />
-      </div>
-      <div className="hero-typing-socials">
-        <span className="hero-skeleton-icon" />
-        <span className="hero-skeleton-icon" />
-      </div>
-    </div>
-  )
+interface HeroTypingAnimationTextProps
+  extends Omit<HeroTypingAnimationProps, 'photo'> {
+  fallbackRole: string
+  languageKey: string
+}
+
+const areRoleListsEqual = (current: string[], next: string[]) => {
+  if (current.length !== next.length) return false
+  return current.every((role, index) => role === next[index])
 }
 
 function HeroTypingAnimationText({
@@ -83,14 +111,46 @@ function HeroTypingAnimationText({
   greeting,
   uniName,
   t,
-}: Omit<HeroTypingAnimationProps, 'photo'>) {
+  fallbackRole,
+  languageKey,
+}: HeroTypingAnimationTextProps) {
+  const roleSource = useMemo(
+    () => (roles.length > 0 ? roles : [fallbackRole || FALLBACK_HERO.roles.en]),
+    [roles, fallbackRole]
+  )
+  const [activeRoles, setActiveRoles] = useState<string[]>(roleSource)
+  const [pendingRoles, setPendingRoles] = useState<string[] | null>(null)
   const [roleIndex, setRoleIndex] = useState(0)
   const [roleCharIndex, setRoleCharIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
   const [hasRoleRendered, setHasRoleRendered] = useState(false)
 
   useEffect(() => {
-    const currentRole = roles[roleIndex]
+    if (areRoleListsEqual(activeRoles, roleSource)) return
+    setPendingRoles(roleSource)
+  }, [activeRoles, roleSource])
+
+  useEffect(() => {
+    setActiveRoles([fallbackRole || FALLBACK_HERO.roles.en])
+    setPendingRoles(null)
+    setRoleIndex(0)
+    setRoleCharIndex(0)
+    setIsDeleting(false)
+  }, [languageKey, fallbackRole])
+
+  useEffect(() => {
+    if (!pendingRoles) return
+    if (!isDeleting || roleCharIndex !== 0) return
+
+    setActiveRoles(pendingRoles)
+    setPendingRoles(null)
+    setRoleIndex(0)
+    setRoleCharIndex(0)
+    setIsDeleting(false)
+  }, [pendingRoles, isDeleting, roleCharIndex])
+
+  useEffect(() => {
+    const currentRole = activeRoles[roleIndex]
     if (!currentRole) return
 
     let timeout: number | ReturnType<typeof setTimeout> | undefined
@@ -107,18 +167,25 @@ function HeroTypingAnimationText({
     } else if (isDeleting && roleCharIndex === 0) {
       timeout = setTimeout(() => {
         setIsDeleting(false)
-        setRoleIndex((roleIndex + 1) % roles.length)
+        setRoleIndex((roleIndex + 1) % activeRoles.length)
       }, 120)
     }
 
     return () => clearTimeout(timeout)
-  }, [roleCharIndex, isDeleting, roleIndex, roles])
+  }, [roleCharIndex, isDeleting, roleIndex, activeRoles])
 
-  const displayRole = roles[roleIndex]
-    ? roles[roleIndex].substring(0, roleCharIndex)
+  useEffect(() => {
+    if (roleIndex < activeRoles.length) return
+    setRoleIndex(0)
+    setRoleCharIndex(0)
+    setIsDeleting(false)
+  }, [roleIndex, activeRoles.length])
+
+  const displayRole = activeRoles[roleIndex]
+    ? activeRoles[roleIndex].substring(0, roleCharIndex)
     : ''
   const showRolePlaceholder =
-    roles.length > 0 && !hasRoleRendered && displayRole.length === 0
+    activeRoles.length > 0 && !hasRoleRendered && displayRole.length === 0
 
   return (
     <div className="hero-typing-text">
@@ -180,39 +247,49 @@ function HeroTypingAnimationText({
 function HeroTyping() {
   const { t, lang } = useLanguage()
   const { profile, loading: profileLoading } = useProfile()
-  const nameText = profile?.name || DEFAULT_HERO_NAME
-  const photo = profile?.photo || DEFAULT_HERO_PHOTO
-  const university = profile?.university || { logo: '', name: '' }
-  const socials = Array.isArray(profile?.socials) ? profile.socials : []
-  const roles = Array.isArray(profile?.roles) ? profile.roles : EMPTY_ROLES
-  const greeting = profile?.greeting || t('hero.greeting')
-  const uniName = university.name || ''
-  const animationKey = `${lang}:${nameText}:${roles.join('|')}`
-  const isReady = !profileLoading
-  const portraitAlt = nameText || DEFAULT_HERO_NAME
+  const nameText = profile?.name || FALLBACK_HERO.name
+  const photo = profile?.photo || FALLBACK_HERO.photo
+  const fallbackUniversityName =
+    lang === 'it'
+      ? FALLBACK_HERO.university.name.it
+      : FALLBACK_HERO.university.name.en
+  const university = {
+    logo: profile?.university?.logo || FALLBACK_HERO.university.logo,
+    name: profileLoading
+      ? fallbackUniversityName
+      : profile?.university?.name || fallbackUniversityName,
+  }
+  const socials =
+    Array.isArray(profile?.socials) && profile.socials.length > 0
+      ? orderHeroSocials(profile.socials)
+      : orderHeroSocials(FALLBACK_HERO.socials)
+  const roles =
+    profileLoading || !Array.isArray(profile?.roles) ? EMPTY_ROLES : profile.roles
+  const greeting = profileLoading ? t('hero.greeting') : profile?.greeting || t('hero.greeting')
+  const fallbackRole =
+    lang === 'it' ? FALLBACK_HERO.roles.it : FALLBACK_HERO.roles.en
+  const uniName = university.name
+  const portraitAlt = nameText || FALLBACK_HERO.name
 
   return (
     <section id="hero" className="hero-typing">
       <div className="hero-typing-container hero-animate">
-        {isReady ? (
-          <HeroTypingAnimationText
-            key={animationKey}
-            nameText={nameText}
-            roles={roles}
-            university={university}
-            socials={socials}
-            greeting={greeting}
-            uniName={uniName}
-            t={t}
-          />
-        ) : (
-          <HeroTypingSkeletonText />
-        )}
+        <HeroTypingAnimationText
+          nameText={nameText}
+          roles={roles}
+          university={university}
+          socials={socials}
+          greeting={greeting}
+          uniName={uniName}
+          t={t}
+          fallbackRole={fallbackRole}
+          languageKey={lang}
+        />
         <HeroPortrait
           photo={photo}
           alt={portraitAlt}
-          contentReady={isReady}
-          ariaHidden={!isReady}
+          contentReady={Boolean(photo)}
+          ariaHidden={false}
         />
       </div>
     </section>
