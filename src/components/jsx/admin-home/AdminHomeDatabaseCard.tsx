@@ -16,7 +16,6 @@ interface AdminHomeDatabaseCardProps {
   statusLabel: string
   latencyLabel: string
   checkedAtLabel: string
-  totalSamples: number
   trendViewMode: 'window' | 'session'
   onTrendViewModeChange: (mode: 'window' | 'session') => void
   latencyTrend: Array<{
@@ -68,12 +67,11 @@ function AdminHomeDatabaseCard({
   statusLabel,
   latencyLabel,
   checkedAtLabel,
-  totalSamples,
   trendViewMode,
   onTrendViewModeChange,
   latencyTrend,
 }: AdminHomeDatabaseCardProps) {
-  const trendData: LatencyTrendPoint[] = latencyTrend.map((sample) => {
+  const trendData: LatencyTrendPoint[] = latencyTrend.map((sample, index) => {
     const timestampMs = new Date(sample.timestamp).getTime()
     const latencyValue = sample.latencyMs
     const overThreshold =
@@ -81,7 +79,7 @@ function AdminHomeDatabaseCard({
 
     return {
       label: formatTrendLabel(sample.timestamp),
-      timestampMs: Number.isNaN(timestampMs) ? Date.now() : timestampMs,
+      timestampMs: Number.isNaN(timestampMs) ? index : timestampMs,
       latencyMs: latencyValue,
       timestamp: sample.timestamp,
       overThreshold,

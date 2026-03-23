@@ -13,6 +13,7 @@ const child = spawn(tsxBin, ['watch', 'lib/devApiServer.ts'], {
   env: {
     ...process.env,
     DEV_API_PARENT_START_MS: String(parentStartedAtMs),
+    DEV_API_STARTUP_TIMING: 'true',
   },
 })
 

@@ -13,7 +13,7 @@
   - nuovo flag `DEV_API_DEBUG_LOGS` separato da `DEV_API_WARMUP`
   - log `ready` sempre disponibile anche con debug disattivato
   - log bootstrap semplificati con elapsed chiaro
-- Introdotto `npm run dev:apilog` con launcher dedicato per misurare l’overhead startup di `tsx watch` (`tsxWatchOverheadMs` + total elapsed).
+- Introdotto `npm run dev:api:log` con launcher dedicato per misurare l’overhead startup di `tsx watch` (`tsxWatchOverheadMs` + total elapsed).
 - Aggiunto `.env.example` con variabili runtime/dev principali senza secret.
 - `Admin health` ora mostra in locale commit/branch reali tramite fallback Git quando le variabili deploy non sono esposte.
 - Allineata la documentazione:

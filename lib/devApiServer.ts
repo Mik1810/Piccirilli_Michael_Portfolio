@@ -9,9 +9,15 @@ const port = appEnv.apiPort
 const debugLogsEnabled = appEnv.devApiDebugLogs
 const serverBootStartedAt = Date.now()
 const serverBootStartedAtIso = new Date(serverBootStartedAt).toISOString()
+const startupTimingEnabled =
+  process.env.DEV_API_STARTUP_TIMING === '1' ||
+  process.env.DEV_API_STARTUP_TIMING === 'true' ||
+  process.env.DEV_API_STARTUP_TIMING === 'yes'
 const parentStartMs = Number(process.env.DEV_API_PARENT_START_MS || '')
-const hasParentStart = Number.isFinite(parentStartMs) && parentStartMs > 0
-const tsxWatchOverheadMs = hasParentStart ? serverBootStartedAt - parentStartMs : null
+const hasParentStart =
+  startupTimingEnabled && Number.isFinite(parentStartMs) && parentStartMs > 0
+const tsxWatchOverheadMs =
+  startupTimingEnabled && hasParentStart ? serverBootStartedAt - parentStartMs : null
 let requestCounter = 0
 const publicRouteSet = new Set([
   'about',
@@ -33,10 +39,12 @@ interface DevApiRequest {
   signal?: AbortSignal
 }
 
-console.log('[dev-api] bootstrap.start', {
-  startedAt: serverBootStartedAtIso,
-  ...(tsxWatchOverheadMs !== null ? { tsxWatchOverheadMs } : {}),
-})
+if (startupTimingEnabled) {
+  console.log('[dev-api] bootstrap.start', {
+    startedAt: serverBootStartedAtIso,
+    ...(tsxWatchOverheadMs !== null ? { tsxWatchOverheadMs } : {}),
+  })
+}
 
 const resolveHandler = (pathname: string) => {
   const parts = pathname.split('/').filter(Boolean)
@@ -208,19 +216,30 @@ server.listen(port, () => {
   console.log(`[dev-api] listening on http://localhost:${port}`)
   if (!appEnv.devApiWarmup) {
     if (debugLogsEnabled) {
-      const readyAtMs = Date.now()
       console.info('[DEBUG] dev-api.ready', {
         message:
           'Dev API pronta senza warmup (imposta DEV_API_WARMUP=true per abilitarlo).',
-        elapsedMs: readyAtMs - serverBootStartedAt,
-        ...(hasParentStart ? { totalElapsedMs: readyAtMs - parentStartMs } : {}),
+        ...(startupTimingEnabled
+          ? {
+              elapsedMs: Date.now() - serverBootStartedAt,
+              ...(hasParentStart
+                ? { totalElapsedMs: Date.now() - parentStartMs }
+                : {}),
+            }
+          : {}),
       })
     }
     if (!debugLogsEnabled) {
-      const readyAtMs = Date.now()
-      console.log(
-        `[dev-api] ready (warmup disabled, elapsed ${readyAtMs - serverBootStartedAt}ms${hasParentStart ? `, total ${readyAtMs - parentStartMs}ms` : ''}). Set DEV_API_WARMUP=true to enable startup warmup.`
-      )
+      if (startupTimingEnabled) {
+        const readyAtMs = Date.now()
+        console.log(
+          `[dev-api] ready (warmup disabled, elapsed ${readyAtMs - serverBootStartedAt}ms${hasParentStart ? `, total ${readyAtMs - parentStartMs}ms` : ''}). Set DEV_API_WARMUP=true to enable startup warmup.`
+        )
+      } else {
+        console.log(
+          '[dev-api] ready (warmup disabled). Set DEV_API_WARMUP=true to enable startup warmup.'
+        )
+      }
     }
     return
   }
@@ -282,14 +301,22 @@ server.listen(port, () => {
       const readyAtMs = Date.now()
       console.info('[DEBUG] dev-api.warmup.ready', {
         message: 'Warmup completato: puoi aprire /home',
-        bootDurationMs: readyAtMs - serverBootStartedAt,
-        ...(hasParentStart ? { totalElapsedMs: readyAtMs - parentStartMs } : {}),
+        ...(startupTimingEnabled
+          ? {
+              bootDurationMs: readyAtMs - serverBootStartedAt,
+              ...(hasParentStart ? { totalElapsedMs: readyAtMs - parentStartMs } : {}),
+            }
+          : {}),
       })
     } else {
-      const readyAtMs = Date.now()
-      console.log(
-        `[dev-api] ready (warmup completed, elapsed ${readyAtMs - serverBootStartedAt}ms${hasParentStart ? `, total ${readyAtMs - parentStartMs}ms` : ''}): puoi aprire /home`
-      )
+      if (startupTimingEnabled) {
+        const readyAtMs = Date.now()
+        console.log(
+          `[dev-api] ready (warmup completed, elapsed ${readyAtMs - serverBootStartedAt}ms${hasParentStart ? `, total ${readyAtMs - parentStartMs}ms` : ''}): puoi aprire /home`
+        )
+      } else {
+        console.log('[dev-api] ready (warmup completed): puoi aprire /home')
+      }
     }
   })()
 })

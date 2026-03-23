@@ -429,14 +429,14 @@ When no owned domain is available yet, the initial contact-flow setup can use Re
 ```bash
 npm run dev
 npm run dev:api
-npm run dev:apilog
+npm run dev:api:log
 npm run dev:fast
 npm run dev:vercel
 ```
 
 Note for local DX:
 - `npm run dev:fast` supports optional API warmup via `DEV_API_WARMUP=true` (default: disabled).
-- `npm run dev:api` starts the plain `tsx watch` runtime; `npm run dev:apilog` starts the instrumented launcher that reports `tsxWatchOverheadMs` and total startup elapsed.
+- `npm run dev:api` starts the plain `tsx watch` runtime; `npm run dev:api:log` starts the instrumented launcher that reports `tsxWatchOverheadMs` and total startup elapsed.
 - dev API backend logs can be toggled with `DEV_API_DEBUG_LOGS=true|false`.
 - frontend debug logs are disabled by default and can be enabled explicitly with `VITE_DEBUG_LOGS=true`.
 - with warmup enabled, wait for `dev-api.warmup.ready` before evaluating first-load behavior on `/home`.

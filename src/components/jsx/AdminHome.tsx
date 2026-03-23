@@ -404,7 +404,6 @@ function AdminHome({ forceSkeleton = false }: AdminHomeProps) {
           latencyLabel={latencyLabel}
           checkedAtLabel={checkedAtLabel}
           latencyTrend={visibleDbLatencyTrend}
-          totalSamples={dbLatencyTrend.length}
           trendViewMode={dbLatencyViewMode}
           onTrendViewModeChange={setDbLatencyViewMode}
         />

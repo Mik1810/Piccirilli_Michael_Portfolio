@@ -20,18 +20,18 @@ _No entries yet._
   - `Over threshold` counter and explicit 1000ms threshold reference line
   - red highlight on the line only for the segment portions above threshold
   - `Latest latency` and `Average latency` summary tiles
-- new local dev script `npm run dev:apilog` to measure startup with a launcher and report `tsxWatchOverheadMs` and total elapsed
+- new local dev script `npm run dev:api:log` to measure startup with a launcher and report `tsxWatchOverheadMs` and total elapsed
 - `.env.example` template with safe placeholders for runtime/dev flags and required secrets
 
 ### Changed
-- `npm run dev:api` now remains the plain `tsx watch` command, while startup timing instrumentation is isolated to `dev:apilog`
+- `npm run dev:api` now remains the plain `tsx watch` command, while startup timing instrumentation is isolated to `dev:api:log`
 - dev API startup logs were simplified to reduce noise and keep `bootstrap.start`, `listening`, and `ready` output concise
 - README expanded and aligned with:
   - operational quickstart
   - app/admin/tests/deploy map
   - status snapshot and architecture-at-a-glance
   - explicit test strategy and dedicated UI-test workflow follow-up
-  - updated commands/env docs for `DEV_API_DEBUG_LOGS` and `dev:apilog`
+  - updated commands/env docs for `DEV_API_DEBUG_LOGS` and `dev:api:log`
 - TODO roadmap updated with:
   - explicit frontend UI/component test item plus dedicated GitHub Action follow-up
   - low-priority legal/privacy evaluation for optional access logging table
