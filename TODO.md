@@ -373,7 +373,7 @@ Rendere il rate limiting e i controlli di sicurezza robusti anche in ambienti mu
 ### Interventi residui
 
 - `✅ Fatto` documentati i limiti del rate limiting process-local e il comportamento in ambienti multi-instance/serverless
-- `🟡 Partial` introdotta una modalita` distribuita opzionale Redis (`RATE_LIMIT_MODE=redis`), mantenendo fallback in-memory; resta da consolidare rollout operativo (env production, monitoraggio e policy fail-open/fail-closed)
+- `✅ Fatto` introdotta modalita` distribuita Redis (`RATE_LIMIT_MODE=redis`) con fallback in-memory resiliente, env production configurate e verifica operativa effettuata su produzione
 
 ### Priorità
 

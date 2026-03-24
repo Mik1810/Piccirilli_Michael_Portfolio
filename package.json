@@ -60,8 +60,8 @@
     "preview": "vite preview",
     "test:db": "vitest run tests/api/publicEndpoints.test.ts",
     "test:db:watch": "vitest tests/api/publicEndpoints.test.ts",
-    "test:api:handlers": "vitest run tests/api",
-    "test:repositories": "vitest run tests/repositories",
+    "test:api:handlers": "DEV_API_DEBUG_LOGS=false vitest run tests/api",
+    "test:repositories": "DEV_API_DEBUG_LOGS=false vitest run tests/repositories",
     "test:api": "npm run test:api:handlers && npm run test:repositories",
     "test:api:watch": "vitest"
   }

@@ -107,7 +107,7 @@ npm run build
 | Public homepage loading stability | Done | TODO point 15 formally closed |
 | Admin health/observability | Partial | DB latency chart done, chart policy/UX refinement still open |
 | UI/component automated tests | Open | API/repository tests available, UI test layer pending |
-| Distributed rate limiting | Partial | Redis-backed mode available (`RATE_LIMIT_MODE=redis`) with in-memory fallback |
+| Distributed rate limiting | Done | Redis-backed mode active in production (`RATE_LIMIT_MODE=redis`) with resilient in-memory fallback |
 
 ## Operational Map (App/Admin/Tests/Deploy)
 
