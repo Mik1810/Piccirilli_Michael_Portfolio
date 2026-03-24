@@ -2,6 +2,36 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 const isAdminAssetName = (name = '') => /admin/i.test(name)
+const getManualChunk = (id = '') => {
+  if (!id.includes('node_modules')) return undefined
+
+  if (
+    id.includes('/react/') ||
+    id.includes('/react-dom/') ||
+    id.includes('/scheduler/')
+  ) {
+    return 'vendor-react'
+  }
+
+  if (id.includes('/react-router-dom/') || id.includes('/react-router/')) {
+    return 'vendor-router'
+  }
+
+  if (
+    id.includes('/recharts/') ||
+    id.includes('/d3-') ||
+    id.includes('/internmap/') ||
+    id.includes('/robust-predicates/')
+  ) {
+    return 'vendor-charts'
+  }
+
+  if (id.includes('/zod/') || id.includes('/clsx/')) {
+    return 'vendor-utils'
+  }
+
+  return 'vendor'
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,6 +41,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       output: {
+        manualChunks: getManualChunk,
         chunkFileNames: (chunkInfo) =>
           isAdminAssetName(chunkInfo.name)
             ? 'assets/admin-[hash].js'

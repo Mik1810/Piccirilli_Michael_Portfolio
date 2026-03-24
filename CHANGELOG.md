@@ -11,6 +11,21 @@ The release discipline is intentionally lightweight:
 
 _No entries yet._
 
+## [1.2.12] - 2026-03-24
+
+### Changed
+- improved Vite production chunking in `vite.config.js` using `build.rollupOptions.output.manualChunks`:
+  - split vendor bundles into `vendor-react`, `vendor-router`, `vendor-charts`, `vendor-utils`, and fallback `vendor`
+  - reduced primary app chunk size and removed the `>500 kB` chunk warning in build output
+- roadmap updates in `TODO.md`:
+  - promoted tooling upgrade and structural refactor items to high priority
+  - added and completed the Vercel build warning remediation item
+
+### Verified
+- performed A/B local build verification:
+  - without manual chunking: single `index-*` chunk around `~997 kB` and Vite warning triggered
+  - with manual chunking restored: warning removed and chunk sizes redistributed across vendor bundles
+
 ## [1.2.11] - 2026-03-24
 
 ### Changed

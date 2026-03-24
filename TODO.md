@@ -77,11 +77,12 @@ Ridurre il lavoro manuale di manutenzione e aumentare la visibilità operativa d
   - changelog minimo
   - tag coerenti con le versioni
 - `✅ Fatto` applicato lo stesso pattern di router unico anche agli endpoint pubblici tramite `api/home`, mantenendo invariati i path HTTP esistenti (`/api/profile`, `/api/about`, ecc.)
-- `❌ Non fatto` pianificare upgrade coordinati dei principali stack di tooling (per esempio ESLint e Vite), verificando la compatibilità tra dipendenze prima del merge
+- `❌ Non fatto [Priorità alta]` pianificare upgrade coordinati dei principali stack di tooling (per esempio ESLint e Vite), verificando la compatibilità tra dipendenze prima del merge
 - `❌ Non fatto` valutare una tabella di logging accessi/connessioni al sito (solo dati minimi), con verifica preventiva legale/privacy e compliance GDPR prima di qualsiasi implementazione
-- `❌ Non fatto` valutare un refactor della struttura cartelle componenti/CSS per migliorare coesione e manutenibilità
-- `❌ Non fatto` valutare refactor dei componenti troppo grandi, estraendo sottocomponenti dove utile
-- `❌ Non fatto` valutare l'estrazione degli hook locali dei componenti in una cartella condivisa `hooks` dove ha senso
+- `❌ Non fatto [Priorità alta]` valutare un refactor della struttura cartelle componenti/CSS (jsx + css) per migliorare coesione e manutenibilità
+- `❌ Non fatto [Priorità alta]` valutare refactor dei componenti troppo grandi, estraendo sottocomponenti dove utile
+- `❌ Non fatto [Priorità alta]` valutare l'estrazione degli hook locali dei componenti in una cartella condivisa `hooks` dove ha senso
+- `✅ Fatto` risolti i warning di chunk size in build Vercel tramite `manualChunks` in `vite.config.js` (split vendor React/Router/Charts/Utils e riduzione del chunk `index-*` sotto soglia warning)
 
 ### Priorità
 

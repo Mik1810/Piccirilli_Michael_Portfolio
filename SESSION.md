@@ -1,5 +1,20 @@
 # SESSION
 
+## Aggiornamento release 1.2.12 (2026-03-24)
+
+- Risolto il warning Vite/Vercel sui chunk oltre soglia (`>500 kB`) tramite `manualChunks` in [vite.config.js](./vite.config.js):
+  - `vendor-react`
+  - `vendor-router`
+  - `vendor-charts`
+  - `vendor-utils`
+  - `vendor` fallback
+- Eseguita verifica comparativa locale:
+  - senza `manualChunks`: chunk unico `index-*` ~`996.99 kB` con warning attivo
+  - con `manualChunks` ripristinato: warning rimosso e split vendor stabile
+- Aggiornato [TODO.md](./TODO.md):
+  - alzate a priorita` alta le voci tooling/refactor (stack upgrade, cartelle componenti/CSS, split componenti, hooks condivisi)
+  - aggiunta e chiusura voce dedicata alla risoluzione warning build Vercel
+
 ## Aggiornamento release 1.2.11 (2026-03-24)
 
 - Rifinito il movimento del portrait hero:
