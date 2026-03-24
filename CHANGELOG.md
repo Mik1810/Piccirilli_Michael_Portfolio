@@ -11,6 +11,18 @@ The release discipline is intentionally lightweight:
 
 _No entries yet._
 
+## [1.2.8] - 2026-03-24
+
+### Added
+- public hero now exposes a dedicated `Site live` status badge with online/offline visual states, including a green variant when the client is online
+
+### Changed
+- GitHub project lightbox mobile controls refined:
+  - close/navigation buttons now use more stable touch targets
+  - reduced control resizing/position drift on small viewports
+  - improved mobile stage sizing behavior with consistent aspect-ratio constraints
+- roadmap status updated for UI/UX section 9 (`site-live` badge + mobile lightbox controls now marked done)
+
 ## [1.2.7] - 2026-03-24
 
 ### Changed

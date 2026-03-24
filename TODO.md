@@ -305,8 +305,8 @@ Rendere l’esperienza utente più curata e accessibile, con attenzione a dettag
 ### Interventi residui
 
 - `🟡 Partial` migliorare lo stile dei tag (project-tag, about-interest-tag) per maggiore visibilità e coerenza visiva
-- `❌ Non fatto` rendere il badge "site-live" verde se il sito è online
-- `❌ Non fatto` sistemare il lightbox dei progetti GitHub su mobile: i bottoni di navigazione e chiusura si spostano/ridimensionano in modo non ottimale
+- `✅ Fatto` rendere il badge "site-live" verde se il sito è online
+- `✅ Fatto` sistemare il lightbox dei progetti GitHub su mobile: controlli close/nav stabilizzati con target touch coerenti e layout meno soggetto a ridimensionamenti/spostamenti
 - `❌ Non fatto [Priorità bassissima]` aggiungere un effetto CSS nella homepage del portfolio, per esempio una chiazza azzurro chiaro che sfuma/degrada allontanandosi dal centro del cursore
 
 ### Priorità

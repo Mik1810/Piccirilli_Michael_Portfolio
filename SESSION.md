@@ -3942,3 +3942,18 @@ pm run test:api.
   - `GET /api/admin/session` autenticato: ~0.23s-0.25s stabile
 - Conclusione operativa: nessuna anomalia backend persistente rilevata; differenza sul primo hit coerente con warmup.
 - Aggiornato lo stato roadmap in [TODO.md](./TODO.md) (punto login admin) e allineata metadata release a `1.2.7`.
+
+## 2026-03-24 02:10 CET - UI/UX #9: site-live badge + lightbox mobile controls (release 1.2.8)
+
+- Added a `Site live` status badge in the public hero section with online/offline states driven by browser connectivity (`navigator.onLine`, `online/offline` events).
+- Updated hero i18n labels (`hero.siteLive`) for both `it` and `en` locale maps.
+- Refined GitHub lightbox mobile behavior in [GithubProjectLightbox.css](./src/components/css/GithubProjectLightbox.css):
+  - stabilized close/prev/next button sizing on small screens
+  - improved mobile media-shell layout to reduce control drift and resize jumps
+  - added touch-friendly control behavior and safer viewport constraints
+- Updated roadmap status in [TODO.md](./TODO.md) for section `9. UI/UX e accessibilità`:
+  - `site-live` badge task -> done
+  - GitHub lightbox mobile controls task -> done
+- Validation executed:
+  - `npm run lint`
+  - `npm run typecheck`
