@@ -24,7 +24,7 @@ function GithubProjectLightbox({
   const showControls = images.length > 1
   const [initialImageSrc] = useState(imageSrc)
   const [layoutMode, setLayoutMode] = useState<'wide' | 'tall'>('wide')
-  const [hasImageError, setHasImageError] = useState(false)
+  const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null)
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
   const previousFocusRef = useRef<HTMLElement | null>(null)
@@ -99,10 +99,6 @@ function GithubProjectLightbox({
       previousFocusRef.current?.focus({ preventScroll: true })
     }
   }, [onClose, onNext, onPrev, showControls])
-
-  useEffect(() => {
-    setHasImageError(false)
-  }, [imageSrc])
 
   useEffect(() => {
     const probe = new window.Image()
@@ -210,7 +206,7 @@ function GithubProjectLightbox({
           )}
 
           <div className="github-project-lightbox-stage">
-            {hasImageError ? (
+            {failedImageSrc === imageSrc ? (
               <div
                 className="github-project-lightbox-fallback"
                 role="status"
@@ -226,8 +222,8 @@ function GithubProjectLightbox({
                 className="github-project-lightbox-image"
                 decoding="async"
                 fetchPriority="high"
-                onLoad={() => setHasImageError(false)}
-                onError={() => setHasImageError(true)}
+                onLoad={() => setFailedImageSrc(null)}
+                onError={() => setFailedImageSrc(imageSrc)}
               />
             )}
           </div>
