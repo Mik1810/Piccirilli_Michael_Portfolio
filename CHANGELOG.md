@@ -9,12 +9,25 @@ The release discipline is intentionally lightweight:
 
 ## [Unreleased]
 
+## [1.2.13] - 2026-04-01
+
 ### Changed
 - prepared the project for the custom production domain `https://michaelpiccirilli.it`:
   - updated runtime SEO metadata in `index.html` (`canonical`, Open Graph, Twitter card, JSON-LD)
   - updated crawler discovery files `public/robots.txt` and `public/sitemap.xml`
   - updated the live-site link in `README.md` to the new custom domain
   - documented the operational rollout and pending DNS activation steps in `TODO.md`
+- finalized operational domain/email rollout:
+  - completed Resend domain verification for `michaelpiccirilli.it`
+  - added baseline DMARC policy on the domain (`v=DMARC1; p=none;`)
+  - validated production end-to-end contact delivery (`From`/`Reply-To`/inbox arrival)
+  - aligned roadmap/session notes to the new post-verification state
+- refined contact submission behavior:
+  - relaxed contact body minimum lengths (`name` and `message` now require at least 1 character)
+  - added a provider-error fallback in `contactService` that retries with `onboarding@resend.dev` when sending with the custom domain sender fails
+  - removed `mailto:` links from the contact email template to avoid sender-domain URL mismatch warnings in deliverability checks
+- updated ignore rules:
+  - added `/domain` to `.gitignore`
 
 ## [1.2.12] - 2026-03-24
 

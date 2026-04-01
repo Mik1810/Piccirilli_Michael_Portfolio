@@ -28,6 +28,7 @@ dist-ssr
 .env.local
 .vercel
 /dump
+/domain
 
 # Exclude the vscode workspace
 *.code-workspace

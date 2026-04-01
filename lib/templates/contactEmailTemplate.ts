@@ -25,9 +25,7 @@ const CONTACT_EMAIL_TEMPLATE = String.raw`
         </tr>
         <tr>
           <td style="width:132px;padding:0;vertical-align:top;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7f97b2;">{{labelEmail}}</td>
-          <td style="padding:0;font-size:16px;">
-            <a href="mailto:{{emailHref}}" style="color:#7dd3fc;text-decoration:none;">{{email}}</a>
-          </td>
+          <td style="padding:0;color:#7dd3fc;font-size:16px;">{{email}}</td>
         </tr>
       </table>
       <div style="border:1px solid #1f3550;border-radius:18px;background:linear-gradient(180deg,#08111e 0%,#0a1626 100%);overflow:hidden;">
@@ -104,7 +102,6 @@ export const renderContactEmailTemplate = ({
     footerNote: escapeHtml(copy.footerNote),
     name: escapeHtml(name),
     email: escapeHtml(email),
-    emailHref: escapeHtml(email),
     message: escapeHtml(message),
   })
 }

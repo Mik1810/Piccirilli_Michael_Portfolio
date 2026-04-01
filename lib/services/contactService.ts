@@ -13,6 +13,7 @@ export interface ContactMessageInput {
 }
 
 const CONTACT_SEND_TIMEOUT_MS = 12000
+const RESEND_TEST_FALLBACK_FROM_EMAIL = 'onboarding@resend.dev'
 
 let resendClient: Resend | null = null
 
@@ -94,13 +95,34 @@ export const sendContactMessage = async (payload: ContactMessageInput) => {
     CONTACT_SEND_TIMEOUT_MS
   )
 
-  if (error) {
-    throw new HttpError(502, 'Unable to deliver message right now', {
-      code: 'contact_delivery_failed',
-    })
+  if (!error) {
+    return {
+      id: data?.id ?? null,
+    }
   }
 
-  return {
-    id: data?.id ?? null,
+  // If the custom domain sender is temporarily not accepted, retry once with the Resend test sender.
+  if (contactFromEmail.toLowerCase() !== RESEND_TEST_FALLBACK_FROM_EMAIL) {
+    const fallbackAttempt = await withTimeout(
+      getResendClient().emails.send({
+        from: RESEND_TEST_FALLBACK_FROM_EMAIL,
+        to: [contactToEmail],
+        replyTo: payload.email,
+        subject: buildSubject(payload.locale, payload.name),
+        text: buildTextBody(payload),
+        html: renderContactEmailTemplate(payload),
+      }),
+      CONTACT_SEND_TIMEOUT_MS
+    )
+
+    if (!fallbackAttempt.error) {
+      return {
+        id: fallbackAttempt.data?.id ?? null,
+      }
+    }
   }
+
+  throw new HttpError(502, 'Unable to deliver message right now', {
+    code: 'contact_delivery_failed',
+  })
 }

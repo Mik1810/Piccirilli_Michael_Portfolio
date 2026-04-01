@@ -39,7 +39,7 @@ export const adminTableBodySchema = z
 
 export const contactBodySchema = z
   .object({
-    name: z.string().trim().min(2, 'Name is required').max(120, 'Name is too long'),
+    name: z.string().trim().min(1, 'Name is required').max(120, 'Name is too long'),
     email: z
       .string()
       .trim()
@@ -49,7 +49,7 @@ export const contactBodySchema = z
     message: z
       .string()
       .trim()
-      .min(10, 'Message is too short')
+      .min(1, 'Message is required')
       .max(4000, 'Message is too long'),
     locale: z.enum(['it', 'en']).default('it'),
     website: z.string().trim().max(0, 'Invalid request payload').default(''),

@@ -125,7 +125,8 @@ describe('Contact API', () => {
 
     expect(html).toContain('Hai ricevuto un nuovo messaggio dal form contatti del portfolio.')
     expect(html).toContain('Mario Rossi')
-    expect(html).toContain('mailto:mario@example.com')
+    expect(html).toContain('mario@example.com')
+    expect(html).not.toContain('mailto:')
     expect(html).toContain('Ciao Michael,\nparliamo del progetto.')
     expect(html).not.toContain('{{intro}}')
     expect(html).not.toContain('{{message}}')

@@ -1,5 +1,19 @@
 # SESSION
 
+## Aggiornamento dominio + contact sender (2026-04-01)
+
+- Completato il collegamento del dominio custom `michaelpiccirilli.it` su Vercel con configurazione operativa del root domain e redirect `www` verso root.
+- Completata la verifica dominio su Resend (`Domain verified`) per l'invio email applicativo.
+- Aggiornata la validazione contact form su [lib/http/requestSchemas.ts](./lib/http/requestSchemas.ts):
+  - `name` minimo ridotto da `2` a `1`
+  - `message` minimo ridotto da `10` a `1`
+- Aggiornato il servizio contatti in [lib/services/contactService.ts](./lib/services/contactService.ts):
+  - primo tentativo con `CONTACT_FROM_EMAIL`
+  - fallback automatico a `onboarding@resend.dev` in caso di errore provider sul mittente custom
+- Aggiornato template contatto in [lib/templates/contactEmailTemplate.ts](./lib/templates/contactEmailTemplate.ts): rimosso link `mailto:` per evitare warning di mismatch URL/sending-domain nella deliverability analysis.
+- Aggiunto record DMARC base nel DNS dominio (`v=DMARC1; p=none;`).
+- Validato flusso end-to-end in produzione (`From`/`Reply-To`/consegna): recapito confermato.
+
 ## Aggiornamento dominio custom (2026-03-30)
 
 - Avviata la migrazione documentale/runtime verso il dominio custom `michaelpiccirilli.it`.
